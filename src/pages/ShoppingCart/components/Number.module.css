@@ -1,0 +1,31 @@
+/* ============================== */
+.input_number {
+    --height: 25px;
+    width: 100px; height: var(--height);
+    display: grid; overflow: hidden;
+    grid-template-columns: 1fr 2fr 1fr;
+    border-top: 1px solid #777;
+    border-bottom: 1px solid #777;
+}
+
+/* ============================== */
+.input_number > input {
+    width: 100%;
+    padding: 2px; margin: 0 auto;
+    text-align: center; font-size: 15px;
+    border: none; outline: none;
+}
+.input_number > input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+}
+
+.input_number > button {
+    width: var(--height); height: var(--height); 
+    border: none; outline: none;
+    user-select: none; cursor: pointer;
+    background-color: inherit;
+    border-left: 1px solid #777;
+    border-right: 1px solid #777;
+}
+
+/* ============================== */

@@ -1,0 +1,53 @@
+/* 特性 */
+/* ============================== */
+.flex {
+    display: flex;
+}
+.grow {
+    flex-grow: 1;
+}
+
+/* svg */
+/* ============================== */
+.icon {
+    --size: 22px;
+    -webkit-user-drag: none; pointer-events: none;
+    width: var(--size); height: var(--size);
+}
+
+/* 純icon button */
+/* ============================== */
+.icon-button {
+    --size: 40px; --color: #0d6efd; --bgColor: white;
+    user-select: none; cursor: pointer; font-size: 13px;
+    width: var(--size); height: var(--size);
+    margin: 5px; border: none; border-radius: 10px;
+    color: var(--color); background-color: var(--bgColor);
+}
+.icon-button:hover {
+    color: var(--bgColor); background-color: var(--color);
+}
+
+/* 純文字 button */
+/* ============================== */
+.button {
+    --color: #fff; --bgColor: #0d6efdcc;
+    user-select: none; cursor: pointer; font-size: 15px;
+    height: 40px; margin: 5px; 
+    border: 1px solid var(--color); border-radius: 10px;
+    color: var(--color); background-color: var(--bgColor);
+}
+.button:hover {
+    --bgColor: #0d6efdee;
+}
+
+/* 文字+icon button */
+/* ============================== */
+.buttonText {
+    display: flex; align-items: center; justify-content: center;
+}
+.buttonText > span {
+    margin-left: 15px;
+}
+
+/* ============================== */

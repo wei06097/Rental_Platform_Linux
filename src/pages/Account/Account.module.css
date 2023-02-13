@@ -1,0 +1,38 @@
+/* ======================================== */
+.container {
+    width: max-content; font-size: 17px;
+    padding: 25px 40px; margin: 10vh auto;
+    border-radius: 15px; border: 1px solid #aaa;
+}
+
+/* ======================================== */
+.container > p {
+    margin: 20px 0 10px;
+}
+
+.container > input {
+    display: block; font-size: 15px;
+    padding: 0 5px; margin: 0 auto;
+    border-radius: 5px; border: 1px solid #aaa;
+}
+.container > input[type="text"],
+.container > input[type="number"],
+.container > input[type="password"] {
+    width: 250px; height: 30px; outline: none;
+}
+.container > input[type="password"] {
+    letter-spacing: 2px;
+}
+
+/* ======================================== */
+.container > input[type="submit"] {
+    width: 150px; height: 30px;
+    margin-top: 5px; border: 0;
+    color: #fff; background-color: #007bffcc;
+    cursor: pointer;
+}
+.container > input[type="submit"]:hover {
+    background-color: #007bffee;
+}
+
+/* ======================================== */

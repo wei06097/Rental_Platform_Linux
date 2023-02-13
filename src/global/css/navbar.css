@@ -1,0 +1,70 @@
+/* ======================================== */
+.main {
+    width: var(--width); margin: 20px auto;
+}
+header {
+    width: var(--width); height: var(--height); 
+    position: sticky; top: 0; z-index: 1;
+    background-color: var(--navBG);
+    box-shadow: 0 0 2px 2px #ddd;
+    display: flex; margin: 0 auto;
+    justify-content: space-between; align-items: center;
+}
+footer {
+    width: var(--width); height: var(--height);
+    position: fixed; bottom: 0; z-index: 1; left: 0; right: 0; 
+    background-color: var(--navBG);
+    box-shadow: 0 0 2px 2px #ddd;
+    display: flex; margin: 0 auto;
+    justify-content: center; align-items: center;
+}
+
+/* ======================================== */
+.base {
+    width: var(--width); height: var(--height);
+}
+.flex_center {
+    display: flex; align-items: center;
+}
+
+/* ======================================== */
+.header3 {
+    width: var(--width); height: auto;
+    position: sticky; top: 0; z-index: 1;
+    background-color: var(--navBG);
+    box-shadow: 0 0 2px 2px #ddd;
+    display: grid; grid-template-columns: 100%;
+    grid-template-rows: var(--height) var(--lineHeight);
+}
+.header2 {
+    --lineHeight: 40px;
+    width: var(--width); height: calc(var(--height) + var(--lineHeight));
+    position: sticky; top: 0; z-index: 1;
+    background-color: var(--navBG);
+    box-shadow: 0 0 2px 2px #ddd;
+    display: grid; grid-template-columns: 100%;
+    grid-template-rows: var(--height) var(--lineHeight);
+}
+
+.header3 > div:nth-child(1),
+.header2 > div:nth-child(1) {
+    display: flex;
+    justify-content: space-between; align-items: center;
+}
+.header2 > div:nth-child(2) {
+    display: flex; justify-content: space-around; align-items: center;
+}
+
+.header2 > div:nth-child(2) > div {
+    width: 200px; height: var(--lineHeight); 
+    line-height: var(--lineHeight);
+    font-size: 15px; text-align: center;
+    cursor: pointer; user-select: none;
+    border-radius: 5px 5px 0 0;
+}
+.header2 > div:nth-child(2) > .selected {
+    color: red; font-weight: bold;
+    background-color: #ddd;
+}
+
+/* ======================================== */

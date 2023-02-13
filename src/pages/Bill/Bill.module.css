@@ -1,0 +1,41 @@
+/* ======================================== */
+.description > div {
+    padding: 2px 7px; 
+    font-weight: bold; font-size: 17px;
+}
+.description > textarea {
+    width: calc(100% - 10px); display: block;
+    padding: 5px; margin: 0 auto;
+    border-radius: 10px; border-color: #ddd;
+    resize: none; outline: none; font-size: 15px;
+}
+
+/* ======================================== */
+.footer {
+    padding: 2px; display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.total {
+    margin: auto 7px auto auto;
+    align-items: center;
+}
+.total > span {
+    padding: 0 5px;
+}
+.total > span:nth-child(1) {
+    color: #777;
+}
+.total > span:nth-child(2) {
+    font-weight: bold; color: #ff0000dd;
+}
+
+/* ======================================== */
+@media(max-width: 600px) {
+    .footer {
+        grid-template-columns: 4fr 3fr;
+    }
+    .total {
+        margin: auto auto auto 7px;
+    }
+}

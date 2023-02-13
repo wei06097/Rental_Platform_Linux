@@ -1,0 +1,34 @@
+.parent {
+    position: relative;
+}
+.dialog {
+    --color: #0d6efd; --bgColor: white;
+    position: absolute; top: var(--height); right: 10px;
+    width: 150px; padding: 2px;
+    border: 1px solid var(--color); border-radius: 5px; 
+    background-color: var(--bgColor);
+    display: flex; flex-direction: column;
+}
+.dialog:before {
+    --width: 7px; content: "";
+    position: absolute; top: calc(var(--width) * -2); right: 5%;
+    border-width: var(--width); border-style: solid;
+    border-color: transparent transparent var(--color) transparent;
+}
+
+.dialog > a > button {
+    width: 100%; height: 30px; font-size: 15px;
+    cursor: pointer; outline: none; border: none;
+    color: var(--color); background-color: var(--bgColor);
+}
+.dialog > a > button:hover {
+    color: var(--bgColor); background-color: var(--color);
+}
+
+.dialog > div {
+    width: 100%; height: 1px;
+    background-color: var(--color);
+}
+.none {
+    display: none;
+}

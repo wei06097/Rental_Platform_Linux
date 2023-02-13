@@ -1,0 +1,61 @@
+/* ============================== */
+.state {
+    width: calc(100% - 10px); margin: 0 auto;
+    height: 50px; line-height: 50px;
+    text-align: center; font-size: 20px;  
+    border: 1px solid #ddd; border-radius: 10px;
+}
+
+/* ============================== */
+.usercards {
+    display: grid; 
+    grid-template-rows: auto;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas: 
+        "seller client"
+        "comment comment";
+}
+.client {grid-area: client;}
+.seller {grid-area: seller;}
+.comment {grid-area: comment;}
+
+/* ============================== */
+.usercards > div {
+    width: calc(100% - 10px); border: 1px solid #ddd;
+    margin: 10px auto; padding: 5px 0; border-radius: 10px;
+}
+.usercards > div > div {
+    margin: 5px 0; padding: 0 5px; font-size: 17px;
+    display: flex; justify-content: space-between;
+}
+.usercards > div > div > span:nth-child(1) {
+    font-weight: bold;
+}
+.usercards > div > div > span:nth-child(2) {
+    color: #777;
+}
+
+/* ============================== */
+.comment > div:nth-child(1) {
+    padding-bottom: 5px; font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+.comment > div:nth-child(2) {
+    padding-top: 5px; color: #777;
+    word-break: break-all; word-wrap: break-word;
+}
+
+/* ============================== */
+@media(max-width: 600px) {
+    .usercards {
+        grid-template-rows: auto;
+        grid-template-columns: 1fr;
+        grid-template-areas: 
+            "seller"
+            "client"
+            "comment";
+    }
+    .usercards > div {
+        margin: 10px auto 0;
+    }
+}
