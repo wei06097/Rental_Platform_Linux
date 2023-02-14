@@ -11,6 +11,11 @@ export default function ImgCard({ ImgArray }) {
     const container = useRef()
     useEffect( () => {
         container.current.setAttribute("page", `${presentPage}/${ImgArray.length}`)
+        return ( () => {
+            presentPage = 1
+            displacement = 0
+            startPosition = 0
+        })
     }, [ImgArray])
     function onPointerdown() {
         displacement = 0
