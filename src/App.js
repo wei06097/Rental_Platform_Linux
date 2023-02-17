@@ -28,9 +28,10 @@ import ChatRoom from "./pages/ChatRoom/ChatRoom"
 
 /* React Hooks */
 import { Routes, Route } from "react-router-dom"
-
+import useSocketIo from "./global/hooks/useSocketIo"
 /* React Components */
 function App() {
+  useSocketIo()
   return <>
     <Routes>
         <Route path="/" element={<HomePage />} />

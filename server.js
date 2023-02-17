@@ -15,6 +15,17 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+const server = require('http').Server(app)
+const io = require('socket.io')(server, {cors: {origin: "*"}})
+
+let sockets = {}
+io.on('connection', socket => {
+    socket.on("message", message => {
+        console.log(message)
+        socket.emit("message", "hello client")
+    })
+})
+
 /* ======================================== */
 app.post("/signup", async (req, res) => {
     const {account} = req.body
@@ -66,7 +77,7 @@ app.get('/jwt', async (req, res) => {
 })
 
 /* ======================================== */
-app.listen(PORT, HOST, () => {
+server.listen(PORT, HOST, () => {
     console.log("\n===== Start =====")
     console.log(`at ${HOST}:${PORT}\n`)
 })
