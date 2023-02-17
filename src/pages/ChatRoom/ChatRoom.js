@@ -11,7 +11,7 @@ import Back from "../../global/icon/Back"
 import { useState, useEffect, useRef } from "react"
 
 /* Functions */
-import isImageFormat from "../../global/js/isImageFormat"
+import InputChecker from "../../global/functions/InputChecker"
 
 function getCurrentTime() {
     const date = new Date()
@@ -86,7 +86,7 @@ export default function ChatRoom() {
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
             const fileData = e.target.files[i]
-            if (! isImageFormat(fileData)) continue
+            if (! InputChecker.isImageFormat(fileData)) continue
             // const url = URL.createObjectURL(fileData)
             // setInputImgs(prev => [...prev, url])
             const reader = new FileReader()
