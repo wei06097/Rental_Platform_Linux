@@ -43,7 +43,7 @@ export default function Product() {
     const product = fetchData()
     useEffect( () => {
         document.title = `產品 ${params?.id} : ${product?.name}` || "商品資訊"
-    }, [product])
+    }, [product, params])
     /* ==================== 分隔線 ==================== */
     return <>
         <header>
