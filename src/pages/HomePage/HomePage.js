@@ -1,18 +1,20 @@
+/* import */
+/* ======================================== */
 /* CSS */
 import style from "./HomePage.module.css"
-
+/* Functions */
+import AccountActions from "../../global/functions/AccountActions"
 /* Components */
 import SearchBar from "../../global/components/SearchBar"
 import OverviewCards from "../../global/components/OverviewCards"
-
 /* header 的按鈕 */
 import ShoppingCart from "../../global/icon/ShoppingCart"
 import Message from "../../global/icon/Message"
 import User from "../../global/icon/User"
-
 /* React Hooks */
-import { useState, useEffect } from "react"
+import { useState, useEffect, useLayoutEffect } from "react"
 
+/* ======================================== */
 /* Functions */
 let counter = 0
 function fetchData() {
@@ -26,9 +28,9 @@ function fetchData() {
 
 /* React Components */
 export default function HomePage() {
+    const [logined, setLogined] = useState(false)
     const [Array, setArray] = useState(fetchData())
     useEffect( () => {
-        document.title = "台科大租借平台"
         window.addEventListener("scroll", moreProducts)
         function moreProducts() {
             const body = document.body
@@ -42,6 +44,13 @@ export default function HomePage() {
             window.removeEventListener('scroll', moreProducts)
         }
     }, [])
+    useLayoutEffect(() => {
+        document.title = "台科大租借平台"
+        checkLogin()
+        async function checkLogin() {
+            setLogined(await AccountActions.check())
+        }
+    }, [])
     /* ==================== 分隔線 ==================== */
     return <>
         <header className="header3">
@@ -52,7 +61,7 @@ export default function HomePage() {
                 <div className="flex_center">
                     <ShoppingCart />
                     <Message />
-                    <User />
+                    <User logined={logined} setLogined={setLogined} />
                 </div>
             </div>
             <SearchBar />

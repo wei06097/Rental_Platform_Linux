@@ -1,9 +1,13 @@
+/* import */
+/* ======================================== */
 import style from "./User.module.css"
+import AccountActions from "../functions/AccountActions"
 
 import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 
-export default function User() {
+/* ======================================== */
+export default function User({ logined, setLogined }) {
     const selfRef = useRef(), dialog = useRef()
     const [visibility, setVisibility] = useState(false)
     useEffect( () => {
@@ -17,6 +21,12 @@ export default function User() {
             window.removeEventListener("pointerdown", onPointerdown)
         }
     }, [])
+    function doLogout() {
+        AccountActions.logout()
+        setLogined(false)
+        setVisibility(false)
+    }
+
     return <>
         <button className={`${style.parent} icon-button`} ref={selfRef}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-person-circle" viewBox="0 0 16 16">
@@ -25,25 +35,36 @@ export default function User() {
             </svg>
         </button>
         <div className={`${style.dialog} ${visibility? "": style.none}`} ref={dialog}>
-            <Link to="/Profile">
-                <button>個人檔案</button>
-            </Link>
-            <Link to="/MyStore">
-                <button>我的賣場</button>
-            </Link>
-            <Link to="/MyCollect">
-                <button>我的收藏</button>
-            </Link>
-            <Link to="/MyShopping">
-                <button>購買清單</button>
-            </Link>
+            {
+                logined && <>
+                    <Link to="/Profile">
+                        <button>個人檔案</button>
+                    </Link>
+                    <Link to="/MyStore">
+                        <button>我的賣場</button>
+                    </Link>
+                    <Link to="/MyCollect">
+                        <button>我的收藏</button>
+                    </Link>
+                    <Link to="/MyShopping">
+                        <button>購買清單</button>
+                    </Link>
+                    <Link to="/">
+                        <button onClick={doLogout}>登出</button>
+                    </Link>
+                </>
+            }
             {/* <div /> */}
-            <Link to="/SignIn">
-                <button>登入</button>
-            </Link>
-            <Link to="/SignUp">
-                <button>註冊</button>
-            </Link>
+            {
+                !logined && <>
+                    <Link to="/SignIn">
+                        <button>登入</button>
+                    </Link>
+                    <Link to="/SignUp">
+                        <button>註冊</button>
+                    </Link>
+                </>
+            }
         </div>
     </>
 }

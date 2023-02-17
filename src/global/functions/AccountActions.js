@@ -26,6 +26,9 @@ async function login(body, callback) {
         alert(result?.message || "error")
     }
 }
+function logout() {
+    localStorage.removeItem("token")
+} 
 async function check() {
     const token = localStorage.getItem("token")
     if (!token) return false
@@ -40,6 +43,7 @@ async function check() {
 const AccountActions = {
     signup,
     login,
+    logout,
     check
 }
 export default AccountActions
