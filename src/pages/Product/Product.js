@@ -14,7 +14,7 @@ import useScrollTop from "../../global/hooks/useScrollTop"
 
 /* React Hooks */
 import { useEffect } from "react"
-
+import { useParams } from "react-router-dom"
 /* Functions */
 function fetchData() {
     return {
@@ -38,10 +38,11 @@ function fetchData() {
 
 /* React Components */
 export default function Product() {
+    const params = useParams()
     useScrollTop()
     const product = fetchData()
     useEffect( () => {
-        document.title = product?.name || "商品資訊"
+        document.title = `產品 ${params?.id} : ${product?.name}` || "商品資訊"
     }, [product])
     /* ==================== 分隔線 ==================== */
     return <>
