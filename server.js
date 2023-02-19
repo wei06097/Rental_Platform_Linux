@@ -18,11 +18,27 @@ app.use(express.json())
 const server = require('http').Server(app)
 const io = require('socket.io')(server, {cors: {origin: "*"}})
 
+/* ======================================== */
 let sockets = {}
+
 io.on('connection', socket => {
-    socket.on("message", message => {
-        console.log(message)
-        socket.emit("message", "hello client")
+    let key = null
+    socket.on("login", account => {
+        key = account
+        if (!sockets[key]) sockets[key] = []
+        sockets[key].push(socket.id)
+    })
+    socket.on("logout", () => {
+        if (!key) return
+        delete sockets[key]
+        key = null
+    })
+    socket.on("disconnect", () => {
+        if (!key) return
+        const index = sockets[key].indexOf(socket.id)
+        if (index > -1) sockets[key].splice(index, 1)
+        const length = sockets[key].length
+        if (length === 0) delete sockets[key]
     })
 })
 
