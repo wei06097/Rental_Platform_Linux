@@ -27,35 +27,37 @@ import ChatList from "./pages/ChatList/ChatList"
 import ChatRoom from "./pages/ChatRoom/ChatRoom"
 
 /* React Hooks */
+import WsProvider from "./global/hooks/WsProvider"
 import { Routes, Route } from "react-router-dom"
-import useSocketIo from "./global/hooks/useSocketIo"
+
 /* React Components */
 function App() {
-  useSocketIo()
   return <>
-    <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/Result" element={<Result />} />
-        <Route path="/Product/:id" element={<Product />} />
-        <Route path="/ShoppingCart" element={<ShoppingCart />} />
-        <Route path="/SignIn" element={<SignIn />} />
-        <Route path="/SignUp" element={<SignUp />} />
-        <Route path="/MyProducts" element={<MyProducts />} />
-        <Route path="/MyProducts/AddProduct" element={<AddProduct />} />
-        
-        <Route path="/MyCollect" element={<MyCollect />} />
-        <Route path="/MyShopping" element={<MyShopping />} />
-        <Route path="/MyOrder" element={<MyOrder />} />
-        <Route path="/OrderDetail" element={<OrderDetail />} />
-        <Route path="/MyStore" element={<MyStore />} />
-        <Route path="/Bill" element={<Bill />} />
-        <Route path="/Profile" element={<Profile />} />
+    <WsProvider>
+      <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/Result" element={<Result />} />
+          <Route path="/Product/:id" element={<Product />} />
+          <Route path="/ShoppingCart" element={<ShoppingCart />} />
+          <Route path="/SignIn" element={<SignIn />} />
+          <Route path="/SignUp" element={<SignUp />} />
+          <Route path="/MyProducts" element={<MyProducts />} />
+          <Route path="/MyProducts/AddProduct" element={<AddProduct />} />
+          
+          <Route path="/MyCollect" element={<MyCollect />} />
+          <Route path="/MyShopping" element={<MyShopping />} />
+          <Route path="/MyOrder" element={<MyOrder />} />
+          <Route path="/OrderDetail" element={<OrderDetail />} />
+          <Route path="/MyStore" element={<MyStore />} />
+          <Route path="/Bill" element={<Bill />} />
+          <Route path="/Profile" element={<Profile />} />
 
-        <Route path="/ChatList" element={<ChatList />} />
-        <Route path="/ChatList/ChatRoom" element={<ChatRoom />} />
-        
-        <Route path="*" element={<NotFound />} />
-    </Routes>
+          <Route path="/ChatList" element={<ChatList />} />
+          <Route path="/ChatList/ChatRoom" element={<ChatRoom />} />
+          
+          <Route path="*" element={<NotFound />} />
+      </Routes>
+    </WsProvider>
   </>
 }
 

@@ -1,25 +1,23 @@
 import API from "../API"
 
-import { useState, useEffect } from "react"
+import React, { useContext, useState, useEffect } from "react"
 import webSocket from "socket.io-client"
 
+const WsContext = React.createContext()
+export function useWs() {
+    return useContext(WsContext)
+}
 
-export default function Socket() {
+export default function WsProvider({ children }) {
     const [ws, setWs] = useState(null)
     useEffect( () => {
-        setWs(webSocket(API.API_URL))
-    }, [])
-    useEffect( () => {
-        function initWebSocket() {
-            ws.on("message", message => {
-                console.log(message)
-            })
-        }
-        if (ws) {
-            initWebSocket()
-            ws.emit("message", "hello server")
-        }
+        if (!ws) setWs(webSocket(API.WS_URL))
     }, [ws])
+    return <>
+        <WsContext.Provider value={ws}>
+            {children}
+        </WsContext.Provider>
+    </>
 }
 
 /* 前端要讓後端知道的動作
