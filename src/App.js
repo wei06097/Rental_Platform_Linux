@@ -27,13 +27,13 @@ import ChatList from "./pages/ChatList/ChatList"
 import ChatRoom from "./pages/ChatRoom/ChatRoom"
 
 /* React Hooks */
-import WsProvider from "./global/hooks/WsProvider"
+import SocketProvider from "./global/hooks/SocketProvider"
 import { Routes, Route } from "react-router-dom"
 
 /* React Components */
 function App() {
   return <>
-    <WsProvider>
+    <SocketProvider>
       <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/Result" element={<Result />} />
@@ -57,7 +57,7 @@ function App() {
           
           <Route path="*" element={<NotFound />} />
       </Routes>
-    </WsProvider>
+    </SocketProvider>
   </>
 }
 
