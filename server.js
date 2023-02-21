@@ -4,6 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const fetch = require('node-fetch')
+const { Socket } = require('dgram')
 
 /* ======================================== */
 const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET
@@ -19,27 +20,53 @@ const server = require('http').Server(app)
 const io = require('socket.io')(server, {cors: {origin: "*"}})
 
 /* ======================================== */
-let sockets = {}
+// let sockets = {}
+function verifyToken(token) {
+    let success = true
+    try { jwt.verify(token, JWT_SECRET) }
+    catch { success = false }
+    return success
+}
 
 io.on('connection', socket => {
-    let key = null
-    socket.on("login", account => {
-        key = account
-        if (!sockets[key]) sockets[key] = []
-        sockets[key].push(socket.id)
-    })
-    socket.on("logout", () => {
-        if (!key) return
-        delete sockets[key]
-        key = null
-    })
+
+    const id = setInterval( () => {
+        toOtherMessage(socket.id, "您有 1 則新通知")
+    }, 1000)
     socket.on("disconnect", () => {
-        if (!key) return
-        const index = sockets[key].indexOf(socket.id)
-        if (index > -1) sockets[key].splice(index, 1)
-        const length = sockets[key].length
-        if (length === 0) delete sockets[key]
+        clearInterval(id)
     })
+    
+    function toOtherMessage(toSocketId, message_input) {
+        const target = io.sockets.sockets.get(toSocketId)
+        target.on("verify-token", handler)
+        target.emit("verify-token")
+        function handler(token, callback) {
+            target.removeListener("verify-token", handler)
+            const correct = verifyToken(token)
+            message = correct? message_input: ""
+            callback( {correct, message} )
+        }
+    }
+
+    // let key = null
+    // socket.on("login", account => {
+    //     key = account
+    //     if (!sockets[key]) sockets[key] = []
+    //     sockets[key].push(socket.id)
+    // })
+    // socket.on("logout", () => {
+    //     if (!key) return
+    //     delete sockets[key]
+    //     key = null
+    // })
+    // socket.on("disconnect", () => {
+    //     if (!key) return
+    //     const index = sockets[key].indexOf(socket.id)
+    //     if (index > -1) sockets[key].splice(index, 1)
+    //     const length = sockets[key].length
+    //     if (length === 0) delete sockets[key]
+    // })
 })
 
 /* ======================================== */
