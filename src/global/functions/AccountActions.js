@@ -22,6 +22,7 @@ async function login(body) {
     if (result?.success) {
         localStorage.setItem("token", result?.message || "")
         localStorage.setItem("account", result?.account || "")
+        // 為了讓socket重新連線，必須重新整理
         window.location.href = "/"
     } else {
         alert(result?.message || "error")
@@ -30,6 +31,7 @@ async function login(body) {
 function logout() {
     localStorage.setItem("token", "")
     localStorage.setItem("account", "")
+    // 為了讓socket重新連線，必須重新整理
     window.location.href = "/"
 }
 async function check() {
