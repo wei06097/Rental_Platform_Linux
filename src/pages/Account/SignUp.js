@@ -25,14 +25,14 @@ export default function SignUp() {
         checkLogin()
         async function checkLogin() {
             const logined = await AccountActions.check()
-            if (logined) navigate("/")
+            if (logined) navigate(-1)
         }
     }, [navigate])
 
     function doSignup(e) {
         e.preventDefault()
         const legal = InputChecker.noBlank(account, password, phone, mail) && (password === password2)
-        if (legal) AccountActions.signup( {account, password, phone, mail}, () => {navigate("/SignIn")} )
+        if (legal) AccountActions.signup( {account, password, phone, mail} )
     }
     function comparePassword(e) {
         setPassword2(e.target.value)

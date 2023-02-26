@@ -2,7 +2,7 @@
 import API from "../API"
 
 /* Functions */
-async function signup(body, callback) {
+async function signup(body) {
     const response = await fetch(API.SIGNUP, {
         method : "POST",
         headers : { "Content-Type" : "application/json" },
@@ -10,28 +10,32 @@ async function signup(body, callback) {
     })
     const result = await response.json()
     if (result?.message) alert(result?.message || "error")
-    if (result?.success) callback()
+    if (result?.success) window.location.href = "/SignIn"
 }
-async function login(body, callback) {
+async function login(body) {
     const response = await fetch(API.LOGIN, {
         method : "POST",
         headers : { "Content-Type" : "application/json" },
         body : JSON.stringify(body)
     })
     const result = await response.json()
-    if (result?.success && result?.message) {
-        localStorage.setItem("token", result.message)
-        callback()
+    if (result?.success) {
+        localStorage.setItem("token", result?.message || "")
+        localStorage.setItem("account", result?.account || "")
+        window.location.href = "/"
     } else {
         alert(result?.message || "error")
     }
 }
 function logout() {
-    localStorage.removeItem("token")
-} 
+    localStorage.setItem("token", "")
+    localStorage.setItem("account", "")
+    window.location.href = "/"
+}
 async function check() {
     const token = localStorage.getItem("token")
-    if (!token) return false
+    const account = localStorage.getItem("account")
+    if (!token || !account) return false
     const response = await fetch(API.JWT, {
         method: "GET",
         headers: { token : token }

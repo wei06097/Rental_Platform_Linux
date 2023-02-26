@@ -22,7 +22,7 @@ export default function SignIn() {
         checkLogin()
         async function checkLogin() {
             const logined = await AccountActions.check()
-            if (logined) navigate("/")
+            if (logined) navigate(-1)
         }
     }, [navigate])
     function doLogin(e) {
@@ -30,7 +30,7 @@ export default function SignIn() {
         const account = account_input.current.value
         const password = password_input.current.value
         const legal = InputChecker.noBlank(account, password)
-        if (legal) AccountActions.login( {account, password}, () => {navigate("/")} )
+        if (legal) AccountActions.login( {account, password} )
     }
 
     return <>
