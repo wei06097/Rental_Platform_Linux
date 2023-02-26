@@ -12,7 +12,6 @@ import ShoppingCart from "../../global/icon/ShoppingCart"
 import Message from "../../global/icon/Message"
 import User from "../../global/icon/User"
 /* React Hooks */
-import { useSocket } from "../../global/hooks/SocketProvider"
 import { useState, useEffect, useLayoutEffect } from "react"
 
 /* ======================================== */
@@ -29,19 +28,10 @@ function fetchData() {
 
 /* React Components */
 export default function HomePage() {
-    const socket = useSocket()
-    useEffect( () => {
-        socket.on("verify-token", () => {
-            const token = localStorage.getItem("token")
-            socket.emit("verify-token", token, (data) => {
-                console.log(data)
-            })
-        })
-    }, [socket])
-
     const [logined, setLogined] = useState(false)
     const [Array, setArray] = useState(fetchData())
     useEffect( () => {
+        window.scrollTo({"top": 0})
         window.addEventListener("scroll", moreProducts)
         function moreProducts() {
             const body = document.body
@@ -52,6 +42,7 @@ export default function HomePage() {
             }
         }
         return () => {
+            counter = 0
             window.removeEventListener('scroll', moreProducts)
         }
     }, [])

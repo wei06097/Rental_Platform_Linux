@@ -9,9 +9,6 @@ import Back from "../../global/icon/Back"
 import ShoppingCar from "../../global/icon/ShoppingCart"
 import Home from "../../global/icon/Home"
 
-/* Custom Hooks */
-import useScrollTop from "../../global/hooks/useScrollTop"
-
 /* React Hooks */
 import { useEffect } from "react"
 import { useParams } from "react-router-dom"
@@ -39,10 +36,10 @@ function fetchData() {
 /* React Components */
 export default function Product() {
     const params = useParams()
-    useScrollTop()
     const product = fetchData()
     useEffect( () => {
         document.title = `產品 ${params?.id} : ${product?.name}` || "商品資訊"
+        window.scrollTo({"top": 0})
     }, [product, params])
     /* ==================== 分隔線 ==================== */
     return <>

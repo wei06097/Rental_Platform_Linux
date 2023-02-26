@@ -7,9 +7,6 @@ import Back from "../../global/icon/Back"
 import ShoppingCart from "../../global/icon/ShoppingCart"
 import Home from "../../global/icon/Home"
 
-/* Custom Hooks */
-import useScrollTop from "../../global/hooks/useScrollTop"
-
 /* React Hooks */
 import { useState, useEffect } from "react"
 import { useLocation } from "react-router-dom"
@@ -29,7 +26,6 @@ function fetchData() {
 export default function Result() {
     const path = useLocation()
     const [Array, setArray] = useState(fetchData())
-    useScrollTop(path)
     useEffect( () => {
         window.addEventListener("scroll", moreProducts)
         function moreProducts() {
@@ -47,6 +43,7 @@ export default function Result() {
     useEffect( () => {
         const result = decodeURI(path.search.split("?s=")[1])
         document.title = `${result} - 台科大租借平台`
+        window.scrollTo({"top": 0})
     }, [path])
     /* ==================== 分隔線 ==================== */
     return <>

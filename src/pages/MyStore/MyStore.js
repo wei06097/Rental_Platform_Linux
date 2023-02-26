@@ -8,9 +8,6 @@ import OverviewCards from "../../global/components/OverviewCards"
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
 
-/* Custom Hooks */
-import useScrollTop from "../../global/hooks/useScrollTop"
-
 /* React Hooks */
 import { useEffect } from "react"
 import { Link } from "react-router-dom"
@@ -20,7 +17,6 @@ import { Link } from "react-router-dom"
 /* React Components */
 
 export default function MyStore() {
-    useScrollTop()
     const description = `● JANコード：4545784068700
 
     ● 預約本商品須支付訂金$600或全額付清。(※標題含超取免訂金之商品除外)
@@ -29,6 +25,7 @@ export default function MyStore() {
     const Array = [1, 2, 3, 4, 5, 6, 7, 8, 9]
     useEffect( () => {
         document.title = `${"小杏"}的賣場`
+        window.scrollTo({"top": 0})
     }, [])
     return <>
         <header>
