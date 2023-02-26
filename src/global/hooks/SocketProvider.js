@@ -8,15 +8,23 @@ const SocketContext = React.createContext()
 export const useSocket = () => useContext(SocketContext)
 
 export default function SocketProvider({ children }) {
-    // 自動偵測localStorage的token，如果沒有token就重新載入(socket會重新連線)
+    // 自動偵測localStorage
     window.addEventListener("storage", (event) => {
         const isLogout = event.key === "token" && !event.newValue
+        // 為了讓socket重新連線，必須重新整理
         if (isLogout) window.location.reload()
     })
-    const token = localStorage.getItem("token")
-    const account = localStorage.getItem("account")
-    if (token && account) socket.emit("login", token, account)
-
+    socket.on('connect', () => {
+        const token = localStorage.getItem("token")
+        const account = localStorage.getItem("account")
+        if (!token && !account) return
+        console.log(socket.id)
+        
+        socket.emit("login", token, account)
+        socket.on("message", message => {
+            console.log(message)
+        })
+    })
     return <>
         <SocketContext.Provider value={socket}>
             {children}
