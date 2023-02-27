@@ -18,12 +18,7 @@ export default function SocketProvider({ children }) {
         const token = localStorage.getItem("token")
         const account = localStorage.getItem("account")
         if (!token && !account) return
-        console.log(socket.id)
-        
         socket.emit("login", token, account)
-        socket.on("message", message => {
-            console.log(message)
-        })
     })
     return <>
         <SocketContext.Provider value={socket}>
