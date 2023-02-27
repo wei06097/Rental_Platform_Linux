@@ -42,7 +42,7 @@ function App() {
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/MyProducts" element={<MyProducts />} />
-          <Route path="/MyProducts/AddProduct" element={<AddProduct />} />
+          <Route path="/AddProduct" element={<AddProduct />} />
           
           <Route path="/MyCollect" element={<MyCollect />} />
           <Route path="/MyShopping" element={<MyShopping />} />
@@ -53,7 +53,7 @@ function App() {
           <Route path="/Profile" element={<Profile />} />
 
           <Route path="/ChatList" element={<ChatList />} />
-          <Route path="/ChatList/ChatRoom" element={<ChatRoom />} />
+          <Route path="/ChatRoom/:receiver" element={<ChatRoom />} />
           
           <Route path="*" element={<NotFound />} />
       </Routes>
