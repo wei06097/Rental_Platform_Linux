@@ -36,7 +36,7 @@ io.on('connection', socket => {
         user = account
         if (!online[user]) online[user] = []
         online[user].push(socket.id)
-        console.log(online)
+        // console.log(online)
     })
     
     socket.on("disconnect", () => {
@@ -44,7 +44,31 @@ io.on('connection', socket => {
         const index = online[user].indexOf(socket.id)
         if (index !== -1) online[user].splice(index, 1)
         if (!online[user][0]) delete online[user]
-        console.log(online)
+        // console.log(online)
+    })
+
+    socket.on("message", ({provider, receiver, type, content}) => {
+        // 檢查傳送者身分
+        if (!online[provider]) return
+        const correct = online[provider].some(myId => myId === socket.id)
+        if (!correct) return
+        // 處理訊息
+        const current = new Date().toLocaleString('zh-TW', {
+            timeZone: 'Asia/Taipei', hour12: false,
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        })
+        const [date, time] = current.split(" ")
+        const message = {provider, receiver, type, content, date, time}
+        // 傳給自己
+        online[provider].forEach(myId => {
+            io.sockets.sockets.get(myId).emit("message", message)
+        })
+        // 傳給對方
+        if (!online[receiver]) return
+        online[receiver].forEach(targetId => {
+            io.sockets.sockets.get(targetId).emit("message", message)
+        })
     })
 })
 
@@ -91,6 +115,15 @@ app.get('/jwt', async (req, res) => {
         success = false
     }
     res.json( {success, account} )
+})
+
+/* ======================================== */
+app.post('/chatroom', async (req, res) => {
+    const receiver = req?.body?.receiver || ""
+    const response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
+    const result = await response.json()
+    const isExist = result[0]? true: false
+    res.json( {success : isExist} )
 })
 
 /* ======================================== */
