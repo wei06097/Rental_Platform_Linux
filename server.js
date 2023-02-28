@@ -26,13 +26,9 @@ io.on('connection', socket => {
 
     socket.on("login", (token, account) => {
         if (!token || !account) return
-        try {
-            const decode = jwt.verify(token, JWT_SECRET)
-            const success = decode?.account === account
-            if (!success) return
-        } catch {
-            return
-        }
+        const data = decodeToken(token)
+        const success = (data?.account === account)
+        if (!success) return
         user = account
         if (!online[user]) online[user] = []
         online[user].push(socket.id)
@@ -47,7 +43,7 @@ io.on('connection', socket => {
         // console.log(online)
     })
 
-    socket.on("message", ({provider, receiver, type, content}) => {
+    socket.on("message", async ({provider, receiver, type, content}) => {
         // 檢查傳送者身分
         if (!online[provider]) return
         const correct = online[provider].some(myId => myId === socket.id)
@@ -60,11 +56,18 @@ io.on('connection', socket => {
         })
         const [date, time] = current.split(" ")
         const message = {provider, receiver, type, content, date, time}
+        // 丟到資料庫
+        await fetch(`${DB_URL}/chat_history`, {
+            method : "POST",
+            headers : { "Content-Type" : "application/json" },
+            body : JSON.stringify(message)
+        })
         // 傳給自己
         online[provider].forEach(myId => {
             io.sockets.sockets.get(myId).emit("message", message)
         })
         // 傳給對方
+        if (provider === receiver) return
         if (!online[receiver]) return
         online[receiver].forEach(targetId => {
             io.sockets.sockets.get(targetId).emit("message", message)
@@ -73,6 +76,14 @@ io.on('connection', socket => {
 })
 
 /* ======================================== */
+function decodeToken(token) {
+    try {
+        return jwt.verify(token, JWT_SECRET)
+    } catch {
+        return null
+    }
+}
+
 app.post("/signup", async (req, res) => {
     const {account} = req.body
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -94,7 +105,7 @@ app.post("/signup", async (req, res) => {
     res.json( {success, message} )
 })
 app.post("/login", async (req, res) => {
-    const {account, password} = req.body
+    const {account, password} = req?.body
     const response = await fetch(`${DB_URL}/accounts?account=${account}`)
     const result = await response.json()
     const success = (account === result[0]?.account) && (password === result[0]?.password)
@@ -106,24 +117,28 @@ app.post("/login", async (req, res) => {
 })
 app.get('/jwt', async (req, res) => {
     const token = req?.headers?.token || ""
-    let account = null, success = true
-    try {
-        /* 要再去資料庫拿資料驗證帳號 但是我懶 */
-        const decode = jwt.verify(token, JWT_SECRET)
-        account = decode?.account || ""
-    } catch {
-        success = false
-    }
+    const user = decodeToken(token)
+    const account = user?.account
+    const success = account? true: false
     res.json( {success, account} )
 })
 
 /* ======================================== */
+// 回傳聊天歷史紀錄
 app.post('/chatroom', async (req, res) => {
-    const receiver = req?.body?.receiver || ""
-    const response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
-    const result = await response.json()
-    const isExist = result[0]? true: false
-    res.json( {success : isExist} )
+    const {token, receiver} = req?.body
+    const user = decodeToken(token)
+    const provider = user?.account
+    let response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
+    let result = await response.json()
+    if (!result[0] || !provider || !receiver || provider === receiver) {
+        res.json({success : false, history : null})
+        return
+    }
+    const query = `provider=${provider}&receiver=${receiver}&provider=${receiver}&receiver=${provider}`
+    response = await fetch(`${DB_URL}/chat_history?${query}`)
+    result = await response.json()
+    res.json( {success : true, history : result} )
 })
 
 /* ======================================== */

@@ -16,39 +16,14 @@ import { useState, useEffect, useRef } from "react"
 import { useParams } from "react-router-dom"
 
 /* ======================================== */
-async function checkReceiver(body) {
+async function getChatHistory(body) {
     const response = await fetch(API.CHATROOM, {
         method : "POST",
         headers : { "Content-Type" : "application/json" },
         body : JSON.stringify(body)
     })
     const result = await response.json()
-    return Promise.resolve(result?.success || false)
-}
-function fetchMessage() {
-    return [
-        {
-            me: true,
-            type: "text",
-            content: "你好",
-            date: "2021/02/02",
-            time: "17:05"
-        },
-        {
-            me: false,
-            type: "text",
-            content: "hello",
-            date: "2022/02/02",
-            time: "17:06"
-        },
-        {
-            me: false,
-            type: "text",
-            content: "hello",
-            date: "2022/02/05",
-            time: "17:07"
-        }
-    ]
+    return Promise.resolve(result)
 }
 
 /* React Components */
@@ -64,31 +39,26 @@ export default function ChatRoom() {
     useEffect( () => {
         const body = document.body
         const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
-        if (bottomDistance < 1000) window.scrollTo("top", body.clientHeight)
-        else if (messages?.at(-1)?.me) window.scrollTo("top", body.clientHeight)
-    }, [messages])
+        const toBottom = (bottomDistance > 1000 || messages?.at(-1)?.provider !== provider)
+        if (toBottom) window.scrollTo("top", body.clientHeight)
+    }, [messages, provider])
     useEffect( () => {
         init()
         document.title = `${receiver} - 聊天室`
-        setMessages(fetchMessage())
         async function init() {
-            const isExist = await checkReceiver( {receiver} )
-            if (!isExist) window.location.replace("/")
+            const token = localStorage.getItem("token")
+            const result = await getChatHistory( {token, receiver} )
+            if (!result?.success) window.location.replace("/")
+            const history = result?.history || []
+            setMessages(history)
         }
     }, [receiver])
     useEffect( () => {
         socket.on("message", messageHandler)
         function messageHandler(message) {
-            const visibile = (message?.provider === provider || message?.provider === receiver)
-            if (!visibile) return
-            const me = message?.provider === provider
-            setMessages( prev => [...prev, {
-                me: me,
-                type: message?.type,
-                content: message?.content,
-                date: message?.date,
-                time: message?.time,
-            }])
+            const Isend = (message?.provider === provider && message?.receiver === receiver)
+            const Usend = (message?.provider === receiver && message?.receiver === provider)
+            if (Isend || Usend) setMessages( prev => [...prev, message])
         }
         return () => {
             socket.off("message", messageHandler)
@@ -162,14 +132,14 @@ export default function ChatRoom() {
                             {
                                 (message?.type === "text") &&
                                 <div
-                                    className={`${style.card} ${message?.me === true? style.right: style.left}`}
+                                    className={`${style.card} ${message?.provider === provider? style.right: style.left}`}
                                     time={message?.time || ""}>
                                     {message?.content || "error"}
                                 </div>
                             }
                             {
                                 (message?.type === "img") &&
-                                <div className={`${style.img} ${message?.me === true? style.right: style.left}`}
+                                <div className={`${style.img} ${message?.provider === provider? style.right: style.left}`}
                                     time={message?.time || ""}
                                     onClick={ ()=>{setFullscreen(message?.src || "")} }    
                                 >
