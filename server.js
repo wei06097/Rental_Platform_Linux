@@ -56,7 +56,7 @@ io.on('connection', socket => {
             hour: '2-digit', minute: '2-digit'
         })
         const [date, time] = current.split(" ")
-        const src = (type == "img")? await saveImg(img): ""
+        const src = (type == "img")? await saveImg(img, true): ""
         const message = (type == "img")
             ?{provider, receiver, type, src, date, time}
             :{provider, receiver, type, content, date, time}
@@ -82,7 +82,7 @@ io.on('connection', socket => {
 /* Functions */
 /* ======================================== */
 // 儲存圖片並回傳子網址
-async function saveImg(img) {
+async function saveImg(img, doSave) {
     // 取得資料庫的計數器 (圖片檔案編號)
     const response = await fetch(`${DB_URL}/parameter`)
     const params = await response.json()
@@ -98,7 +98,7 @@ async function saveImg(img) {
     const path = `${__dirname}\\img\\${number}.${type}`
     const data = img.replace(/^data:image\/\w+;base64,/, "")
     const buf = Buffer.from(data, 'base64')
-    fs.writeFile(path, buf, (err) => {
+    if (doSave) fs.writeFile(path, buf, (err) => {
         if (err) throw err
     })
     // 回傳子網址
