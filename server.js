@@ -4,6 +4,7 @@ const express = require('express')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const fetch = require('node-fetch')
+const fs = require('fs')
 
 /* ======================================== */
 const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET
@@ -43,7 +44,7 @@ io.on('connection', socket => {
         // console.log(online)
     })
 
-    socket.on("message", async ({provider, receiver, type, content}) => {
+    socket.on("message", async ({provider, receiver, type, content, img}) => {
         // 檢查傳送者身分
         if (!online[provider]) return
         const correct = online[provider].some(myId => myId === socket.id)
@@ -55,7 +56,10 @@ io.on('connection', socket => {
             hour: '2-digit', minute: '2-digit'
         })
         const [date, time] = current.split(" ")
-        const message = {provider, receiver, type, content, date, time}
+        const src = (type == "img")? await saveImg(img): ""
+        const message = (type == "img")
+            ?{provider, receiver, type, src, date, time}
+            :{provider, receiver, type, content, date, time}
         // 丟到資料庫
         await fetch(`${DB_URL}/chat_history`, {
             method : "POST",
@@ -74,6 +78,32 @@ io.on('connection', socket => {
         })
     })
 })
+
+/* Functions */
+/* ======================================== */
+// 儲存圖片並回傳子網址
+async function saveImg(img) {
+    // 取得資料庫的計數器 (圖片檔案編號)
+    const response = await fetch(`${DB_URL}/parameter`)
+    const params = await response.json()
+    const number = parseInt(params?.img_counter)
+    // 更新資料庫的計數器
+    await fetch(`${DB_URL}/parameter`, {
+        method: "PATCH",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify({img_counter : number + 1})
+    })
+    // 儲存圖片到 img 資料夾
+    const type = img.replace("data:image/","").split(";")[0]
+    const path = `${__dirname}\\img\\${number}.${type}`
+    const data = img.replace(/^data:image\/\w+;base64,/, "")
+    const buf = Buffer.from(data, 'base64')
+    fs.writeFile(path, buf, (err) => {
+        if (err) throw err
+    })
+    // 回傳子網址
+    return Promise.resolve(`img/${number}.${type}`)
+}
 
 /* ======================================== */
 function decodeToken(token) {
@@ -158,6 +188,14 @@ app.post('/chatlist', async (req, res) => {
         return {account}
     })
     res.json( {success : true, list : result} )
+})
+// 顯示圖片
+app.get('/img/:name', async (req, res) => {
+    const path = `${__dirname}\\img\\${req.params.name}`
+    const NotFound = `${__dirname}\\img\\NotFound.jpeg`
+    fs.readFile(path, (err) => {
+        res.sendFile(err? NotFound: path)
+    })
 })
 
 /* ======================================== */

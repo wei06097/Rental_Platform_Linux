@@ -80,6 +80,7 @@ export default function ChatRoom() {
         sendMessage()
     }
     function onInputImgChange(e) {
+        const type = "img"
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
             const fileData = e.target.files[i]
@@ -89,20 +90,9 @@ export default function ChatRoom() {
             const reader = new FileReader()
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
-                const base64Pic = reader.result
-                const current = new Date().toLocaleString('zh-TW', {
-                    timeZone: 'Asia/Taipei', hour12: false,
-                    day: '2-digit', month: '2-digit', year: 'numeric',
-                    hour: '2-digit', minute: '2-digit'
-                })
-                const [date, time] = current.split(" ")
-                setMessages( prev => [...prev, {
-                    me: true,
-                    type: "img",
-                    src: base64Pic,
-                    date: date,
-                    time: time,
-                }])
+                // base64Pic
+                const img = reader.result 
+                socket.emit("message", {provider, receiver, type, img})
             }, false)
         }
         e.target.value = "";
@@ -141,9 +131,10 @@ export default function ChatRoom() {
                                 (message?.type === "img") &&
                                 <div className={`${style.img} ${message?.provider === provider? style.right: style.left}`}
                                     time={message?.time || ""}
-                                    onClick={ ()=>{setFullscreen(message?.src || "")} }    
+                                    onClick={ ()=>{setFullscreen(`${API.WS_URL}/${message?.src || ""}`)} }    
                                 >
-                                    <img src={message?.src || ""} alt="" />
+                                    
+                                    <img src={`${API.WS_URL}/${message?.src || ""}`} alt="" />
                                 </div>
                             }
                         </div>
