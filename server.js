@@ -140,6 +140,25 @@ app.post('/chatroom', async (req, res) => {
     result = await response.json()
     res.json( {success : true, history : result} )
 })
+// 回傳所有帳號
+app.post('/chatlist', async (req, res) => {
+    const {token} = req?.body
+    const user = decodeToken(token)
+    const provider = user?.account
+    let response = await fetch(`${DB_URL}/accounts?account=${provider}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json({success : false, list : null})
+        return
+    }
+    response = await fetch(`${DB_URL}/accounts?account_ne=${provider}`)
+    result = await response.json()
+    result = result.map( user => {
+        const account = user?.account
+        return {account}
+    })
+    res.json( {success : true, list : result} )
+})
 
 /* ======================================== */
 server.listen(PORT, HOST, () => {
