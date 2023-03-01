@@ -43,8 +43,8 @@ export default function ChatRoom() {
         if (toBottom) window.scrollTo("top", body.clientHeight)
     }, [messages, provider])
     useEffect( () => {
+        document.title = `對話 - ${receiver}`
         init()
-        document.title = `${receiver} - 聊天室`
         async function init() {
             const token = localStorage.getItem("token")
             const result = await getChatHistory( {token, receiver} )
@@ -111,7 +111,7 @@ export default function ChatRoom() {
         <header>
             <div className="flex_center">
                 <Back />
-                <span>小杏</span>
+                <span>{receiver}</span>
             </div>
         </header>
         <main className="main">
