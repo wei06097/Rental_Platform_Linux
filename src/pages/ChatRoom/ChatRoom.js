@@ -39,7 +39,7 @@ export default function ChatRoom() {
     useEffect( () => {
         const body = document.body
         const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
-        const toBottom = (bottomDistance > 1000 || messages?.at(-1)?.provider !== provider)
+        const toBottom = (bottomDistance < 1000 || messages?.at(-1)?.provider === provider)
         if (toBottom) window.scrollTo("top", body.clientHeight)
     }, [messages, provider])
     useEffect( () => {
@@ -90,8 +90,7 @@ export default function ChatRoom() {
             const reader = new FileReader()
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
-                // base64Pic
-                const img = reader.result 
+                const img = reader.result //base64Pic
                 socket.emit("message", {provider, receiver, type, img})
             }, false)
         }
