@@ -29,6 +29,11 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
+  "nodemonConfig": {
+    "watch": ["server.js"],
+    "ignore": ["db.json"],
+    "ext": "js"
+  },
   "eslintConfig": {
     "extends": [
       "react-app",
