@@ -1,4 +1,7 @@
 {
+  "parameter": {
+    "img_counter": 0
+  },
   "accounts": [
     {
       "account": "kokoro123",
