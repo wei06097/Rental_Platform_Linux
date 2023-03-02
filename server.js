@@ -14,8 +14,7 @@ const DB_URL = "http://127.0.0.1:5000"
 
 const app = express()
 app.use(cors())
-app.use(express.json())
-
+app.use(express.json({limit: '50mb'}))
 const server = require('http').Server(app)
 const io = require('socket.io')(server, {cors: {origin: "*"}})
 
@@ -196,6 +195,37 @@ app.get('/img/:name', async (req, res) => {
     fs.readFile(path, (err) => {
         res.sendFile(err? NotFound: path)
     })
+})
+
+/* ======================================== */
+// 新增商品
+app.post('/add_product', async (req, res) => {
+    const {token, imgs, name, description, price, amount, position} = req?.body
+    // 驗證身分
+    const {account} = decodeToken(token)
+    let response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 處理產品資訊
+    let urls = []
+    for (let i=0; i<imgs.length; i++) {
+        const url = await saveImg(imgs[i], true)
+        urls.push(url)
+    }
+    const product = {
+        provider : account, imgs : urls,
+        name, description, price, amount, position
+    }
+    // 丟到資料庫
+    response = await fetch(`${DB_URL}/products`, {
+        method : "POST",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(product)
+    })
+    res.json( {success : true} )
 })
 
 /* ======================================== */

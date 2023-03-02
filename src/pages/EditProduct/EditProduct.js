@@ -2,19 +2,39 @@
 /* ======================================== */
 /* CSS */
 import style from "./EditProduct.module.css"
+/* API */
+import API from "../../global/API"
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 /* React Hooks */
-import { useState, useEffect } from "react"
-import { useParams } from "react-router-dom"
+import { useState, useEffect, useRef } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 
 /* ======================================== */
+/* Functions */
+async function postProduct(body) {
+    const response = await fetch(API.ADD_PRODUCT, {
+        method : "POST",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(body)
+    })
+    const result = await response.json()
+    return Promise.resolve(result)
+}
+
 /* React Components */
 export default function EditProduct() {
     const {id} = useParams()
+    const navigate = useNavigate()
     const [inputImgs, setInputImgs] = useState([])
+    const nameRef = useRef()
+    const descriptionRef = useRef()
+    const priceRef = useRef()
+    const amountRef = useRef()
+    const positionRef = useRef()
+
     useEffect( () => {
         if (id === "new") {
             document.title = "新增商品"
@@ -29,8 +49,6 @@ export default function EditProduct() {
         for (let i=0; i<length; i++) {
             const fileData = e.target.files[i]
             if (! InputChecker.isImageFormat(fileData)) continue
-            // const url = URL.createObjectURL(fileData)
-            // setInputImgs(prev => [...prev, url])
             const reader = new FileReader()
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
@@ -40,6 +58,23 @@ export default function EditProduct() {
         }
         e.target.value = "";
     }
+    async function saveProduct() {
+        const token = localStorage.getItem("token")
+        const imgs = inputImgs
+        const name = nameRef.current.value
+        const description = descriptionRef.current.value
+        const price = priceRef.current.value
+        const amount = amountRef.current.value
+        const position = positionRef.current.value
+        const isValid = InputChecker.noBlank(name, description, price, amount, position)
+        // if (!isValid) alert("請確認欄位皆已填寫")
+        // else if (!imgs[0]) alert("請確認至少上傳1張照片")
+        // if (!isValid || !imgs[0]) return
+        const result = await postProduct( {token, imgs, name, description, price, amount, position} )
+        if (result?.success) navigate(-1)
+        else alert("儲存商品失敗")
+    }
+
     /* ==================== 分隔線 ==================== */
     return <>
         <header>
@@ -75,30 +110,32 @@ export default function EditProduct() {
                 </div>
                 <div className={style.product_name}>
                     <div>名稱</div>
-                    <input type="text" />
+                    <input type="text" ref={nameRef} />
                 </div>
                 <div className={style.description}>
                     <div>描述</div>
-                    <textarea rows="10" wrap="soft"></textarea>
+                    <textarea rows="10" wrap="soft" ref={descriptionRef} />
                 </div>
                 <div className={style.inline}>
                     <span>價格</span>
-                    <input type="number" placeholder="0" />
+                    <input type="number" placeholder="0"
+                        onClick={(e) => {e.target.select()}} ref={priceRef} />
                 </div>
                 <div className={style.inline}>
                     <span>數量</span>
-                    <input type="number" placeholder="0" />
+                    <input type="number" placeholder="0"
+                        onClick={(e) => {e.target.select()}} ref={amountRef} />
                 </div>
                 <div className={style.inline}>
                     <span>商品位置</span>
-                    <input type="text" placeholder="位置" />
+                    <input type="text" placeholder="位置" ref={positionRef} />
                 </div>
             </div>
         </main>
         <div className="base" />
         <footer>
-            <button className="button grow">儲存</button>
-            <button className="button grow">上架</button>
+            <button className="button grow" onClick={saveProduct}>儲存</button>
+            {/* <button className="button grow">上架</button> */}
         </footer>
     </>
 }
