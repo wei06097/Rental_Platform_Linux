@@ -17,6 +17,7 @@ import { useParams, useNavigate } from "react-router-dom"
 export default function EditProduct() {
     const {id} = useParams()
     const navigate = useNavigate()
+    const [remoteImgs, setRemoteImgs] = useState([])
     const [inputImgs, setInputImgs] = useState([])
     const nameRef = useRef()
     const descriptionRef = useRef()
@@ -29,8 +30,21 @@ export default function EditProduct() {
             document.title = "新增商品"
         } else if (Number.isInteger(Number(id))) {
             document.title = "編輯商品"
+            getInfo()
         } else {
             window.location.replace("/")
+        }
+        async function getInfo() {
+            const token = localStorage.getItem("token")
+            const {success, info} = await API.post(API.EDIT_PRODUCT, {token, id})
+            if (!success) window.location.replace("/")
+            const {imgs, name, description, price, amount, position} = info
+            setRemoteImgs(imgs.map( img => `${API.WS_URL}/${img}`))
+            nameRef.current.value = name
+            descriptionRef.current.value = description
+            priceRef.current.value = price
+            amountRef.current.value = amount
+            positionRef.current.value = position
         }
     }, [id])
     function onInputImgChange(e) {
@@ -91,12 +105,12 @@ export default function EditProduct() {
                             +加入照片
                         </label>
                         {
-                            inputImgs.map( (element, i) => 
+                            remoteImgs.concat(inputImgs).map( (element, i) => 
                                 <Photo
                                     key={i}
                                     order={i}
                                     src={element}
-                                    set={setInputImgs}
+                                    sets={[setRemoteImgs, setInputImgs]}
                                 />
                             )
                         }
@@ -133,22 +147,27 @@ export default function EditProduct() {
                 <button className="button grow" onClick={() => {postProduct(false)}}>儲存</button>
             </> }
             { Number.isInteger(Number(id)) && "編輯商品" && <>
-                <button className="button grow">儲存</button>
+                <button className="button grow" onClick={() => {navigate(-1)}}>取消</button>
+                <button className="button grow" onClick={() => {}}>儲存</button>
             </> }
         </footer>
     </>
 }
 
-const Photo = ({ order, src, set }) => {
+const Photo = ({ order, src, sets }) => {
+    const first = (order === 0)
     function deletePhoto() {
-        set( prev => {
-            let result = [...prev]
-            result.splice(prev.indexOf(src), 1)
-            return result
+        sets.forEach( set => {
+            set( prev => {
+                const result = [...prev]
+                const index = prev.indexOf(src)
+                if (index !== -1) result.splice(index, 1)
+                return result
+            })
         })
     }
     return <>
-        <div className={style.preview_photo} cover={(order===0)? "封面照片": ""}>
+        <div className={style.preview_photo} cover={first? "封面照片": ""}>
             <img src={src} alt="" />
             <svg onClick={deletePhoto} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
                 <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>

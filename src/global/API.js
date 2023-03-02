@@ -7,6 +7,7 @@ const JWT = `${API_URL}/jwt`
 const CHATLIST = `${API_URL}/chatlist`
 const CHATROOM = `${API_URL}/chatroom`
 const ADD_PRODUCT = `${API_URL}/add_product`
+const EDIT_PRODUCT = `${API_URL}/edit_product`
 
 export async function get(url) {
     const response = await fetch(url)
@@ -25,15 +26,11 @@ export async function post(url, body) {
 
 const API = {
     // function
-    get,
-    post,
+    get, post,
     // constant
     WS_URL,
-    SIGNUP,
-    LOGIN,
-    JWT,
-    CHATLIST,
-    CHATROOM,
-    ADD_PRODUCT
+    SIGNUP, LOGIN, JWT,
+    CHATLIST, CHATROOM,
+    ADD_PRODUCT, EDIT_PRODUCT
 }
 export default API

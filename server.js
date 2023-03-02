@@ -228,6 +228,21 @@ app.post('/add_product', async (req, res) => {
     res.json( {success : true} )
 })
 
+// 取得商品(編輯用)
+app.post('/edit_product', async (req, res) => {
+    const {token, id} = req.body
+    const {account} = decodeToken(token)
+    if (!account) {
+        res.json( {success : false, info : null} )
+        return
+    }
+    const response = await fetch(`${DB_URL}/products?id=${id}`)
+    const result = await response.json()
+    const success = (account === result[0]?.provider)
+    const info = success? result[0]: null
+    res.json( {success, info} )
+})
+
 /* ======================================== */
 server.listen(PORT, HOST, () => {
     console.log("\n===== Start =====")
