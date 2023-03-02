@@ -11,16 +11,6 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 
 /* ======================================== */
-/* Functions */
-async function getUserList(body) {
-    const response = await fetch(API.CHATLIST, {
-        method : "POST",
-        headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify(body)
-    })
-    const result = await response.json()
-    return Promise.resolve(result)
-}
 /* React Components */
 export default function ChatList() {
     const [users, setUsers] = useState([])
@@ -29,12 +19,9 @@ export default function ChatList() {
         init()
         async function init() {
             const token = localStorage.getItem("token")
-            const result = await getUserList( {token} )
-            if (!result?.success) alert("尚未登入")
-            else {
-                const list = result?.list || []
-                setUsers(list)
-            }
+            const {success, list} = await API.post(API.CHATLIST, {token})
+            if (!success) alert("尚未登入")
+            else setUsers(list || [])
         }
     }, [])
     return <>

@@ -16,16 +16,6 @@ import { useState, useEffect, useRef } from "react"
 import { useParams } from "react-router-dom"
 
 /* ======================================== */
-async function getChatHistory(body) {
-    const response = await fetch(API.CHATROOM, {
-        method : "POST",
-        headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify(body)
-    })
-    const result = await response.json()
-    return Promise.resolve(result)
-}
-
 /* React Components */
 const onMOBILE = (/Mobi|Android|iPhone/i.test(navigator.userAgent))
 export default function ChatRoom() {
@@ -47,10 +37,9 @@ export default function ChatRoom() {
         init()
         async function init() {
             const token = localStorage.getItem("token")
-            const result = await getChatHistory( {token, receiver} )
-            if (!result?.success) window.location.replace("/")
-            const history = result?.history || []
-            setMessages(history)
+            const {success, history} = await API.post(API.CHATROOM, {token, receiver})
+            if (!success) window.location.replace("/")
+            setMessages(history || [])
         }
     }, [receiver])
     useEffect( () => {
