@@ -145,10 +145,9 @@ app.post("/login", async (req, res) => {
     else message = jwt.sign(result[0], JWT_SECRET)
     res.json( {success, message, account} )
 })
-app.get('/jwt', async (req, res) => {
-    const token = req?.headers?.token || ""
-    const user = decodeToken(token)
-    const account = user?.account
+app.post('/jwt', async (req, res) => {
+    const {token} = req.body
+    const {account} = decodeToken(token)
     const success = account? true: false
     res.json( {success, account} )
 })
