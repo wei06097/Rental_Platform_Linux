@@ -104,7 +104,7 @@ async function saveImg(img, doSave) {
     return Promise.resolve(`img/${number}.${type}`)
 }
 
-/* ======================================== */
+// 將token解密
 function decodeToken(token) {
     try {
         return jwt.verify(token, JWT_SECRET)
@@ -113,6 +113,7 @@ function decodeToken(token) {
     }
 }
 
+/* ======================================== */
 app.post("/signup", async (req, res) => {
     const {account} = req.body
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -134,7 +135,7 @@ app.post("/signup", async (req, res) => {
     res.json( {success, message} )
 })
 app.post("/login", async (req, res) => {
-    const {account, password} = req?.body
+    const {account, password} = req.body
     const response = await fetch(`${DB_URL}/accounts?account=${account}`)
     const result = await response.json()
     const success = (account === result[0]?.account) && (password === result[0]?.password)
@@ -155,7 +156,7 @@ app.get('/jwt', async (req, res) => {
 /* ======================================== */
 // 回傳聊天歷史紀錄
 app.post('/chatroom', async (req, res) => {
-    const {token, receiver} = req?.body
+    const {token, receiver} = req.body
     const user = decodeToken(token)
     const provider = user?.account
     let response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
@@ -171,7 +172,7 @@ app.post('/chatroom', async (req, res) => {
 })
 // 回傳所有帳號
 app.post('/chatlist', async (req, res) => {
-    const {token} = req?.body
+    const {token} = req.body
     const user = decodeToken(token)
     const provider = user?.account
     let response = await fetch(`${DB_URL}/accounts?account=${provider}`)
@@ -200,7 +201,7 @@ app.get('/img/:name', async (req, res) => {
 /* ======================================== */
 // 新增商品
 app.post('/add_product', async (req, res) => {
-    const {token, imgs, name, description, price, amount, position} = req?.body
+    const {token, launched, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -216,7 +217,7 @@ app.post('/add_product', async (req, res) => {
         urls.push(url)
     }
     const product = {
-        provider : account, imgs : urls,
+        provider : account, launched, imgs : urls,
         name, description, price, amount, position
     }
     // 丟到資料庫

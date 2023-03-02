@@ -13,17 +13,6 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 
 /* ======================================== */
-/* Functions */
-async function postProduct(body) {
-    const response = await fetch(API.ADD_PRODUCT, {
-        method : "POST",
-        headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify(body)
-    })
-    const result = await response.json()
-    return Promise.resolve(result)
-}
-
 /* React Components */
 export default function EditProduct() {
     const {id} = useParams()
@@ -58,19 +47,24 @@ export default function EditProduct() {
         }
         e.target.value = "";
     }
-    async function saveProduct() {
-        const token = localStorage.getItem("token")
+
+    async function postProduct(launched) {
+        // 取的 inputs
         const imgs = inputImgs
         const name = nameRef.current.value
         const description = descriptionRef.current.value
         const price = priceRef.current.value
         const amount = amountRef.current.value
         const position = positionRef.current.value
+        // 檢查 inputs
         const isValid = InputChecker.noBlank(name, description, price, amount, position)
-        // if (!isValid) alert("請確認欄位皆已填寫")
-        // else if (!imgs[0]) alert("請確認至少上傳1張照片")
-        // if (!isValid || !imgs[0]) return
-        const result = await postProduct( {token, imgs, name, description, price, amount, position} )
+        if (!isValid) alert("請確認欄位皆已填寫")
+        else if (!imgs[0]) alert("請確認至少上傳1張照片")
+        if (!isValid || !imgs[0]) return
+        // post
+        const token = localStorage.getItem("token")
+        const payload = {token, launched, imgs, name, description, price, amount, position}
+        const result = await API.post(API.ADD_PRODUCT, payload)
         if (result?.success) navigate(-1)
         else alert("儲存商品失敗")
     }
@@ -134,8 +128,13 @@ export default function EditProduct() {
         </main>
         <div className="base" />
         <footer>
-            <button className="button grow" onClick={saveProduct}>儲存</button>
-            {/* <button className="button grow">上架</button> */}
+            { (id === "new") && <>
+                <button className="button grow" onClick={() => {postProduct(true)}}>上架</button>
+                <button className="button grow" onClick={() => {postProduct(false)}}>儲存</button>
+            </> }
+            { Number.isInteger(Number(id)) && "編輯商品" && <>
+                <button className="button grow">儲存</button>
+            </> }
         </footer>
     </>
 }
