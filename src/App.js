@@ -42,7 +42,7 @@ function App() {
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/MyProducts" element={<MyProducts />} />
-          <Route path="/EditProduct" element={<EditProduct />} />
+          <Route path="/EditProduct/:id" element={<EditProduct />} />
           
           <Route path="/MyCollect" element={<MyCollect />} />
           <Route path="/MyShopping" element={<MyShopping />} />

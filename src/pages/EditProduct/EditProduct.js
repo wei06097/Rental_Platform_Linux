@@ -1,21 +1,29 @@
+/* import */
+/* ======================================== */
 /* CSS */
 import style from "./EditProduct.module.css"
-
-/* header 的按鈕 */
-import Back from "../../global/icon/Back"
-
-/* React Hooks */
-import { useState, useEffect } from "react"
-
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
+/* header 的按鈕 */
+import Back from "../../global/icon/Back"
+/* React Hooks */
+import { useState, useEffect } from "react"
+import { useParams } from "react-router-dom"
 
+/* ======================================== */
 /* React Components */
 export default function EditProduct() {
+    const {id} = useParams()
     const [inputImgs, setInputImgs] = useState([])
     useEffect( () => {
-        document.title = "編輯商品"
-    }, [])
+        if (id === "new") {
+            document.title = "新增商品"
+        } else if (Number.isInteger(Number(id))) {
+            document.title = "編輯商品"
+        } else {
+            window.location.replace("/")
+        }
+    }, [id])
     function onInputImgChange(e) {
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
@@ -37,7 +45,10 @@ export default function EditProduct() {
         <header>
             <div className="flex_center">
                 <Back />
-                <span>編輯商品</span>
+                <span>
+                    { (id === "new") && "新增商品" }
+                    { Number.isInteger(Number(id)) && "編輯商品" }
+                </span>
             </div>
         </header>
         <main className="main">
