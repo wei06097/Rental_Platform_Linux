@@ -47,6 +47,8 @@ export default function EditProduct() {
             positionRef.current.value = position
         }
     }, [id])
+
+    /* ==================== 分隔線 ==================== */
     function onInputImgChange(e) {
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
@@ -61,9 +63,9 @@ export default function EditProduct() {
         }
         e.target.value = "";
     }
-
-    async function postProduct(launched) {
+    async function postProduct(mode, launched) {
         // 取的 inputs
+        const oldImgs = remoteImgs.map( img => img.replace(`${API.WS_URL}/`, "") )
         const imgs = inputImgs
         const name = nameRef.current.value
         const description = descriptionRef.current.value
@@ -71,16 +73,21 @@ export default function EditProduct() {
         const amount = amountRef.current.value
         const position = positionRef.current.value
         // 檢查 inputs
-        const isValid = InputChecker.noBlank(name, description, price, amount, position)
-        if (!isValid) alert("請確認欄位皆已填寫")
-        else if (!imgs[0]) alert("請確認至少上傳1張照片")
-        if (!isValid || !imgs[0]) return
+        const notValid = !InputChecker.noBlank(name, description, price, amount, position)
+        const noImg = !oldImgs.concat(imgs)[0]
+        if (notValid) alert("請確認欄位皆已填寫")
+        else if (noImg) alert("請確認至少上傳1張照片")
+        if (notValid || noImg) return
         // post
         const token = localStorage.getItem("token")
-        const payload = {token, launched, imgs, name, description, price, amount, position}
-        const result = await API.post(API.ADD_PRODUCT, payload)
-        if (result?.success) navigate(-1)
-        else alert("儲存商品失敗")
+        const payload = (mode === "add")
+            ? {token, launched, imgs, name, description, price, amount, position}
+            : {token, oldImgs, imgs, name, description, price, amount, position}
+        const {success} = (mode === "add")
+            ? await API.post(API.ADD_PRODUCT, payload)
+            : await API.post(API.SAVE_PRODUCT, payload)
+        if (!success) alert("儲存商品失敗")
+        else navigate(-1)
     }
 
     /* ==================== 分隔線 ==================== */
@@ -143,12 +150,12 @@ export default function EditProduct() {
         <div className="base" />
         <footer>
             { (id === "new") && <>
-                <button className="button grow" onClick={() => {postProduct(true)}}>上架</button>
-                <button className="button grow" onClick={() => {postProduct(false)}}>儲存</button>
+                <button className="button grow" onClick={() => {postProduct('add', true)}}>上架</button>
+                <button className="button grow" onClick={() => {postProduct('add', false)}}>儲存</button>
             </> }
             { Number.isInteger(Number(id)) && "編輯商品" && <>
                 <button className="button grow" onClick={() => {navigate(-1)}}>取消</button>
-                <button className="button grow" onClick={() => {}}>儲存</button>
+                <button className="button grow" onClick={() => {postProduct('edit')}}>儲存</button>
             </> }
         </footer>
     </>
