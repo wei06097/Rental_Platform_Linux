@@ -69,7 +69,7 @@ export default function MyProducts() {
         </main>
         <div className="base" />
         <footer>
-            <Link className={`${style.link} flex_center grow`} to="AddProduct">
+            <Link className={`${style.link} flex_center grow`} to="/EditProduct">
                 <button className="button grow">新增商品</button>
             </Link>
         </footer>

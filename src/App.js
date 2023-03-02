@@ -9,7 +9,7 @@ import NotFound from "./NotFound"
 import HomePage from "./pages/HomePage/HomePage"
 import MyProducts from "./pages/MyProducts/MyProducts"
 import Product from "./pages/Product/Product"
-import AddProduct from "./pages/AddProduct/AddProduct"
+import EditProduct from "./pages/EditProduct/EditProduct"
 import ShoppingCart from "./pages/ShoppingCart/ShoppingCart"
 import SignIn from "./pages/Account/SignIn"
 import SignUp from "./pages/Account/SignUp"
@@ -42,7 +42,7 @@ function App() {
           <Route path="/SignIn" element={<SignIn />} />
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/MyProducts" element={<MyProducts />} />
-          <Route path="/AddProduct" element={<AddProduct />} />
+          <Route path="/EditProduct" element={<EditProduct />} />
           
           <Route path="/MyCollect" element={<MyCollect />} />
           <Route path="/MyShopping" element={<MyShopping />} />
