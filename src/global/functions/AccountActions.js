@@ -3,29 +3,19 @@ import API from "../API"
 
 /* Functions */
 async function signup(body) {
-    const response = await fetch(API.SIGNUP, {
-        method : "POST",
-        headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify(body)
-    })
-    const result = await response.json()
-    if (result?.message) alert(result?.message || "error")
-    if (result?.success) window.location.href = "/SignIn"
+    const {success, message} = await API.post(API.SIGNUP, body)
+    alert(message || "error")
+    if (success) window.location.href = "/SignIn"
 }
 async function login(body) {
-    const response = await fetch(API.LOGIN, {
-        method : "POST",
-        headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify(body)
-    })
-    const result = await response.json()
-    if (result?.success) {
-        localStorage.setItem("token", result?.message || "")
-        localStorage.setItem("account", result?.account || "")
+    const {success, message, account} = await API.post(API.LOGIN, body)
+    if (success) {
+        localStorage.setItem("token", message || "")
+        localStorage.setItem("account", account || "")
         // 為了讓socket重新連線，必須重新整理
         window.location.href = "/"
     } else {
-        alert(result?.message || "error")
+        alert(message || "error")
     }
 }
 function logout() {
@@ -36,14 +26,11 @@ function logout() {
 }
 async function check() {
     const token = localStorage.getItem("token")
-    const account = localStorage.getItem("account")
-    if (!token || !account) return false
-    const response = await fetch(API.JWT, {
-        method: "GET",
-        headers: { token : token }
-    })
-    const result = await response.json()
-    return Promise.resolve(result?.success || false)
+    if (!token) return false
+    const {success, account} = await API.post(API.JWT, {token})
+    localStorage.setItem("token", success? token: "")
+    localStorage.setItem("account", success? account: "")
+    return Promise.resolve(success || false)
 }
 
 const AccountActions = {
