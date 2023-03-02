@@ -6,6 +6,7 @@ const LOGIN = `${API_URL}/login`
 const JWT = `${API_URL}/jwt`
 const CHATLIST = `${API_URL}/chatlist`
 const CHATROOM = `${API_URL}/chatroom`
+const ADD_PRODUCT = `${API_URL}/add_product`
 
 const API = {
     WS_URL,
@@ -13,6 +14,7 @@ const API = {
     LOGIN,
     JWT,
     CHATLIST,
-    CHATROOM
+    CHATROOM,
+    ADD_PRODUCT
 }
 export default API
