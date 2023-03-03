@@ -97,9 +97,7 @@ async function saveImg(img, doSave) {
     const path = `${__dirname}\\img\\${number}.${type}`
     const data = img.replace(/^data:image\/\w+;base64,/, "")
     const buf = Buffer.from(data, 'base64')
-    if (doSave) fs.writeFile(path, buf, (err) => {
-        if (err) throw err
-    })
+    if (doSave) fs.writeFile(path, buf, () => {})
     // 回傳子網址
     return Promise.resolve(`img/${number}.${type}`)
 }
@@ -109,7 +107,7 @@ function decodeToken(token) {
     try {
         return jwt.verify(token, JWT_SECRET)
     } catch {
-        return null
+        return {}
     }
 }
 
@@ -190,10 +188,10 @@ app.post('/chatlist', async (req, res) => {
 })
 // 顯示圖片
 app.get('/img/:name', async (req, res) => {
-    const path = `${__dirname}\\img\\${req.params.name}`
+    const Picture = `${__dirname}\\img\\${req.params.name}`
     const NotFound = `${__dirname}\\img\\NotFound.jpeg`
-    fs.readFile(path, (err) => {
-        res.sendFile(err? NotFound: path)
+    fs.readFile(Picture, (err) => {
+        res.sendFile(err? NotFound: Picture)
     })
 })
 
@@ -209,12 +207,13 @@ app.post('/add_product', async (req, res) => {
         res.json( {success : false} )
         return
     }
-    // 處理產品資訊
+    // 儲存上傳的圖片
     let urls = []
     for (let i=0; i<imgs.length; i++) {
         const url = await saveImg(imgs[i], true)
         urls.push(url)
     }
+    // 處理產品資訊
     const product = {
         provider : account, launched, imgs : urls,
         name, description, price, amount, position
@@ -241,6 +240,41 @@ app.post('/edit_product', async (req, res) => {
     const success = (account === result[0]?.provider)
     const info = success? result[0]: null
     res.json( {success, info} )
+})
+
+// 儲存商品(編輯用)
+app.post('/save_product', async (req, res) => {
+    const {id, token, remain_imgs, imgs, name, description, price, amount, position} = req.body
+    // 驗證身分
+    const {account} = decodeToken(token)
+    let response = await fetch(`${DB_URL}/products?id=${id}&account=${account}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 刪除不要的圖片
+    (result[0]?.imgs || [])
+        .filter(img => !remain_imgs.includes(img))
+        .forEach(path => fs.unlink(path, () => {}))
+    // 儲存新上傳的圖片
+    let urls = []
+    for (let i=0; i<imgs.length; i++) {
+        const url = await saveImg(imgs[i], true)
+        urls.push(url)
+    }
+    // 處理產品資訊
+    const product = {
+        imgs : remain_imgs.concat(urls),
+        name, description, price, amount, position
+    }
+    // 丟到資料庫
+    response = await fetch(`${DB_URL}/products/${id}`, {
+        method : "PATCH",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(product)
+    })
+    res.json( {success : true} )
 })
 
 /* ======================================== */

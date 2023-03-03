@@ -5,6 +5,7 @@ import style from "./EditProduct.module.css"
 /* API */
 import API from "../../global/API"
 /* Functions */
+import AccountActions from "../../global/functions/AccountActions"
 import InputChecker from "../../global/functions/InputChecker"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
@@ -28,16 +29,23 @@ export default function EditProduct() {
     useEffect( () => {
         if (id === "new") {
             document.title = "新增商品"
+            checkLogin()
         } else if (Number.isInteger(Number(id))) {
             document.title = "編輯商品"
             getInfo()
         } else {
+            goHome()
+        }
+        function goHome() {
             window.location.replace("/")
+        }
+        async function checkLogin() {
+            if (!await AccountActions.check()) goHome()
         }
         async function getInfo() {
             const token = localStorage.getItem("token")
             const {success, info} = await API.post(API.EDIT_PRODUCT, {token, id})
-            if (!success) window.location.replace("/")
+            if (!success) goHome()
             const {imgs, name, description, price, amount, position} = info
             setRemoteImgs(imgs.map( img => `${API.WS_URL}/${img}`))
             nameRef.current.value = name
@@ -64,8 +72,8 @@ export default function EditProduct() {
         e.target.value = "";
     }
     async function postProduct(mode, launched) {
-        // 取的 inputs
-        const oldImgs = remoteImgs.map( img => img.replace(`${API.WS_URL}/`, "") )
+        // 取得 inputs
+        const remain_imgs = remoteImgs.map( img => img.replace(`${API.WS_URL}/`, "") )
         const imgs = inputImgs
         const name = nameRef.current.value
         const description = descriptionRef.current.value
@@ -74,7 +82,7 @@ export default function EditProduct() {
         const position = positionRef.current.value
         // 檢查 inputs
         const notValid = !InputChecker.noBlank(name, description, price, amount, position)
-        const noImg = !oldImgs.concat(imgs)[0]
+        const noImg = !remain_imgs.concat(imgs)[0]
         if (notValid) alert("請確認欄位皆已填寫")
         else if (noImg) alert("請確認至少上傳1張照片")
         if (notValid || noImg) return
@@ -82,7 +90,7 @@ export default function EditProduct() {
         const token = localStorage.getItem("token")
         const payload = (mode === "add")
             ? {token, launched, imgs, name, description, price, amount, position}
-            : {token, oldImgs, imgs, name, description, price, amount, position}
+            : {id, token, remain_imgs, imgs, name, description, price, amount, position}
         const {success} = (mode === "add")
             ? await API.post(API.ADD_PRODUCT, payload)
             : await API.post(API.SAVE_PRODUCT, payload)
