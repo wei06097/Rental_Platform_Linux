@@ -8,6 +8,7 @@
       "password": "kokoro123",
       "phone": "0911222333",
       "mail": "123@gmail.com",
+      "nickname": "kokoro123",
       "id": 1
     },
     {
@@ -15,6 +16,7 @@
       "password": "1",
       "phone": "1",
       "mail": "1",
+      "nickname": "1",
       "id": 2
     },
     {
@@ -22,6 +24,7 @@
       "password": "2",
       "phone": "2",
       "mail": "2",
+      "nickname": "2",
       "id": 3
     }
   ],
