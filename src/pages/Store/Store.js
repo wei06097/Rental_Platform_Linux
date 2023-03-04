@@ -22,7 +22,6 @@ export default function Store() {
     const {seller} = useParams()
     useEffect( () => {
         init()
-        document.title = `${"小杏"}的賣場`
         window.scrollTo({"top": 0})
         async function init() {
             const token = localStorage.getItem("token")
@@ -30,6 +29,7 @@ export default function Store() {
             if (!success) window.location.replace("/")
             setProducts(products || [])
             setInfo(provider || {})
+            document.title = `${provider?.nickname || seller} 的賣場`
         }
     }, [seller])
     /* ==================== 分隔線 ==================== */
@@ -77,19 +77,23 @@ export default function Store() {
                     </div>
                 </div>
             </div>
-            <OverviewCards>
-                {
-                    products.map( element => 
-                        <OverviewCards.ProductCard
-                            key={element.id}
-                            link={`${API.WS_URL}/${element?.imgs[0] || "img/0"}`}
-                            name={element?.name || ""}
-                            price={element?.price || ""}
-                            showHeart={false}
-                        />
-                    )
-                }
-            </OverviewCards>
+            {
+                ! (products[0])
+                ? <div style={{textAlign: "center"}}>沒有商品</div>
+                : <OverviewCards>
+                    {
+                        products.map( element => 
+                            <OverviewCards.ProductCard
+                                key={element.id}
+                                link={`${API.WS_URL}/${element?.imgs[0] || "img/0"}`}
+                                name={element?.name || ""}
+                                price={element?.price || ""}
+                                showHeart={false}
+                            />
+                        )
+                    }
+                </OverviewCards>
+            }
         </main>
     </>
 }
