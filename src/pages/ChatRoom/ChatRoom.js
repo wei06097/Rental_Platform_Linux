@@ -37,7 +37,7 @@ export default function ChatRoom() {
         init()
         async function init() {
             const token = localStorage.getItem("token")
-            const {success, history} = await API.post(API.CHATROOM, {token, receiver})
+            const {success, history} = await API.post(API.CHAT_HISTORY, {token, receiver})
             if (!success) window.location.replace("/")
             setMessages(history || [])
         }

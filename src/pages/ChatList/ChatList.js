@@ -19,7 +19,7 @@ export default function ChatList() {
         init()
         async function init() {
             const token = localStorage.getItem("token")
-            const {success, list} = await API.post(API.CHATLIST, {token})
+            const {success, list} = await API.post(API.CHAT_LIST, {token})
             if (!success) alert("尚未登入")
             else setUsers(list || [])
         }
