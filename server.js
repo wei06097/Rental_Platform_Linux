@@ -117,7 +117,7 @@ app.post("/signup", async (req, res) => {
         success = false
         message = "帳號已經被註冊"
     } else {
-        const payload = {...req.body, nickname: account}
+        const payload = {...req.body, nickname: account, intro: ""}
         response = await fetch(`${DB_URL}/accounts`, {
             method : "POST",
             headers : { "Content-Type" : "application/json" },
@@ -331,6 +331,26 @@ app.post('/launch_product', async (req, res) => {
         body : JSON.stringify(product)
     })
     res.json( {success : true} )
+})
+
+/* ======================================== */
+// 查看賣場
+app.post('/store', async (req, res) => {
+    const {seller} = req.body
+    // 確認賣場存在
+    let response = await fetch(`${DB_URL}/accounts?account=${seller}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false, provider : null, products : null} )
+        return
+    }
+    //　取得賣家資訊
+    const {phone, mail, nickname, intro} = result[0]
+    const provider = {phone, mail, nickname, intro}
+    //　取得賣場商品
+    response = await fetch(`${DB_URL}/products?provider=${seller}&launched=true`)
+    result = await response.json()
+    res.json( {success : true, provider : provider, products : result} )
 })
 
 /* ======================================== */
