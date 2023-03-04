@@ -12,8 +12,24 @@ import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 /* ======================================== */
-let showAvailable = true
+/* Functions */
+async function launchProduct(id, launched, refresh) {
+    const token = localStorage.getItem("token")
+    const {success} = await API.post(API.LAUNCH_PRODUCT, {token, id, launched})
+    if (!success) alert("操作失敗")
+    else refresh()
+}
+async function deleteProduct(id, refresh) {
+    const confirm = window.confirm("確定要刪除")
+    if (!confirm) return
+    const token = localStorage.getItem("token")
+    const {success} = await API.post(API.DELETE_PRODUCT, {token, id})
+    if (!success) alert("刪除商品失敗")
+    else refresh()
+}
+
 /* React Components */
+let showAvailable = true
 export default function MyProducts() {
     const navigate = useNavigate()
     const [available, setAvailable] = useState(showAvailable)
@@ -22,23 +38,14 @@ export default function MyProducts() {
     useEffect( () => {
         document.title = "我的商品"
         getMyProducts()
-        async function getMyProducts() {
-            const token = localStorage.getItem("token")
-            const {success, avl_products, na_products} = await API.post(API.MY_PRODUCTS, {token})
-            if (!success) window.location.replace("/")
-            setProducts1(avl_products)
-            setProducts2(na_products)
-        }
-        // window.addEventListener("scroll", moreProducts)
-        // function moreProducts() {
-        //     const body = document.body
-        //     const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
-        //     if (bottomDistance < 1000) {}
-        // }
-        // return () => {
-        //     window.removeEventListener('scroll', moreProducts)
-        // }
     }, [])
+    async function getMyProducts() {
+        const token = localStorage.getItem("token")
+        const {success, avl_products, na_products} = await API.post(API.MY_PRODUCTS, {token})
+        if (!success) window.location.replace("/")
+        setProducts1(avl_products)
+        setProducts2(na_products)
+    }
     function toggleAvailable(state) {
         showAvailable = state
         setAvailable(state)
@@ -70,6 +77,7 @@ export default function MyProducts() {
                         key={element.id}
                         item={element}
                         toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
+                        refresh={getMyProducts}
                     />
                 )
             }
@@ -83,7 +91,7 @@ export default function MyProducts() {
     </>
 }
 
-const Card = ({ item, toEditPage }) => {
+const Card = ({ item, toEditPage, refresh }) => {
     return <>
         <div className={style.product}>
             <div className={style.product_info}>
@@ -96,9 +104,18 @@ const Card = ({ item, toEditPage }) => {
                 </div>
             </div>
             <div className={style.product_btnGroup}>
-                <button className="button grow">刪除</button>
-                <button className="button grow">{item?.launched? "下架": "上架"}</button>
-                <button className="button grow" onClick={toEditPage}>編輯</button>
+                <button className="button grow"
+                    onClick={() => {deleteProduct(item.id, refresh)}}>
+                    刪除
+                </button>
+                <button className="button grow"
+                    onClick={() => {launchProduct(item.id, !item?.launched, refresh)}}>
+                    {item?.launched? "下架": "上架"}
+                </button>
+                <button className="button grow"
+                    onClick={toEditPage}>
+                    編輯
+                </button>
             </div>
         </div>
     </>

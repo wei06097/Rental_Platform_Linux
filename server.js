@@ -151,6 +151,7 @@ app.post('/jwt', async (req, res) => {
 // 回傳聊天歷史紀錄
 app.post('/chat_history', async (req, res) => {
     const {token, receiver} = req.body
+    // 驗證身分
     const user = decodeToken(token)
     const provider = user?.account
     let response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
@@ -159,6 +160,7 @@ app.post('/chat_history', async (req, res) => {
         res.json({success : false, history : null})
         return
     }
+    // 取的聊天紀錄
     const query = `provider=${provider}&receiver=${receiver}&provider=${receiver}&receiver=${provider}`
     response = await fetch(`${DB_URL}/chat_history?${query}`)
     result = await response.json()
@@ -167,6 +169,7 @@ app.post('/chat_history', async (req, res) => {
 // 回傳所有帳號
 app.post('/chat_list', async (req, res) => {
     const {token} = req.body
+    // 驗證身分
     const user = decodeToken(token)
     const provider = user?.account
     let response = await fetch(`${DB_URL}/accounts?account=${provider}`)
@@ -175,6 +178,7 @@ app.post('/chat_list', async (req, res) => {
         res.json({success : false, list : null})
         return
     }
+    // 取得除了自己外的所有帳號
     response = await fetch(`${DB_URL}/accounts?account_ne=${provider}`)
     result = await response.json()
     result = result.map( user => {
@@ -198,8 +202,8 @@ app.post('/add_product', async (req, res) => {
     const {token, launched, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
-    let response = await fetch(`${DB_URL}/accounts?account=${account}`)
-    let result = await response.json()
+    const response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    const result = await response.json()
     if (!result[0]) {
         res.json( {success : false} )
         return
@@ -216,7 +220,7 @@ app.post('/add_product', async (req, res) => {
         name, description, price, amount, position
     }
     // 丟到資料庫
-    response = await fetch(`${DB_URL}/products`, {
+    await fetch(`${DB_URL}/products`, {
         method : "POST",
         headers : { "Content-Type" : "application/json" },
         body : JSON.stringify(product)
@@ -242,8 +246,8 @@ app.post('/save_product', async (req, res) => {
     const {id, token, remain_imgs, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
-    let response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
-    let result = await response.json()
+    const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
+    const result = await response.json()
     if (!result[0]) {
         res.json( {success : false} )
         return
@@ -264,7 +268,7 @@ app.post('/save_product', async (req, res) => {
         name, description, price, amount, position
     }
     // 丟到資料庫
-    response = await fetch(`${DB_URL}/products/${id}`, {
+    await fetch(`${DB_URL}/products/${id}`, {
         method : "PATCH",
         headers : { "Content-Type" : "application/json" },
         body : JSON.stringify(product)
@@ -295,11 +299,40 @@ app.post('/my_products', async (req, res) => {
 })
 // 刪除我的商品
 app.post('/delete_product', async (req, res) => {
-    res.json({})
+    const {token, id} = req.body
+    // 驗證身分
+    const {account} = decodeToken(token)
+    let response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 刪除不要的圖片
+    (result[0]?.imgs || []).forEach(path => fs.unlink(path, () => {}))
+    // 從資料庫刪除
+    await fetch(`${DB_URL}/products/${id}`, {method : "DELETE"})
+    res.json( {success : true} )
 })
 // 上架/下架我的商品
 app.post('/launch_product', async (req, res) => {
-    res.json({})
+    const {token, id, launched} = req.body
+    // 驗證身分
+    const {account} = decodeToken(token)
+    const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
+    const result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 更新資料庫的商品
+    const product = {...result[0], launched}
+    await fetch(`${DB_URL}/products/${id}`, {
+        method : "PATCH",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(product)
+    })
+    res.json( {success : true} )
 })
 
 /* ======================================== */
