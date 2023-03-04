@@ -8,7 +8,9 @@ import { Link } from "react-router-dom"
 
 /* ======================================== */
 export default function User({ logined, setLogined }) {
-    const selfRef = useRef(), dialog = useRef()
+    const account = localStorage.getItem("account")
+    const selfRef = useRef()
+    const dialog = useRef()
     const [visibility, setVisibility] = useState(false)
     useEffect( () => {
         function onPointerdown(e) {
@@ -40,7 +42,7 @@ export default function User({ logined, setLogined }) {
                     <Link to="/Profile">
                         <button>個人檔案</button>
                     </Link>
-                    <Link to="/MyStore">
+                    <Link to={`/Store/${account}`}>
                         <button>我的賣場</button>
                     </Link>
                     <Link to="/MyCollect">
