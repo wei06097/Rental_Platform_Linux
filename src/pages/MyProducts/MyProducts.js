@@ -1,68 +1,75 @@
+/* import */
+/* ======================================== */
 /* CSS */
 import style from "./MyProducts.module.css"
-
+/* API */
+import API from "../../global/API"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
-
 /* React Hooks */
 import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 
-/* Functions */
-async function getProducts() {
-    /* "id" "title" "price" "description" "images" "creationAt" "updatedAt" "category" */
-    const API = "https://api.escuelajs.co/api/v1/products"
-    try {
-        const res = await fetch(API)
-        const datas = await res.json() 
-        return Promise.resolve(datas)
-    } catch {
-        return Promise.reject()
-    }
-}
-
+/* ======================================== */
+let showAvailable = true
 /* React Components */
-let count = 5, step = 5
 export default function MyProducts() {
-    const [Array, setArray] = useState([])
+    const navigate = useNavigate()
+    const [available, setAvailable] = useState(showAvailable)
+    const [products1, setProducts1] = useState([])
+    const [products2, setProducts2] = useState([])
     useEffect( () => {
         document.title = "我的商品"
-        let products = []
-        getProducts().then( result => {
-            products = result
-            setArray(products.slice(0, count))
-        })
-        window.addEventListener("scroll", moreProducts)
-        function moreProducts() {
-            const body = document.body
-            const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
-            if (bottomDistance < 1000) {
-                count = (count + step > products.length)? products.length: count + step
-                setArray(products.slice(0, count))
-            }
+        getMyProducts()
+        async function getMyProducts() {
+            const token = localStorage.getItem("token")
+            const {success, avl_products, na_products} = await API.post(API.MY_PRODUCTS, {token})
+            if (!success) window.location.replace("/")
+            setProducts1(avl_products)
+            setProducts2(na_products)
         }
-        return () => {
-            window.removeEventListener('scroll', moreProducts)
-        }
+        // window.addEventListener("scroll", moreProducts)
+        // function moreProducts() {
+        //     const body = document.body
+        //     const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
+        //     if (bottomDistance < 1000) {}
+        // }
+        // return () => {
+        //     window.removeEventListener('scroll', moreProducts)
+        // }
     }, [])
+    function toggleAvailable(state) {
+        showAvailable = state
+        setAvailable(state)
+    }
     /* ==================== 分隔線 ==================== */
     return <>
-        <header>
-            <div className="flex_center">
-                <Back />
-                <span>我的商品</span>
+        <header className="header2">
+            <div>
+                <div className="flex_center">
+                    <Back />
+                    <span>我的商品</span>
+                </div>
+                <div>
+                    <Home />
+                </div>
             </div>
             <div>
-                <Home />
+                <div onClick={() => {toggleAvailable(true)}} className={`grow ${available? "selected": ""}`}>已上架</div>
+                <div onClick={() => {toggleAvailable(false)}} className={`grow ${!available? "selected": ""}`}>未上架</div>
             </div>
         </header>
         <main className="main">
             {
-                Array.map( element => 
-                    <Card 
-                        key={element?.id || ""}
-                        item={element || ""}
+                ! (available? products1: products2)[0]
+                ? <div style={{textAlign: "center"}}>沒有商品</div>
+                : (available? products1: products2)
+                .map( element => 
+                    <Card
+                        key={element.id}
+                        item={element}
+                        toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
                     />
                 )
             }
@@ -76,22 +83,22 @@ export default function MyProducts() {
     </>
 }
 
-const Card = ({ item }) => {
+const Card = ({ item, toEditPage }) => {
     return <>
         <div className={style.product}>
             <div className={style.product_info}>
                 <div className={style.img}>
-                    <img src="https://placeimg.com/640/480/any" alt="" />
+                    <img src={`${API.WS_URL}/${item?.imgs[0] || "img/error"}`} alt="" />
                 </div>
                 <div className={style.content}>
-                    <p className={style.product_name}>{item?.title || ""}</p>
-                    <div className={style.product_price}>NT$ {item?.price || ""} / 每天</div>
+                    <p className={style.product_name}>{item?.name || "error"}</p>
+                    <div className={style.product_price}>NT$ {item?.price || "error"} / 每天</div>
                 </div>
             </div>
             <div className={style.product_btnGroup}>
-                <button className="button grow">下架</button>
-                <button className="button grow">編輯</button>
                 <button className="button grow">刪除</button>
+                <button className="button grow">{item?.launched? "下架": "上架"}</button>
+                <button className="button grow" onClick={toEditPage}>編輯</button>
             </div>
         </div>
     </>

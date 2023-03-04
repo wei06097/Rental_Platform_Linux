@@ -23,7 +23,6 @@ let online = {}
 
 io.on('connection', socket => {
     let user = null
-
     socket.on("login", (token, account) => {
         if (!token || !account) return
         const data = decodeToken(token)
@@ -34,7 +33,6 @@ io.on('connection', socket => {
         online[user].push(socket.id)
         // console.log(online)
     })
-    
     socket.on("disconnect", () => {
         if (!user) return
         const index = online[user].indexOf(socket.id)
@@ -42,7 +40,6 @@ io.on('connection', socket => {
         if (!online[user][0]) delete online[user]
         // console.log(online)
     })
-
     socket.on("message", async ({provider, receiver, type, content, img}) => {
         // 檢查傳送者身分
         if (!online[provider]) return
@@ -101,7 +98,6 @@ async function saveImg(img, doSave) {
     // 回傳子網址
     return Promise.resolve(`img/${number}.${type}`)
 }
-
 // 將token解密
 function decodeToken(token) {
     try {
@@ -121,10 +117,11 @@ app.post("/signup", async (req, res) => {
         success = false
         message = "帳號已經被註冊"
     } else {
+        const payload = {...req.body, nickname: account}
         response = await fetch(`${DB_URL}/accounts`, {
             method : "POST",
             headers : { "Content-Type" : "application/json" },
-            body : JSON.stringify(req.body)
+            body : JSON.stringify(payload)
         })
         result = await response.json()
         success = result?.account === account
@@ -152,7 +149,7 @@ app.post('/jwt', async (req, res) => {
 
 /* ======================================== */
 // 回傳聊天歷史紀錄
-app.post('/chatroom', async (req, res) => {
+app.post('/chat_history', async (req, res) => {
     const {token, receiver} = req.body
     const user = decodeToken(token)
     const provider = user?.account
@@ -168,7 +165,7 @@ app.post('/chatroom', async (req, res) => {
     res.json( {success : true, history : result} )
 })
 // 回傳所有帳號
-app.post('/chatlist', async (req, res) => {
+app.post('/chat_list', async (req, res) => {
     const {token} = req.body
     const user = decodeToken(token)
     const provider = user?.account
@@ -226,7 +223,6 @@ app.post('/add_product', async (req, res) => {
     })
     res.json( {success : true} )
 })
-
 // 取得商品(編輯用)
 app.post('/edit_product', async (req, res) => {
     const {token, id} = req.body
@@ -241,13 +237,12 @@ app.post('/edit_product', async (req, res) => {
     const info = success? result[0]: null
     res.json( {success, info} )
 })
-
 // 儲存商品(編輯用)
 app.post('/save_product', async (req, res) => {
     const {id, token, remain_imgs, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
-    let response = await fetch(`${DB_URL}/products?id=${id}&account=${account}`)
+    let response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
     let result = await response.json()
     if (!result[0]) {
         res.json( {success : false} )
@@ -275,6 +270,36 @@ app.post('/save_product', async (req, res) => {
         body : JSON.stringify(product)
     })
     res.json( {success : true} )
+})
+
+/* ======================================== */
+// 取得我的商品
+app.post('/my_products', async (req, res) => {
+    const {token} = req.body
+    // 驗證身分
+    const {account} = decodeToken(token)
+    let response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false, avl_products : null, na_products : null} )
+        return
+    }
+    // 取得商品
+    response = await fetch(`${DB_URL}/products?provider=${account}&launched=true`)
+    result = await response.json()
+    const avl_products = [...result]
+    response = await fetch(`${DB_URL}/products?provider=${account}&launched=false`)
+    result = await response.json()
+    const na_products = [...result]
+    res.json({success : true, avl_products, na_products})
+})
+// 刪除我的商品
+app.post('/delete_product', async (req, res) => {
+    res.json({})
+})
+// 上架/下架我的商品
+app.post('/launch_product', async (req, res) => {
+    res.json({})
 })
 
 /* ======================================== */
