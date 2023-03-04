@@ -152,15 +152,15 @@ app.post('/jwt', async (req, res) => {
 app.post('/chat_history', async (req, res) => {
     const {token, receiver} = req.body
     // 驗證身分
-    const user = decodeToken(token)
-    const provider = user?.account
+    const {account} = decodeToken(token)
+    const provider = account
     let response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
     let result = await response.json()
     if (!result[0] || !provider || !receiver || provider === receiver) {
         res.json({success : false, history : null})
         return
     }
-    // 取的聊天紀錄
+    // 取得聊天紀錄
     const query = `provider=${provider}&receiver=${receiver}&provider=${receiver}&receiver=${provider}`
     response = await fetch(`${DB_URL}/chat_history?${query}`)
     result = await response.json()
@@ -170,20 +170,18 @@ app.post('/chat_history', async (req, res) => {
 app.post('/chat_list', async (req, res) => {
     const {token} = req.body
     // 驗證身分
-    const user = decodeToken(token)
-    const provider = user?.account
-    let response = await fetch(`${DB_URL}/accounts?account=${provider}`)
+    const {account} = decodeToken(token)
+    let response = await fetch(`${DB_URL}/accounts?account=${account}`)
     let result = await response.json()
     if (!result[0]) {
         res.json({success : false, list : null})
         return
     }
     // 取得除了自己外的所有帳號
-    response = await fetch(`${DB_URL}/accounts?account_ne=${provider}`)
+    response = await fetch(`${DB_URL}/accounts?account_ne=${account}`)
     result = await response.json()
     result = result.map( user => {
-        const account = user?.account
-        return {account}
+        return {account : user?.account}
     })
     res.json( {success : true, list : result} )
 })
@@ -230,16 +228,16 @@ app.post('/add_product', async (req, res) => {
 // 取得商品(編輯用)
 app.post('/edit_product', async (req, res) => {
     const {token, id} = req.body
+    // 驗證身分
     const {account} = decodeToken(token)
-    if (!account) {
+    const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
+    const result = await response.json()
+    if (!result[0]) {
         res.json( {success : false, info : null} )
         return
     }
-    const response = await fetch(`${DB_URL}/products?id=${id}`)
-    const result = await response.json()
-    const success = (account === result[0]?.provider)
-    const info = success? result[0]: null
-    res.json( {success, info} )
+    // 回傳
+    res.json( {success : true, info : result[0]} )
 })
 // 儲存商品(編輯用)
 app.post('/save_product', async (req, res) => {
