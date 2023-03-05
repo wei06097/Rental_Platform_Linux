@@ -91,7 +91,7 @@ async function saveImg(img, doSave) {
     })
     // 儲存圖片到 img 資料夾
     const type = img.replace("data:image/","").split(";")[0]
-    const path = `${__dirname}\\img\\${number}.${type}`
+    const path = `${__dirname}/img/${number}.${type}`
     const data = img.replace(/^data:image\/\w+;base64,/, "")
     const buf = Buffer.from(data, 'base64')
     if (doSave) fs.writeFile(path, buf, () => {})
@@ -187,8 +187,8 @@ app.post('/chat_list', async (req, res) => {
 })
 // 顯示圖片
 app.get('/img/:name', async (req, res) => {
-    const Picture = `${__dirname}\\img\\${req.params.name}`
-    const NotFound = `${__dirname}\\img\\NotFound.jpeg`
+    const Picture = `${__dirname}/img/${req.params.name}`
+    const NotFound = `${__dirname}/img/NotFound.jpeg`
     fs.readFile(Picture, (err) => {
         res.sendFile(err? NotFound: Picture)
     })
@@ -307,7 +307,7 @@ app.post('/delete_product', async (req, res) => {
         return
     }
     // 刪除不要的圖片
-    (result[0]?.imgs || []).forEach(path => fs.unlink(path, () => {}))
+    (result[0]?.imgs || []).forEach(path => fs.unlink(`${__dirname}/${path}`, () => {}))
     // 從資料庫刪除
     await fetch(`${DB_URL}/products/${id}`, {method : "DELETE"})
     res.json( {success : true} )
