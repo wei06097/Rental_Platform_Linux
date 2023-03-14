@@ -85,6 +85,7 @@ export default function Store() {
                         products.map( element => 
                             <OverviewCards.ProductCard
                                 key={element.id}
+                                id={element.id}
                                 link={`${API.WS_URL}/${element?.imgs[0] || "img/0"}`}
                                 name={element?.name || ""}
                                 price={element?.price || ""}
