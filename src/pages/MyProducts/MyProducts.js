@@ -70,31 +70,29 @@ export default function MyProducts() {
         <main className="main">
             {
                 ! (available? products1: products2)[0]
-                ? <div style={{textAlign: "center"}}>沒有商品</div>
-                : <>
-                    {
-                        products1.map( element =>
-                            <Card
-                                key={element.id}
-                                show={available}
-                                item={element}
-                                toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
-                                refresh={getMyProducts}
-                            />
-                        )
-                    }
-                    {
-                        products2.map( element => 
-                            <Card
-                                key={element.id}
-                                show={!available}
-                                item={element}
-                                toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
-                                refresh={getMyProducts}
-                            />
-                        )
-                    }
-                </>
+                && <div style={{textAlign: "center"}}>沒有商品</div>
+            }
+            {
+                products1.map( element =>
+                    <Card
+                        key={element.id}
+                        show={available}
+                        item={element}
+                        toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
+                        refresh={getMyProducts}
+                    />
+                )
+            }
+            {
+                products2.map( element =>
+                    <Card
+                        key={element.id}
+                        show={!available}
+                        item={element}
+                        toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
+                        refresh={getMyProducts}
+                    />
+                )
             }
         </main>
         <div className="base" />
@@ -108,7 +106,7 @@ export default function MyProducts() {
 
 const Card = ({ show, item, toEditPage, refresh }) => {
     return <>
-        <div className={style.product} style={show? {display: "none"}: {}}>
+        <div className={show? style.product: style.none}>
             <div className={style.product_info}>
                 <div className={style.img}>
                     <img src={`${API.WS_URL}/${item?.imgs[0] || "img/error"}`} alt="" />
