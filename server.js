@@ -353,6 +353,16 @@ app.post('/store', async (req, res) => {
     res.json( {success : true, provider : provider, products : result} )
 })
 
+// 商品頁面
+app.post('/product', async (req, res) => {
+    const {id} = req.body
+    const response = await fetch(`${DB_URL}/products?id=${id}&launched=true`)
+    const result = await response.json()
+    const success = result[0]? true: false
+    const product = result[0] || []
+    res.json( {success, product} )
+})
+
 /* ======================================== */
 server.listen(PORT, HOST, () => {
     console.log("\n===== Start =====")

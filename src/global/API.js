@@ -17,6 +17,7 @@ const DELETE_PRODUCT = `${API_URL}/delete_product`
 const LAUNCH_PRODUCT = `${API_URL}/launch_product`
 
 const STORE = `${API_URL}/store`
+const PRODUCT = `${API_URL}/product`
 
 export async function get(url) {
     const response = await fetch(url)
@@ -42,6 +43,6 @@ const API = {
     CHAT_LIST, CHAT_HISTORY,
     ADD_PRODUCT, EDIT_PRODUCT, SAVE_PRODUCT,
     MY_PRODUCTS, DELETE_PRODUCT, LAUNCH_PRODUCT,
-    STORE
+    STORE, PRODUCT
 }
 export default API
