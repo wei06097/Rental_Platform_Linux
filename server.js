@@ -372,7 +372,6 @@ app.post('/result', async (req, res) => {
     const {keyword} = req.body
     const response = await fetch(`${DB_URL}/products?name_like=${keyword}`)
     const result = await response.json()
-    console.log(result)
     res.json( {result} )
 })
 
