@@ -66,11 +66,10 @@
 }
 
 .product_info > .detail {
-    width: 100%; padding: 0;
+    width: 100%; padding: 10px 0;
 }
-.product_info > .detail > div {
-    margin: 10px 0 0;
-}
+.product_info > .detail > div {margin-top: 5px;}
+.product_info > .detail > div:nth-child(1) {margin-top: 0;}
 .product_info > .detail > div > span:nth-child(1) {
     width: 100%; color: #777;
 }
@@ -114,8 +113,8 @@
         width: var(--width);
     }
     .product_info > .product_price {
-        --height: 30px; padding: 0;
-        background-color: inherit;
+        --height: 0; background-color: inherit;
+        padding: 0; margin: 10px 0 20px;
     }
     .product_description {
         padding: 10px;
