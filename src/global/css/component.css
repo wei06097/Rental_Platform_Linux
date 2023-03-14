@@ -33,7 +33,7 @@
 .button {
     --color: #fff; --bgColor: #0d6efdcc;
     user-select: none; cursor: pointer; font-size: 15px;
-    height: 40px; margin: 5px; 
+    height: 40px; margin: 5px; word-break: keep-all;
     border: 1px solid var(--color); border-radius: 10px;
     color: var(--color); background-color: var(--bgColor);
 }
