@@ -66,10 +66,10 @@
 }
 
 .product_info > .detail {
-    width: 100%; padding: 20px 10px;
+    width: 100%; padding: 0;
 }
 .product_info > .detail > div {
-    margin: 0 0 15px;
+    margin: 10px 0 0;
 }
 .product_info > .detail > div > span:nth-child(1) {
     width: 100%; color: #777;
@@ -83,7 +83,7 @@
 /* ======================================== */
 .product_description {
     width: 100%; margin-top: 10px;
-    border: 1px solid #ddd; padding: 10px 20px;
+    border: 1px solid #ddd; padding: 10px 15px;
 }
 .product_description > div:nth-child(1),
 .product_description > div:nth-child(3) {
@@ -116,6 +116,9 @@
     .product_info > .product_price {
         --height: 30px; padding: 0;
         background-color: inherit;
+    }
+    .product_description {
+        padding: 10px;
     }
 }
 
