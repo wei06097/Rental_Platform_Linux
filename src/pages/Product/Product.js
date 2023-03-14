@@ -30,7 +30,7 @@ export default function Product() {
         }
     }, [id])
     useEffect(() => {
-        document.title = `商品 - ${product?.description || ""}`
+        document.title = `商品 - ${product?.name || ""}`
     }, [product])
     /* ==================== 分隔線 ==================== */
     return <>
