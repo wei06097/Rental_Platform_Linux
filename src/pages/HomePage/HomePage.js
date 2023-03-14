@@ -2,6 +2,8 @@
 /* ======================================== */
 /* CSS */
 import style from "./HomePage.module.css"
+/* API */
+import API from "../../global/API"
 /* Functions */
 import AccountActions from "../../global/functions/AccountActions"
 /* Components */
@@ -12,41 +14,31 @@ import ShoppingCart from "../../global/icon/ShoppingCart"
 import Message from "../../global/icon/Message"
 import User from "../../global/icon/User"
 /* React Hooks */
-import { useState, useEffect, useLayoutEffect } from "react"
+import { useState, useEffect } from "react"
 
 /* ======================================== */
-/* Functions */
-let counter = 0
-function fetchData() {
-    let array = [], number=20
-    for (let i=0; i<number; i++) {
-        counter += 1
-        array = [...array, counter]
-    }
-    return array
-}
-
 /* React Components */
 export default function HomePage() {
     const [logined, setLogined] = useState(false)
-    const [Array, setArray] = useState(fetchData())
+    const [products, setProducts] = useState([])
     useEffect( () => {
         window.scrollTo({"top": 0})
-        window.addEventListener("scroll", moreProducts)
-        function moreProducts() {
-            const body = document.body
-            const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
-            if (bottomDistance < 1000) {
-                const newArray = fetchData()
-                setArray(prevArray => [...prevArray, ...newArray])
-            }
+        init()
+        async function init() {
+            const {result} = await API.get(API.HOMEPAGE)
+            setProducts(result || [])
         }
+        // window.addEventListener("scroll", moreProducts)
+        // function moreProducts() {
+        //     const body = document.body
+        //     const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
+        //     if (bottomDistance < 1000) {}
+        // }
         return () => {
-            counter = 0
-            window.removeEventListener('scroll', moreProducts)
+            // window.removeEventListener('scroll', moreProducts)
         }
     }, [])
-    useLayoutEffect(() => {
+    useEffect(() => {
         document.title = "台科大租借平台"
         checkLogin()
         async function checkLogin() {
@@ -74,15 +66,20 @@ export default function HomePage() {
                     <img src="https://dengekidaioh.jp/archives/003/201908/7abf06c543302ba23fa6e35a50db895b.png" alt=""></img>
                 </div>
             </div>
+            {
+                !products[0] &&
+                <div style={{textAlign: "center"}}>沒有商品</div>
+            }
             <OverviewCards>
                 {
-                    Array.map( element => 
+                    products.map( element =>
                         <OverviewCards.ProductCard
-                            key={element}
-                            link={"https://cf.shopee.tw/file/7547aa6b546059505722d474287b8371"}
-                            name={"三顆星彩色冒險 三顆星彩色冒險 三顆星彩色冒險 三顆星彩色冒險"}
-                            price={"100"}
-                            showHeart={true}
+                            key={element.id}
+                            id={element.id}
+                            link={`${API.WS_URL}/${element?.imgs[0] || "img/0"}`}
+                            name={element?.name}
+                            price={element?.price}
+                            showHeart={false}
                         />
                     )
                 }
