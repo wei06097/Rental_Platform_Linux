@@ -352,7 +352,6 @@ app.post('/store', async (req, res) => {
     result = await response.json()
     res.json( {success : true, provider : provider, products : result} )
 })
-
 // 商品頁面
 app.post('/product', async (req, res) => {
     const {id} = req.body
@@ -361,6 +360,20 @@ app.post('/product', async (req, res) => {
     const success = result[0]? true: false
     const product = result[0] || []
     res.json( {success, product} )
+})
+// 首頁給商品
+app.get('/homepage', async (req, res) => {
+    const response = await fetch(`${DB_URL}/products?launched=true`)
+    const result = await response.json()
+    res.json( {result} )
+})
+// 搜尋商品
+app.post('/result', async (req, res) => {
+    const {keyword} = req.body
+    const response = await fetch(`${DB_URL}/products?name_like=${keyword}`)
+    const result = await response.json()
+    console.log(result)
+    res.json( {result} )
 })
 
 /* ======================================== */
