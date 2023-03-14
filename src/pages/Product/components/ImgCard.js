@@ -1,12 +1,15 @@
+/* import */
+/* ======================================== */
 /* CSS */
 import style from "../Product.module.css"
-
+/* API */
+import API from "../../../global/API"
 /* React Hooks */
 import { useEffect, useRef } from "react"
 
-/* React Components */
+/* ======================================== */
 let presentPage = 1, displacement = 0, startPosition = 0
-
+/* React Components */
 export default function ImgCard({ ImgArray }) {
     const container = useRef()
     useEffect( () => {
@@ -48,7 +51,7 @@ export default function ImgCard({ ImgArray }) {
             {
                 ImgArray.map( (element, i) => {
                     return <div key={i}>
-                        <img src={element} alt="" />
+                        <img src={`${API.WS_URL}/${element}`} alt="" />
                     </div>
                 })
             }
