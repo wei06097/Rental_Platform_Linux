@@ -4,10 +4,10 @@ import style from "./OverviewCards.module.css"
 /* React Hooks */
 import { Link } from "react-router-dom"
 
-function ProductCard({ link, name, price, showHeart }) {
+function ProductCard({id, link, name, price, showHeart }) {
     return <>
         <div className={style.product_card} >
-            <Link to="/Product/1">
+            <Link to={`/Product/${id}`}>
                 <div className={style.img}>
                     <img src={link} alt="" />
                 </div>
