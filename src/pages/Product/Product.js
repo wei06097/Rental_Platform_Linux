@@ -24,7 +24,7 @@ export default function Product() {
         init()
         window.scrollTo({"top": 0})
         async function init() {
-            const {success, product} = await API.post(API.PRODUCT, {id})
+            const {success, product} = await API.get(`${API.PRODUCT}/?id=${id}`, null)
             if (!success) window.location.replace("/")
             else setProduct(product)
         }

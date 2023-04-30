@@ -25,7 +25,7 @@ export default function Store() {
         window.scrollTo({"top": 0})
         async function init() {
             const token = localStorage.getItem("token")
-            const {success, provider, products} = await API.post(API.STORE, {token, seller})
+            const {success, provider, products} = await API.get(`${API.STORE}/?seller=${seller}`, token)
             if (!success) window.location.replace("/")
             setProducts(products || [])
             setInfo(provider || {})

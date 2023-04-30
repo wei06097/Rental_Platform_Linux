@@ -15,7 +15,7 @@ import { Link, useNavigate } from "react-router-dom"
 /* Functions */
 async function launchProduct(id, launched, refresh) {
     const token = localStorage.getItem("token")
-    const {success} = await API.post(API.LAUNCH_PRODUCT, {token, id, launched})
+    const {success} = await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
     if (!success) alert("操作失敗")
     else refresh()
 }
@@ -23,7 +23,7 @@ async function deleteProduct(id, refresh) {
     const confirm = window.confirm("確定要刪除")
     if (!confirm) return
     const token = localStorage.getItem("token")
-    const {success} = await API.post(API.DELETE_PRODUCT, {token, id})
+    const {success} = await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
     if (!success) alert("刪除商品失敗")
     else refresh()
 }
@@ -41,7 +41,7 @@ export default function MyProducts() {
     }, [])
     async function getMyProducts() {
         const token = localStorage.getItem("token")
-        const {success, avl_products, na_products} = await API.post(API.MY_PRODUCTS, {token})
+        const {success, avl_products, na_products} = await API.get(API.MY_PRODUCTS, token)
         if (!success) window.location.replace("/")
         setProducts1(avl_products)
         setProducts2(na_products)

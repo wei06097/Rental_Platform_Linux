@@ -24,7 +24,7 @@ export default function Result() {
         document.title = `${keyword} - 台科大租借平台`
         searchProducts(keyword)
         async function searchProducts(keyword) {
-            const {result} = await API.post(API.RESULT, {keyword})
+            const {result} = await API.get(`${API.RESULT}/?keyword=${keyword}`, null)
             setProducts(result)
         }
     }, [path])

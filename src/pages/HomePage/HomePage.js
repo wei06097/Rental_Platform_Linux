@@ -25,7 +25,7 @@ export default function HomePage() {
         window.scrollTo({"top": 0})
         init()
         async function init() {
-            const {result} = await API.get(API.HOMEPAGE)
+            const {result} = await API.get(API.HOMEPAGE, null)
             setProducts(result || [])
         }
         // window.addEventListener("scroll", moreProducts)

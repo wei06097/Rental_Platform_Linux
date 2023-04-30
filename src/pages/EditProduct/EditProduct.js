@@ -44,7 +44,7 @@ export default function EditProduct() {
         }
         async function getInfo() {
             const token = localStorage.getItem("token")
-            const {success, info} = await API.post(API.EDIT_PRODUCT, {token, id})
+            const {success, info} = await API.get(`${API.CRUD_PRODUCT}/?id=${id}`, token)
             if (!success) goHome()
             const {imgs, name, description, price, amount, position} = info
             setRemoteImgs(imgs.map( img => `${API.WS_URL}/${img}`))
@@ -89,11 +89,11 @@ export default function EditProduct() {
         // post
         const token = localStorage.getItem("token")
         const payload = (mode === "add")
-            ? {token, launched, imgs, name, description, price, amount, position}
-            : {id, token, remain_imgs, imgs, name, description, price, amount, position}
+            ? {launched, imgs, name, description, price, amount, position}
+            : {remain_imgs, imgs, name, description, price, amount, position}
         const {success} = (mode === "add")
-            ? await API.post(API.ADD_PRODUCT, payload)
-            : await API.post(API.SAVE_PRODUCT, payload)
+            ? await API.post(API.CRUD_PRODUCT, token, payload)
+            : await API.put(`${API.CRUD_PRODUCT}/?id=${id}`, token, payload)
         if (!success) alert("儲存商品失敗")
         else navigate(-1)
     }

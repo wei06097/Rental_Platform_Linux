@@ -108,7 +108,7 @@ function decodeToken(token) {
 }
 
 /* ======================================== */
-app.post("/signup", async (req, res) => {
+app.post("/api/signup", async (req, res) => {
     const {account} = req.body
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
     let result = await response.json()
@@ -129,7 +129,7 @@ app.post("/signup", async (req, res) => {
     }
     res.json( {success, message} )
 })
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
     const {account, password} = req.body
     const response = await fetch(`${DB_URL}/accounts?account=${account}`)
     const result = await response.json()
@@ -140,8 +140,8 @@ app.post("/login", async (req, res) => {
     else message = jwt.sign(result[0], JWT_SECRET)
     res.json( {success, message, account} )
 })
-app.post('/jwt', async (req, res) => {
-    const {token} = req.body
+app.get('/api/token_verify', async (req, res) => {
+    const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
     const success = account? true: false
     res.json( {success, account} )
@@ -149,8 +149,9 @@ app.post('/jwt', async (req, res) => {
 
 /* ======================================== */
 // 回傳聊天歷史紀錄
-app.post('/chat_history', async (req, res) => {
-    const {token, receiver} = req.body
+app.get('/chat_history', async (req, res) => {
+    const receiver = req.query?.receiver || undefined
+    const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
     const provider = account
@@ -167,8 +168,8 @@ app.post('/chat_history', async (req, res) => {
     res.json( {success : true, history : result} )
 })
 // 回傳所有帳號
-app.post('/chat_list', async (req, res) => {
-    const {token} = req.body
+app.get('/chat_list', async (req, res) => {
+    const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -195,9 +196,10 @@ app.get('/img/:name', async (req, res) => {
 })
 
 /* ======================================== */
-// 新增商品
-app.post('/add_product', async (req, res) => {
-    const {token, launched, imgs, name, description, price, amount, position} = req.body
+// C 新增商品
+app.post('/api/commodity/commodity_CRUD', async (req, res) => {
+    const token = req.headers?.authorization || undefined
+    const {launched, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
     const response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -225,9 +227,10 @@ app.post('/add_product', async (req, res) => {
     })
     res.json( {success : true} )
 })
-// 取得商品(編輯用)
-app.post('/edit_product', async (req, res) => {
-    const {token, id} = req.body
+// R 取得商品
+app.get('/api/commodity/commodity_CRUD', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
     const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
@@ -239,9 +242,11 @@ app.post('/edit_product', async (req, res) => {
     // 回傳
     res.json( {success : true, info : result[0]} )
 })
-// 儲存商品(編輯用)
-app.post('/save_product', async (req, res) => {
-    const {id, token, remain_imgs, imgs, name, description, price, amount, position} = req.body
+// U 儲存商品
+app.put('/api/commodity/commodity_CRUD', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
+    const {remain_imgs, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
     const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
@@ -273,11 +278,27 @@ app.post('/save_product', async (req, res) => {
     })
     res.json( {success : true} )
 })
-
-/* ======================================== */
-// 取得我的商品
-app.post('/my_products', async (req, res) => {
-    const {token} = req.body
+// D 刪除商品
+app.delete('/api/commodity/commodity_CRUD', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
+    // 驗證身分
+    const {account} = decodeToken(token)
+    let response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
+    let result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 刪除不要的圖片
+    (result[0]?.imgs || []).forEach(path => fs.unlink(`${__dirname}/${path}`, () => {}))
+    // 從資料庫刪除
+    await fetch(`${DB_URL}/products/${id}`, {method : "DELETE"})
+    res.json( {success : true} )
+})
+// 取得我的所有商品
+app.get('/api/commodity/my_commodity', async (req, res) => {
+    const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -295,26 +316,11 @@ app.post('/my_products', async (req, res) => {
     const na_products = [...result]
     res.json({success : true, avl_products, na_products})
 })
-// 刪除我的商品
-app.post('/delete_product', async (req, res) => {
-    const {token, id} = req.body
-    // 驗證身分
-    const {account} = decodeToken(token)
-    let response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
-    let result = await response.json()
-    if (!result[0]) {
-        res.json( {success : false} )
-        return
-    }
-    // 刪除不要的圖片
-    (result[0]?.imgs || []).forEach(path => fs.unlink(`${__dirname}/${path}`, () => {}))
-    // 從資料庫刪除
-    await fetch(`${DB_URL}/products/${id}`, {method : "DELETE"})
-    res.json( {success : true} )
-})
 // 上架/下架我的商品
-app.post('/launch_product', async (req, res) => {
-    const {token, id, launched} = req.body
+app.put('/launch_product', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
+    const {launched} = req.body
     // 驗證身分
     const {account} = decodeToken(token)
     const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
@@ -335,8 +341,8 @@ app.post('/launch_product', async (req, res) => {
 
 /* ======================================== */
 // 查看賣場
-app.post('/store', async (req, res) => {
-    const {seller} = req.body
+app.get('/store', async (req, res) => {
+    const seller = req.query?.seller || undefined
     // 確認賣場存在
     let response = await fetch(`${DB_URL}/accounts?account=${seller}`)
     let result = await response.json()
@@ -353,8 +359,8 @@ app.post('/store', async (req, res) => {
     res.json( {success : true, provider : provider, products : result} )
 })
 // 商品頁面
-app.post('/product', async (req, res) => {
-    const {id} = req.body
+app.get('/product', async (req, res) => {
+    const id = req.query?.id || undefined
     const response = await fetch(`${DB_URL}/products?id=${id}&launched=true`)
     const result = await response.json()
     const success = result[0]? true: false
@@ -368,8 +374,9 @@ app.get('/homepage', async (req, res) => {
     res.json( {result} )
 })
 // 搜尋商品
-app.post('/result', async (req, res) => {
-    const {keyword} = req.body
+app.get('/result', async (req, res) => {
+    const keyword = req.query?.keyword || undefined
+    console.log(keyword)
     const response = await fetch(`${DB_URL}/products?name_like=${keyword}`)
     const result = await response.json()
     res.json( {result} )
