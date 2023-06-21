@@ -7,27 +7,13 @@ import API from "../../global/API"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
+/* Components */
+import Card from "./Components/Card"
 /* React Hooks */
 import { useState, useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
 /* ======================================== */
-/* Functions */
-async function launchProduct(id, launched, refresh) {
-    const token = localStorage.getItem("token")
-    const {success} = await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
-    if (!success) alert("操作失敗")
-    else refresh()
-}
-async function deleteProduct(id, refresh) {
-    const confirm = window.confirm("確定要刪除")
-    if (!confirm) return
-    const token = localStorage.getItem("token")
-    const {success} = await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
-    if (!success) alert("刪除商品失敗")
-    else refresh()
-}
-
 /* React Components */
 let showAvailable = true
 export default function MyProducts() {
@@ -101,35 +87,5 @@ export default function MyProducts() {
                 <button className="button grow">新增商品</button>
             </Link>
         </footer>
-    </>
-}
-
-const Card = ({ show, item, toEditPage, refresh }) => {
-    return <>
-        <div className={show? style.product: style.none}>
-            <div className={style.product_info}>
-                <div className={style.img}>
-                    <img src={`${API.WS_URL}/${item?.imgs[0] || "img/error"}`} alt="" />
-                </div>
-                <div className={style.content}>
-                    <p className={style.product_name}>{item?.name || "error"}</p>
-                    <div className={style.product_price}>NT$ {item?.price || "error"} / 每天</div>
-                </div>
-            </div>
-            <div className={style.product_btnGroup}>
-                <button className="button grow"
-                    onClick={() => {deleteProduct(item.id, refresh)}}>
-                    刪除
-                </button>
-                <button className="button grow"
-                    onClick={() => {launchProduct(item.id, !item?.launched, refresh)}}>
-                    {item?.launched? "下架": "上架"}
-                </button>
-                <button className="button grow"
-                    onClick={toEditPage}>
-                    編輯
-                </button>
-            </div>
-        </div>
     </>
 }
