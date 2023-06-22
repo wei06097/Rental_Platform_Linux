@@ -326,7 +326,7 @@ app.put('/launch_product', async (req, res) => {
     const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
     const result = await response.json()
     if (!result[0]) {
-        res.json( {success : true, id : null} )
+        res.json( {success : false, id : null} )
         return
     }
     // 更新資料庫的商品
