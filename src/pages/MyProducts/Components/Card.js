@@ -6,28 +6,17 @@ import style from "../MyProducts.module.css"
 import API from "../../../global/API"
 /* React Hooks */
 import { useState, useEffect, useRef } from "react"
+import { useSelector, useDispatch } from "react-redux"
+import { deleteProduct, launchProduct } from "../../../store/myProductSlice"
 
 /* ======================================== */
-/* Functions */
-async function launchProduct(id, launched, refresh) {
-    const token = localStorage.getItem("token")
-    const {success} = await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
-    if (!success) alert("操作失敗")
-    else refresh()
-}
-async function deleteProduct(id, refresh) {
-    const confirm = window.confirm("確定要刪除")
-    if (!confirm) return
-    const token = localStorage.getItem("token")
-    const {success} = await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
-    if (!success) alert("刪除商品失敗")
-    else refresh()
-}
-
 /* React Components */
-export default function Card({ show, item, toEditPage, refresh }) {
-    const [loaded, setLoaded] = useState(false)
+export default function Card({ item, launched, toEditPage }) {
+    const dispatch = useDispatch()
+    const {isHandling} = useSelector(state => state.myProduct)
     const imgRef = useRef()
+    const [loaded, setLoaded] = useState(false)
+
     useEffect(() => {
         const imgElement = imgRef.current
         const loaded = () => setLoaded(true)
@@ -37,8 +26,18 @@ export default function Card({ show, item, toEditPage, refresh }) {
         }
     }, [])
 
+    function deleteHandler(id) {
+        const confirm = window.confirm("確定要刪除")
+        if (!confirm) return
+        dispatch(deleteProduct({id}))
+    }
+    function launchHandler(id, launched) {
+        dispatch(launchProduct({id, launched}))
+    }
+
+    /* ==================== 分隔線 ==================== */
     return <>
-        <div className={show? style.product: style.none}>
+        <div className={style.product}>
             <div className={style.product_info}>
                 <div className={style.img}>
                     {!loaded && <div className="fill skeleton" />}
@@ -55,15 +54,18 @@ export default function Card({ show, item, toEditPage, refresh }) {
             </div>
             <div className={style.product_btnGroup}>
                 <button className="button grow"
-                    onClick={() => {deleteProduct(item.id, refresh)}}>
+                    onClick={() => {deleteHandler(item.id)}}
+                    disabled={isHandling}>
                     刪除
                 </button>
                 <button className="button grow"
-                    onClick={() => {launchProduct(item.id, !item?.launched, refresh)}}>
-                    {item?.launched? "下架": "上架"}
+                    onClick={() => {launchHandler(item.id, !launched)}}
+                    disabled={isHandling}>
+                    {launched? "下架": "上架"}
                 </button>
                 <button className="button grow"
-                    onClick={toEditPage}>
+                    onClick={toEditPage}
+                    disabled={isHandling}>
                     編輯
                 </button>
             </div>

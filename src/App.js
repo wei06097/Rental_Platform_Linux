@@ -4,6 +4,7 @@
 import "./global/css/body.css"
 import "./global/css/navbar.css"
 import "./global/css/component.css"
+import "./global/css/loading-ring.css"
 /* Components: pages */
 import NotFound from "./NotFound"
 import HomePage from "./pages/HomePage/HomePage"
@@ -24,37 +25,41 @@ import Profile from "./pages/Profile/Profile"
 import ChatList from "./pages/ChatList/ChatList"
 import ChatRoom from "./pages/ChatRoom/ChatRoom"
 /* React Hooks */
-import SocketProvider from "./global/hooks/SocketProvider"
+import store from "./store"
+import { Provider } from "react-redux"
 import { Routes, Route } from "react-router-dom"
+import SocketProvider from "./global/hooks/SocketProvider"
 
 /* ======================================== */
 /* React Components */
 function App() {
   return <>
-    <SocketProvider>
-      <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/SignIn" element={<SignIn />} />
-          <Route path="/SignUp" element={<SignUp />} />
-          <Route path="/ChatList" element={<ChatList />} />
-          <Route path="/ChatRoom/:receiver" element={<ChatRoom />} />
-          <Route path="/Store/:seller" element={<Store />} />
-          <Route path="/MyProducts" element={<MyProducts />} />
-          <Route path="/EditProduct/:id" element={<EditProduct />} />
+      <Provider store={store}>
+      <SocketProvider>
+        <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/SignIn" element={<SignIn />} />
+            <Route path="/SignUp" element={<SignUp />} />
+            <Route path="/ChatList" element={<ChatList />} />
+            <Route path="/ChatRoom/:receiver" element={<ChatRoom />} />
+            <Route path="/Store/:seller" element={<Store />} />
+            <Route path="/MyProducts" element={<MyProducts />} />
+            <Route path="/EditProduct/:id" element={<EditProduct />} />
 
-          <Route path="/Result" element={<Result />} />
-          <Route path="/Product/:id" element={<Product />} />
-          <Route path="/ShoppingCart" element={<ShoppingCart />} /> 
-          <Route path="/MyCollect" element={<MyCollect />} />
-          <Route path="/MyShopping" element={<MyShopping />} />
-          <Route path="/MyOrder" element={<MyOrder />} />
-          <Route path="/OrderDetail" element={<OrderDetail />} />
-          <Route path="/Bill" element={<Bill />} />
-          <Route path="/Profile" element={<Profile />} />
+            <Route path="/Result" element={<Result />} />
+            <Route path="/Product/:id" element={<Product />} />
+            <Route path="/ShoppingCart" element={<ShoppingCart />} /> 
+            <Route path="/MyCollect" element={<MyCollect />} />
+            <Route path="/MyShopping" element={<MyShopping />} />
+            <Route path="/MyOrder" element={<MyOrder />} />
+            <Route path="/OrderDetail" element={<OrderDetail />} />
+            <Route path="/Bill" element={<Bill />} />
+            <Route path="/Profile" element={<Profile />} />
 
-          <Route path="*" element={<NotFound />} />
-      </Routes>
-    </SocketProvider>
+            <Route path="*" element={<NotFound />} />
+        </Routes>
+      </SocketProvider>
+      </Provider>
   </>
 }
 

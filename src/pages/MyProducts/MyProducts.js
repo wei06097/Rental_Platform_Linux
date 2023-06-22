@@ -2,40 +2,40 @@
 /* ======================================== */
 /* CSS */
 import style from "./MyProducts.module.css"
-/* API */
-import API from "../../global/API"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
 /* Components */
 import Card from "./Components/Card"
 /* React Hooks */
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useSelector, useDispatch } from "react-redux"
+import { changeOnOff, recordScrollY, getMyProducts } from "../../store/myProductSlice"
 
 /* ======================================== */
-/* React Components */
-let showAvailable = true
 export default function MyProducts() {
     const navigate = useNavigate()
-    const [available, setAvailable] = useState(showAvailable)
-    const [products1, setProducts1] = useState([])
-    const [products2, setProducts2] = useState([])
+    const dispatch = useDispatch()
+    const state = useSelector(state => state.myProduct)
+    const {on, scrollY, products, isLoading, isHandling} = state
+    const {product_on, product_off} = products
+
     useEffect( () => {
         document.title = "我的商品"
-        getMyProducts()
-    }, [])
-    async function getMyProducts() {
-        const token = localStorage.getItem("token")
-        const {success, avl_products, na_products} = await API.get(API.MY_PRODUCTS, token)
-        if (!success) window.location.replace("/")
-        setProducts1(avl_products)
-        setProducts2(na_products)
+        dispatch(getMyProducts())
+    }, [dispatch])
+
+    function changePage(state) {
+        if (isHandling) return
+        const target = scrollY
+        dispatch(recordScrollY(window.scrollY))
+        dispatch(changeOnOff(state))
+        setTimeout(() => {
+            window.scroll(window.scrollX, target)   
+        }, 10)
     }
-    function toggleAvailable(state) {
-        showAvailable = state
-        setAvailable(state)
-    }
+
     /* ==================== 分隔線 ==================== */
     return <>
         <header className="header2">
@@ -49,42 +49,49 @@ export default function MyProducts() {
                 </div>
             </div>
             <div>
-                <div onClick={() => {toggleAvailable(true)}} className={`grow ${available? "selected": ""}`}>已上架</div>
-                <div onClick={() => {toggleAvailable(false)}} className={`grow ${!available? "selected": ""}`}>未上架</div>
+                <div onClick={() => { changePage(true) }} 
+                    className={`grow ${on? "selected": ""}`}>已上架</div>
+                <div onClick={() => { changePage(false) }}
+                    className={`grow ${!on? "selected": ""}`}>未上架</div>
             </div>
         </header>
         <main className="main">
-            {
-                ! (available? products1: products2)[0]
-                && <div style={{textAlign: "center"}}>沒有商品</div>
+            {   
+                (isLoading || isHandling) &&
+                <div className = "loading-ring" />
             }
             {
-                products1.map( element =>
-                    <Card
-                        key={element.id}
-                        show={available}
-                        item={element}
-                        toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
-                        refresh={getMyProducts}
-                    />
-                )
+                !isLoading && !(on? product_on: product_off)[0] &&
+                <div style={{textAlign: "center"}}>沒有商品</div>
             }
             {
-                products2.map( element =>
+                !isLoading && on &&
+                product_on
+                    .map( element =>
+                        <Card
+                            key={element.id}
+                            item={element}
+                            launched={true}
+                            toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
+                        />
+                    )
+            }
+            {
+                !isLoading && !on &&
+                product_off.map( element =>
                     <Card
                         key={element.id}
-                        show={!available}
                         item={element}
+                        launched={false}
                         toEditPage={() => {navigate(`/EditProduct/${element.id}`)}}
-                        refresh={getMyProducts}
                     />
                 )
             }
         </main>
-        <div className="base" />
+        <div className="base"/>
         <footer>
             <Link className={`${style.link} flex_center grow`} to="/EditProduct/new">
-                <button className="button grow">新增商品</button>
+                <button className="button grow" disabled={isHandling}>新增商品</button>
             </Link>
         </footer>
     </>
