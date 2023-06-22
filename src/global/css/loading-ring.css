@@ -1,0 +1,24 @@
+.loading-ring {
+    --size: 80px; --margin: calc(50% - var(--size) * 0.5);
+    display: grid; position: fixed;
+    top: var(--margin); left: var(--margin);
+    width: var(--size); height: var(--size);
+    background-color: black; opacity: 0.3; border-radius: 8px;
+}
+.loading-ring:after {
+    --size: 40px; --color: #fff;
+    content: ""; display: block;
+    align-self: center; justify-self: center;
+    width: var(--size); height: var(--size);
+    border: 5px solid var(--color); border-radius: 50%;
+    border-color: var(--color) transparent var(--color) transparent;
+    animation: loading-ring 1s linear infinite;
+}
+@keyframes loading-ring {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
