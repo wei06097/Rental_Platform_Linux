@@ -12,11 +12,13 @@ import Home from "../../global/icon/Home"
 /* React Hooks */
 import { useEffect, useState } from "react"
 import { useParams, Link } from "react-router-dom"
+/* Redux */
+import { useSelector } from "react-redux"
 
 /* ======================================== */
 /* React Components */
 export default function Store() {
-    const account = localStorage.getItem("account")
+    const {account} = useSelector(state => state.account)
     const [info, setInfo] = useState({})
     const [products, setProducts] = useState([])
     const {seller} = useParams()

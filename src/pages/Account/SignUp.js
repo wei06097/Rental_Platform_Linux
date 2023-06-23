@@ -4,98 +4,89 @@
 import style from "./Account.module.css"
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
-import AccountActions from "../../global/functions/AccountActions"
 /* Components */
 import Back from "../../global/icon/Back"
-/* React Hooks */
-import { useState, useLayoutEffect } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import Home from "../../global/icon/Home"
+/* Hooks */
+import { useEffect, useRef } from "react"
+import { Link, useNavigate } from "react-router-dom"
+/* Redux */
+import { useSelector, useDispatch } from "react-redux"
+import { doSignup } from "../../store/accountSlice"
 
 /* ======================================== */
 /* React Components */
 export default function SignUp() {
     const navigate = useNavigate()
-    const [account, setAccount] = useState("")
-    const [password, setPassword] = useState("")
-    const [password2, setPassword2] = useState("")
-    const [phone, setPhone] = useState("")
-    const [mail, setMail] = useState("")
-    useLayoutEffect( () => {
-        document.title = "註冊"
-        checkLogin()
-        async function checkLogin() {
-            const logined = await AccountActions.check()
-            if (logined) navigate(-1)
-        }
-    }, [navigate])
+    const dispatch = useDispatch()
+    const {isLogin, isHandling} = useSelector(state => state.account)
+    const accountRef = useRef()
+    const passwordRef = useRef()
+    const password2Ref = useRef()
+    const phoneRef = useRef()
+    const mailRef = useRef()
 
-    function doSignup(e) {
-        e.preventDefault()
-        const legal = InputChecker.noBlank(account, password, phone, mail) && (password === password2)
-        if (legal) AccountActions.signup( {account, password, phone, mail} )
-    }
-    function comparePassword(e) {
-        setPassword2(e.target.value)
-        const correct = (password === e.target.value) && (e.target.value !== "")
-        if (correct) e.target.classList.add(style.shadow)
-        else e.target.classList.remove(style.shadow)
-    }
-    function addShadow(e) {
-        if (e.target.value === "") e.target.classList.remove(style.shadow)
-        else e.target.classList.add(style.shadow)
-    }
+    useEffect( () => {
+        document.title = "註冊"
+    }, [])
+    useEffect( () => {
+        if (isLogin) navigate("/")
+    }, [isLogin, navigate])
     
+    function submitHandler(e) {
+        e.preventDefault()
+        const account = accountRef.current.value
+        const password = passwordRef.current.value
+        const password2 = password2Ref.current.value
+        const phone = phoneRef.current.value
+        const mail = mailRef.current.value
+        const isSame = password === password2
+        const isLegal = InputChecker.noBlank(account, password, phone, mail)
+        if (!isSame) alert("密碼確認不相同")
+        else if (!isLegal) alert("輸入不合法")
+        else dispatch(doSignup({account, password, phone, mail}))
+    }
+    function signinHandler(e) {
+        if (isHandling) e.preventDefault()
+    }
+
+    /* ==================== 分隔線 ==================== */
     return <>
         <header>
             <div className="flex_center">
                 <Back />
                 <span>註冊</span>
             </div>
+            <div className="flex_center">
+                <Home />
+            </div>
         </header>
         <main className="main">
-            <form className={style.container} onSubmit={doSignup}>
+            {
+                isHandling &&
+                <div className="loading-ring" />
+            }
+            <form className={style.container} onSubmit={submitHandler}>
                 <div style={{fontSize:"25px", textAlign:"center"}}>註冊</div>
                 <br />
 
                 <p>帳號</p>
-                <input type="text" autoComplete="username"
-                    value={account} onChange={e => {
-                        setAccount(e.target.value)
-                        addShadow(e)
-                    }}
-                />
+                <input type="text" autoComplete="username" ref={accountRef} />
                 <p>密碼</p>
-                <input type="password" autoComplete="new-password"
-                    value={password} onChange={e => {
-                        setPassword(e.target.value)
-                        addShadow(e)
-                    }}
-                />
+                <input type="password" autoComplete="new-password" ref={passwordRef} />
                 <p>確認密碼</p>
-                <input type="password" autoComplete="new-password"
-                    value={password2} onChange={comparePassword}
-                />
+                <input type="password" autoComplete="new-password" ref={password2Ref} />
                 <p>手機</p>
-                <input type="number"
-                    value={phone} onChange={e => {
-                        setPhone(e.target.value)
-                        addShadow(e)
-                    }}
-                />
+                <input type="number" ref={phoneRef} />
                 <p>信箱</p>
-                <input type="text"
-                    value={mail} onChange={e => {
-                        setMail(e.target.value)
-                        addShadow(e)
-                    }}
-                />
-                
+                <input type="text" ref={mailRef} />
                 <br />
-                <input type="submit" value="確認" />
+                <input type="submit" value="確認"/>
                 <br /><br />
+
                 <div style={{fontSize:"15px", textAlign:"center"}}>
                     <span style={{paddingRight: "5px"}}>已經有帳號?</span>
-                    <Link to="/SignIn">登入</Link>
+                    <Link to="/SignIn" onClick={signinHandler}>登入</Link>
                 </div>
             </form>
         </main>

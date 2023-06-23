@@ -5,19 +5,25 @@ import style from "./EditProduct.module.css"
 /* API */
 import API from "../../global/API"
 /* Functions */
-import AccountActions from "../../global/functions/AccountActions"
 import InputChecker from "../../global/functions/InputChecker"
-/* header 的按鈕 */
+/* Components */
 import Back from "../../global/icon/Back"
-/* React Hooks */
+/* Hooks */
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
+/* Redux */
+import { useDispatch } from "react-redux"
+import { verifyJWT } from "../../store/accountSlice"
 
 /* ======================================== */
 /* React Components */
 export default function EditProduct() {
+    const dispatch = useDispatch()
     const {id} = useParams()
     const navigate = useNavigate()
+    // const state = useSelector(state => state.editProduct)
+    // console.log(state)
+    
     const [remoteImgs, setRemoteImgs] = useState([])
     const [inputImgs, setInputImgs] = useState([])
     const nameRef = useRef()
@@ -29,7 +35,7 @@ export default function EditProduct() {
     useEffect( () => {
         if (id === "new") {
             document.title = "新增商品"
-            checkLogin()
+            dispatch(verifyJWT())
         } else if (Number.isInteger(Number(id))) {
             document.title = "編輯商品"
             getInfo()
@@ -38,9 +44,6 @@ export default function EditProduct() {
         }
         function goHome() {
             window.location.replace("/")
-        }
-        async function checkLogin() {
-            if (!await AccountActions.check()) goHome()
         }
         async function getInfo() {
             const token = localStorage.getItem("token")
@@ -54,7 +57,7 @@ export default function EditProduct() {
             amountRef.current.value = amount
             positionRef.current.value = position
         }
-    }, [id])
+    }, [id, dispatch])
 
     /* ==================== 分隔線 ==================== */
     function onInputImgChange(e) {

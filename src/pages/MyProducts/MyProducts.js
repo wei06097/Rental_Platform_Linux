@@ -1,28 +1,38 @@
 /* import */
 /* ======================================== */
-/* header 的按鈕 */
+/* Components */
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
-/* Components */
 import Card from "./Components/Card"
-/* React Hooks */
+/* Hooks */
 import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
+/* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { changeOnOff, recordScrollY, getMyProducts } from "../../store/myProductSlice"
+import { changeOnOff, recordScrollY, getMyProducts, reloadTab } from "../../store/myProductSlice"
 
 /* ======================================== */
 export default function MyProducts() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const state = useSelector(state => state.myProduct)
-    const {on, scrollY, products, isLoading, isHandling} = state
+    const {on, scrollY, products, isLoading, isHandling, isRefreshed} = state
     const {product_on, product_off} = products
 
-    useEffect( () => {
-        document.title = "我的商品"
-        dispatch(getMyProducts())
+    useEffect(() => {
+        function reloadHandler(e) {
+            e.preventDefault()
+            dispatch(reloadTab())
+        }
+        window.addEventListener('beforeunload', reloadHandler)
+        return () => {
+            window.removeEventListener('beforeunload', reloadHandler)
+        }
     }, [dispatch])
+    useEffect(() => {
+        document.title = "我的商品"
+        if (!isRefreshed) dispatch(getMyProducts())
+    }, [dispatch, isRefreshed])
 
     function changePage(state) {
         if (isHandling) return
@@ -30,7 +40,7 @@ export default function MyProducts() {
         dispatch(recordScrollY(window.scrollY))
         dispatch(changeOnOff(state))
         setTimeout(() => {
-            window.scroll(window.scrollX, target)   
+            window.scroll(window.scrollX, target)
         }, 10)
     }
 

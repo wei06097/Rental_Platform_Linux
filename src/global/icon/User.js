@@ -1,17 +1,22 @@
 /* import */
 /* ======================================== */
+/* CSS */
 import style from "./User.module.css"
-import AccountActions from "../functions/AccountActions"
-
+/* Hooks */
 import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
+/* Redux */
+import { useSelector, useDispatch } from "react-redux"
+import { doLogout } from "../../store/accountSlice"
 
 /* ======================================== */
-export default function User({ logined, setLogined }) {
-    const account = localStorage.getItem("account")
+export default function User() {
+    const dispatch = useDispatch()
+    const {account, isLogin} = useSelector(state => state.account)
+    const [visibility, setVisibility] = useState(false)
     const selfRef = useRef()
     const dialog = useRef()
-    const [visibility, setVisibility] = useState(false)
+
     useEffect( () => {
         function onPointerdown(e) {
             if (e.target.parentNode.parentNode === dialog.current) setVisibility(prev => prev)
@@ -23,9 +28,8 @@ export default function User({ logined, setLogined }) {
             window.removeEventListener("pointerdown", onPointerdown)
         }
     }, [])
-    function doLogout() {
-        AccountActions.logout()
-        setLogined(false)
+    function logoutHandler() {
+        dispatch(doLogout())
         setVisibility(false)
     }
 
@@ -38,7 +42,7 @@ export default function User({ logined, setLogined }) {
         </button>
         <div className={`${style.dialog} ${visibility? "": style.none}`} ref={dialog}>
             {
-                logined && <>
+                isLogin && <>
                     <Link to="/Profile">
                         <button>個人檔案</button>
                     </Link>
@@ -52,13 +56,12 @@ export default function User({ logined, setLogined }) {
                         <button>購買清單</button>
                     </Link>
                     <Link to="/">
-                        <button onClick={doLogout}>登出</button>
+                        <button onClick={logoutHandler}>登出</button>
                     </Link>
                 </>
             }
-            {/* <div /> */}
             {
-                !logined && <>
+                !isLogin && <>
                     <Link to="/SignIn">
                         <button>登入</button>
                     </Link>
