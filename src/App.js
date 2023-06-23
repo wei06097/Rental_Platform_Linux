@@ -25,16 +25,19 @@ import Profile from "./pages/Profile/Profile"
 import ChatList from "./pages/ChatList/ChatList"
 import ChatRoom from "./pages/ChatRoom/ChatRoom"
 /* React Hooks */
-import store from "./store"
-import { Provider } from "react-redux"
 import { Routes, Route } from "react-router-dom"
 import SocketProvider from "./global/hooks/SocketProvider"
+/* Redux */
+import { Provider } from "react-redux"
+import { PersistGate } from "redux-persist/integration/react"
+import store, { persistor } from "./store"
 
 /* ======================================== */
 /* React Components */
 function App() {
   return <>
       <Provider store={store}>
+      <PersistGate persistor={persistor}>
       <SocketProvider>
         <Routes>
             <Route path="/" element={<HomePage />} />
@@ -59,6 +62,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
         </Routes>
       </SocketProvider>
+      </PersistGate>
       </Provider>
   </>
 }
