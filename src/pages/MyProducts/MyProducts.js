@@ -1,7 +1,5 @@
 /* import */
 /* ======================================== */
-/* CSS */
-import style from "./MyProducts.module.css"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
@@ -90,7 +88,7 @@ export default function MyProducts() {
         </main>
         <div className="base"/>
         <footer>
-            <Link className={`${style.link} flex_center grow`} to="/EditProduct/new">
+            <Link className="link flex_center grow" to="/EditProduct/new">
                 <button className="button grow" disabled={isHandling}>新增商品</button>
             </Link>
         </footer>

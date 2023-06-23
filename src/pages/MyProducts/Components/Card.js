@@ -1,7 +1,7 @@
 /* import */
 /* ======================================== */
 /* CSS */
-import style from "../MyProducts.module.css"
+import style from "./Card.module.css"
 /* API */
 import API from "../../../global/API"
 /* React Hooks */
