@@ -4,11 +4,10 @@ import API from "../global/API"
 /* ============================================================ */
 export const getMyProducts = createAsyncThunk(
     "myProduct/getMyProducts",
-    async (thunkAPI) => {
-        const token = localStorage.getItem("token") || ""
+    async (payload, thunkAPI) => {
         try {
-            const data = await API.get(API.MY_PRODUCTS, token)
-            return data
+            const token = thunkAPI.getState().account.token
+            return await API.get(API.MY_PRODUCTS, token)
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
         }
@@ -17,10 +16,9 @@ export const getMyProducts = createAsyncThunk(
 export const deleteProduct = createAsyncThunk(
     "myProduct/deleteProduct",
     async ({id}, thunkAPI) => {
-        const token = localStorage.getItem("token") || ""
         try {
-            const data = await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
-            return data
+            const token = thunkAPI.getState().account.token
+            return await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
         }
@@ -29,10 +27,9 @@ export const deleteProduct = createAsyncThunk(
 export const launchProduct = createAsyncThunk(
     "myProduct/launchProduct",
     async ({id, launched}, thunkAPI) => {
-        const token = localStorage.getItem("token") || ""
         try {
-            const data = await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
-            return data
+            const token = thunkAPI.getState().account.token
+            return await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message);
         }
@@ -48,51 +45,53 @@ const initialState = {
         product_off : []
     },
     isLoading : false,
-    isHandling : false
+    isHandling : false,
+    isRefreshed : false
 }
 
 const myProductSlice = createSlice({
     name : "myProduct",
     initialState : initialState,
     reducers : {
-        changeOnOff(state, action) {
+        changeOnOff : (state, action) => {
             state.on = action.payload
         },
-        recordScrollY(state, action) {
+        recordScrollY : (state, action) => {
             state.scrollY = action.payload
+        },
+        reloadTab : (state) => {
+            state.isRefreshed = false
         }
     },
     extraReducers : (builder) => {
         builder
-            /* 查看所有商品 */
+        /* 查看所有商品 */
             .addCase(getMyProducts.pending, (state) => {
-                console.log("pending")
                 state.isLoading = true
             })
             .addCase(getMyProducts.fulfilled, (state, action) => {
-                console.log("fulfilled")
                 const { success, avl_products, na_products } = action.payload
                 if (success) {
                     state.products = {
                         product_on : [...avl_products],
                         product_off : [...na_products]
                     }
+                    state.isRefreshed = true
+                    state.isLoading = false
                 } else {
-                    alert("尚未登入")
+                    window.location.replace("/SignIn")
+                    return {...initialState}
                 }
-                state.isLoading = false
             })
             .addCase(getMyProducts.rejected, (state, action) => {
                 console.log(action.payload)
                 state.isLoading = false
             })
-            /* 刪除商品 */
+        /* 刪除商品 */
             .addCase(deleteProduct.pending, (state) => {
-                console.log("pending")
                 state.isHandling = true
             })
             .addCase(deleteProduct.fulfilled, (state, action) => {
-                console.log("fulfilled")
                 const {success, id} = action.payload
                 if (success) {
                     const {on, products} = current(state)
@@ -115,13 +114,11 @@ const myProductSlice = createSlice({
                 console.log(action.payload)
                 state.isHandling = false
             })
-            /* 上/下架商品 */
+        /* 上/下架商品 */
             .addCase(launchProduct.pending, (state) => {
-                console.log("pending")
                 state.isHandling = true
             })
             .addCase(launchProduct.fulfilled, (state, action) => {
-                console.log("fulfilled")
                 const {success, id} = action.payload
                 const {on, products} = current(state)
                 const {product_on, product_off} = products
@@ -157,4 +154,4 @@ const myProductSlice = createSlice({
 
 /* ============================================================ */
 export default myProductSlice.reducer
-export const { changeOnOff, recordScrollY } = myProductSlice.actions
+export const { changeOnOff, recordScrollY, reloadTab } = myProductSlice.actions
