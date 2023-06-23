@@ -4,25 +4,25 @@
     padding: 25px 40px; margin: 10vh auto;
     border-radius: 15px; border: 1px solid #aaa;
 }
-
-/* ======================================== */
 .container > p {
     margin: 20px 0 10px;
 }
 
+/* ======================================== */
 .container > input {
     display: block; font-size: 15px;
     padding: 0 5px; margin: 0 auto;
     border-radius: 5px; border: 1px solid #aaa;
 }
-.container > input:not([type="submit"]) {
-    width: 250px; height: 30px; outline: none;
-}
 .container > input[type="password"] {
     letter-spacing: 2px;
 }
-
-/* ======================================== */
+.container > input:not([type="submit"]) {
+    width: 250px; height: 30px; outline: none;
+}
+.container > input:not([type="submit"]):hover {
+    box-shadow: 0px 0px 2px 1px #007bffcc;
+}
 .container > input[type="submit"] {
     width: 150px; height: 30px;
     margin-top: 5px; border: 0;
@@ -31,9 +31,4 @@
 }
 .container > input[type="submit"]:hover {
     background-color: #007bffee;
-}
-
-/* ======================================== */
-.shadow {
-    box-shadow: 0px 0px 2px 1px green;
 }
