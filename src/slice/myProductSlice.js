@@ -61,6 +61,9 @@ const myProductSlice = createSlice({
         },
         reloadTab : (state) => {
             state.isRefreshed = false
+        },
+        setRefreshed : (state) => {
+            state.isRefreshed = true
         }
     },
     extraReducers : (builder) => {
@@ -153,4 +156,4 @@ const myProductSlice = createSlice({
 
 /* ============================================================ */
 export default myProductSlice.reducer
-export const { changeOnOff, recordScrollY, reloadTab } = myProductSlice.actions
+export const { changeOnOff, recordScrollY, reloadTab, setRefreshed } = myProductSlice.actions
