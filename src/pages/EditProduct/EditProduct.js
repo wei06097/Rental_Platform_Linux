@@ -12,17 +12,16 @@ import Back from "../../global/icon/Back"
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 /* Redux */
-import { useDispatch } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
 import { verifyJWT } from "../../slice/accountSlice"
 
 /* ======================================== */
 /* React Components */
 export default function EditProduct() {
-    const dispatch = useDispatch()
     const {id} = useParams()
+    const dispatch = useDispatch()
     const navigate = useNavigate()
-    // const state = useSelector(state => state.editProduct)
-    // console.log(state)
+    const {isLogin} = useSelector(state => state.account)
     
     const [remoteImgs, setRemoteImgs] = useState([])
     const [inputImgs, setInputImgs] = useState([])
@@ -33,22 +32,21 @@ export default function EditProduct() {
     const positionRef = useRef()
 
     useEffect( () => {
+        document.title = (id === "new")? "新增商品": "編輯商品"
+    }, [id])
+    useEffect( () => {
+        if (!isLogin) navigate("/SignIn", {replace: true})
+    }, [navigate, isLogin])
+    useEffect( () => {
         if (id === "new") {
-            document.title = "新增商品"
             dispatch(verifyJWT())
         } else if (Number.isInteger(Number(id))) {
-            document.title = "編輯商品"
             getInfo()
-        } else {
-            goHome()
-        }
-        function goHome() {
-            window.location.replace("/")
         }
         async function getInfo() {
             const token = localStorage.getItem("token")
             const {success, info} = await API.get(`${API.CRUD_PRODUCT}/?id=${id}`, token)
-            if (!success) goHome()
+            if (!success) return
             const {imgs, name, description, price, amount, position} = info
             setRemoteImgs(imgs.map( img => `${API.WS_URL}/${img}`))
             nameRef.current.value = name

@@ -79,7 +79,6 @@ const myProductSlice = createSlice({
                     state.isRefreshed = true
                     state.isLoading = false
                 } else {
-                    window.location.replace("/SignIn")
                     return {...initialState}
                 }
             })

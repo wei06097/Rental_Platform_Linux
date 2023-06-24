@@ -15,10 +15,17 @@ import { changeOnOff, recordScrollY, getMyProducts, reloadTab } from "../../slic
 export default function MyProducts() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const state = useSelector(state => state.myProduct)
-    const {on, scrollY, products, isLoading, isHandling, isRefreshed} = state
+    const {isLogin} = useSelector(state => state.account)
+    const {on, scrollY, products, isLoading, isHandling, isRefreshed} = useSelector(state => state.myProduct)
     const {product_on, product_off} = products
 
+    useEffect(() => {
+        document.title = "我的商品"
+    }, [])
+    useEffect(() => {
+        if (!isLogin) navigate("/SignIn", {replace: true})
+        else if (!isRefreshed) dispatch(getMyProducts())
+    }, [navigate, dispatch, isLogin, isRefreshed])
     useEffect(() => {
         function reloadHandler(e) {
             e.preventDefault()
@@ -29,10 +36,6 @@ export default function MyProducts() {
             window.removeEventListener('beforeunload', reloadHandler)
         }
     }, [dispatch])
-    useEffect(() => {
-        document.title = "我的商品"
-        if (!isRefreshed) dispatch(getMyProducts())
-    }, [dispatch, isRefreshed])
 
     function changePage(state) {
         if (isHandling) return
