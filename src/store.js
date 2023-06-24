@@ -5,10 +5,10 @@ import { persistReducer, persistStore } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import storageSession from "redux-persist/lib/storage/session"
 
-import accountSlice from "./store/accountSlice"
-import homepageSlice from "./store/homepageSlice"
-import myProductSlice from "./store/myProductSlice"
-import editProductSlice from "./store/editProductSlice.js"
+import accountSlice from "./slice/accountSlice"
+import homepageSlice from "./slice/homepageSlice"
+import myProductSlice from "./slice/myProductSlice"
+import editProductSlice from "./slice/editProductSlice.js"
 
 /* ======================================== */
 const account_PersistConfig = {

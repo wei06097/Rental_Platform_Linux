@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 import API from "../global/API"
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 
 /* ============================================================ */
 export const getRecommend = createAsyncThunk(

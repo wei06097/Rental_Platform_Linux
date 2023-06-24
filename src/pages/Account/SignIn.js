@@ -12,7 +12,7 @@ import { useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { doLogin } from "../../store/accountSlice"
+import { doLogin } from "../../slice/accountSlice"
 
 /* ======================================== */
 /* React Components */

@@ -13,7 +13,7 @@ import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 /* Redux */
 import { useDispatch } from "react-redux"
-import { verifyJWT } from "../../store/accountSlice"
+import { verifyJWT } from "../../slice/accountSlice"
 
 /* ======================================== */
 /* React Components */

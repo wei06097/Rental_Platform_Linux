@@ -1,5 +1,5 @@
+import API from "../API"
 import { current, createSlice, createAsyncThunk } from "@reduxjs/toolkit"
-import API from "../global/API"
 
 /* ============================================================ */
 export const method = createAsyncThunk(

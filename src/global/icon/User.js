@@ -7,7 +7,7 @@ import { useState, useEffect, useRef } from "react"
 import { Link } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { doLogout } from "../../store/accountSlice"
+import { doLogout } from "../../slice/accountSlice"
 
 /* ======================================== */
 export default function User() {

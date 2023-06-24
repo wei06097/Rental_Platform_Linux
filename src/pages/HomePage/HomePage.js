@@ -14,7 +14,7 @@ import OverviewCards from "../../global/components/OverviewCards"
 import { useEffect } from "react"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { getRecommend } from "../../store/homepageSlice"
+import { getRecommend } from "../../slice/homepageSlice"
 
 /* ======================================== */
 /* React Components */

@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { changeOnOff, recordScrollY, getMyProducts, reloadTab } from "../../store/myProductSlice"
+import { changeOnOff, recordScrollY, getMyProducts, reloadTab } from "../../slice/myProductSlice"
 
 /* ======================================== */
 export default function MyProducts() {
