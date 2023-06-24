@@ -39,3 +39,22 @@ const store = configureStore({
 /* ======================================== */
 export const persistor = persistStore(store)
 export default store
+
+/* 偵測其他分頁是否執行登入/登出動作，並同步 account 的 state */
+window.addEventListener("storage", (event) => {
+    if (event.key !== "account") return
+    const oldState = JSON.parse(event.oldValue)
+    const newState = JSON.parse(event.newValue)
+    if (!oldState.isLogin && newState.isLogin) {
+        // 登入
+        store.dispatch({
+            type : "account/writeState",
+            payload : newState
+        })
+    } else if (oldState.isLogin && !newState.isLogin) {
+        // 登出
+        store.dispatch({
+            type : "account/resetState"
+        })
+    }
+})

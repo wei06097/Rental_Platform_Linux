@@ -47,8 +47,15 @@ const accountSlice = createSlice({
     initialState : initialState,
     reducers : {
         doLogout : (state) => {
-            // window.location.href = "/"
-            return initialState
+            const data = JSON.stringify(initialState)
+            localStorage.setItem("account", data)
+            return {...initialState}
+        },
+        resetState : (state) => {
+            return {...initialState}
+        },
+        writeState : (state, action) => {
+            return {...action.payload}
         }
     },
     extraReducers : (builder) => {
@@ -59,11 +66,16 @@ const accountSlice = createSlice({
             })
             .addCase(doLogin.fulfilled, (state, action) => {
                 const {success, message, account} = action.payload
-                if (success) return {
-                    token : message,
-                    account : account,
-                    isLogin : true,
-                    isHandling : false
+                if (success) {
+                    const newState = {
+                        token : message,
+                        account : account,
+                        isLogin : true,
+                        isHandling : false
+                    }
+                    const data = JSON.stringify(newState)
+                    localStorage.setItem("account", data)
+                    return newState
                 }
                 alert(message)
                 state.isHandling = false
@@ -78,7 +90,7 @@ const accountSlice = createSlice({
             })
             .addCase(doSignup.fulfilled, (state, action) => {
                 const {success, message} = action.payload
-                if (success) window.location.replace = "/SignIn"
+                if (success) window.location.replace("/SignIn")
                 alert(message)
                 state.isHandling = false
             })
@@ -93,7 +105,8 @@ const accountSlice = createSlice({
             .addCase(verifyJWT.fulfilled, (state, action) => {
                 const {success} = action.payload
                 if (!success) {
-                    window.location.replace = "/SignIn"
+                    const data = JSON.stringify(initialState)
+                    localStorage.setItem("account", data)
                     return {...initialState}
                 }
             })
