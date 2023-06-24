@@ -7,7 +7,7 @@ import PhotoViewer from "../../global/components/PhotoViewer"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
 /* React Hooks */

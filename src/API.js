@@ -2,18 +2,15 @@ const API_URL = process.env.REACT_APP_API_URL
 const WS_URL = API_URL
 
 /* ============================================================ */
+/* 登入註冊 */
 const SIGNUP = `${API_URL}/api/signup`
 const LOGIN = `${API_URL}/api/login`
 const JWT = `${API_URL}/api/token_verify`
-
+/* 賣場商品 */
 const CRUD_PRODUCT = `${API_URL}/api/commodity/commodity_CRUD`
 const MY_PRODUCTS = `${API_URL}/api/commodity/my_commodity`
 const LAUNCH_PRODUCT = `${API_URL}/launch_product`
-// const ADD_PRODUCT = `${API_URL}/api/commodity/commodity_CRUD`
-// const EDIT_PRODUCT = `${API_URL}/edit_product`
-// const SAVE_PRODUCT = `${API_URL}/save_product`
-// const DELETE_PRODUCT = `${API_URL}/delete_product`
-
+/* 其他 */
 const STORE = `${API_URL}/store`
 const PRODUCT = `${API_URL}/product`
 const HOMEPAGE = `${API_URL}/homepage`
@@ -71,7 +68,7 @@ const API = {
     // constant
     WS_URL,
     SIGNUP, LOGIN, JWT,
-    CRUD_PRODUCT, MY_PRODUCTS, LAUNCH_PRODUCT, // ADD_PRODUCT, EDIT_PRODUCT, SAVE_PRODUCT, DELETE_PRODUCT,
+    CRUD_PRODUCT, MY_PRODUCTS, LAUNCH_PRODUCT,
     STORE, PRODUCT, HOMEPAGE, RESULT,
     CHAT_LIST, CHAT_HISTORY
 }

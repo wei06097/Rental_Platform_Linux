@@ -1,4 +1,4 @@
-import API from "../global/API"
+import API from "../API"
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 
 /* ============================================================ */

@@ -3,7 +3,7 @@
 /* CSS */
 import style from "./ChatList.module.css"
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* header 的按鈕 */
 import Back from "../../global/icon/Back"
 /* React Hooks */

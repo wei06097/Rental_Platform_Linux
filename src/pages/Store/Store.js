@@ -3,7 +3,7 @@
 /* CSS */
 import style from "./Store.module.css"
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* Components */
 import OverviewCards from "../../global/components/OverviewCards"
 /* header 的按鈕 */

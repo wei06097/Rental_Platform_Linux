@@ -3,7 +3,7 @@
 /* CSS */
 import style from "./EditProduct.module.css"
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
 /* Components */

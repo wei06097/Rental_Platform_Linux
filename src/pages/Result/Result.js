@@ -1,7 +1,7 @@
 /* import */
 /* ======================================== */
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* Components */
 import SearchBar from "../../global/components/SearchBar"
 import OverviewCards from "../../global/components/OverviewCards"

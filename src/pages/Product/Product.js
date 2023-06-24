@@ -3,7 +3,7 @@
 /* CSS */
 import style from "./Product.module.css"
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* Components */
 import ImgCard from "./components/ImgCard"
 /* header 的按鈕 */

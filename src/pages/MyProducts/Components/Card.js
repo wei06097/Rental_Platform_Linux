@@ -3,7 +3,7 @@
 /* CSS */
 import style from "./Card.module.css"
 /* API */
-import API from "../../../global/API"
+import API from "../../../API"
 /* React Hooks */
 import { useState, useEffect, useRef } from "react"
 import { useSelector, useDispatch } from "react-redux"

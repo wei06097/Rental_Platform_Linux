@@ -3,7 +3,7 @@
 /* CSS */
 import style from "./HomePage.module.css"
 /* API */
-import API from "../../global/API"
+import API from "../../API"
 /* Components */
 import ShoppingCart from "../../global/icon/ShoppingCart"
 import Message from "../../global/icon/Message"

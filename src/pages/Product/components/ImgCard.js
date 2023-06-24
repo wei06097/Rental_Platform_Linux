@@ -3,7 +3,7 @@
 /* CSS */
 import style from "../Product.module.css"
 /* API */
-import API from "../../../global/API"
+import API from "../../../API"
 /* React Hooks */
 import { useEffect, useRef } from "react"
 
