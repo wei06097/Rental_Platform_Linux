@@ -8,7 +8,7 @@ export const doLogin = createAsyncThunk(
         try {
             return await API.post(API.LOGIN, null, payload)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
@@ -18,7 +18,7 @@ export const doSignup = createAsyncThunk(
         try {
             return await API.post(API.SIGNUP, null, payload)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
@@ -29,7 +29,7 @@ export const verifyJWT = createAsyncThunk(
             const token = thunkAPI.getState().account.token
             return await API.get(API.JWT, token)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
@@ -115,6 +115,7 @@ const accountSlice = createSlice({
                     localStorage.setItem("account", data)
                     return {...initialState}
                 }
+                state.isHandling = false
             })
             .addCase(verifyJWT.rejected, (state, action) => {
                 alert(action.payload)

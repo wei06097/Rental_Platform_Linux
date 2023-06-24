@@ -8,7 +8,7 @@ export const getRecommend = createAsyncThunk(
         try {
             return await API.get(API.HOMEPAGE, null)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )

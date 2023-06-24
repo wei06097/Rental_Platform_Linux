@@ -9,7 +9,7 @@ export const getMyProducts = createAsyncThunk(
             const token = thunkAPI.getState().account.token
             return await API.get(API.MY_PRODUCTS, token)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
@@ -20,7 +20,7 @@ export const deleteProduct = createAsyncThunk(
             const token = thunkAPI.getState().account.token
             return await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
@@ -31,7 +31,7 @@ export const launchProduct = createAsyncThunk(
             const token = thunkAPI.getState().account.token
             return await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
@@ -44,9 +44,9 @@ const initialState = {
         product_on : [],
         product_off : []
     },
-    isLoading : false,
-    isHandling : false,
-    isRefreshed : false
+    isLoading : false, //第一次載入
+    isHandling : false, //處理 刪除/編輯
+    isRefreshed : false 
 }
 
 const myProductSlice = createSlice({

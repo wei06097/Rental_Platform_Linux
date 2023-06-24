@@ -9,7 +9,7 @@ export const method = createAsyncThunk(
         try {
             return await API.get(`${API.LAUNCH_PRODUCT}/?id=${id}`, token)
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.message);
+            return thunkAPI.rejectWithValue(error.message)
         }
     }
 )
