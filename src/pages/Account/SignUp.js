@@ -12,14 +12,14 @@ import { useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { doSignup } from "../../slice/accountSlice"
+import { doSignup, clcHandler } from "../../slice/accountSlice"
 
 /* ======================================== */
 /* React Components */
 export default function SignUp() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const {isLogin, isHandling} = useSelector(state => state.account)
+    const {isLogin, isHandling, isOldInputs} = useSelector(state => state.account)
     const accountRef = useRef()
     const passwordRef = useRef()
     const password2Ref = useRef()
@@ -31,8 +31,18 @@ export default function SignUp() {
     }, [])
     useEffect( () => {
         if (isLogin) navigate("/")
-    }, [isLogin, navigate])
-    
+    }, [navigate, isLogin])
+    useEffect(() => {
+        if (isOldInputs) {
+            accountRef.current.value = ""
+            passwordRef.current.value = ""
+            password2Ref.current.value = ""
+            phoneRef.current.value = ""
+            mailRef.current.value = ""
+            dispatch(clcHandler())
+        }
+    }, [dispatch, isOldInputs])
+
     function submitHandler(e) {
         e.preventDefault()
         const account = accountRef.current.value
@@ -42,8 +52,8 @@ export default function SignUp() {
         const mail = mailRef.current.value
         const isSame = password === password2
         const isLegal = InputChecker.noBlank(account, password, phone, mail)
-        if (!isSame) alert("密碼確認不相同")
-        else if (!isLegal) alert("輸入不合法")
+        if (!isSame) alert("輸入密碼不相同")
+        else if (!isLegal) alert("輸入不可為空白")
         else dispatch(doSignup({account, password, phone, mail}))
     }
     function signinHandler(e) {

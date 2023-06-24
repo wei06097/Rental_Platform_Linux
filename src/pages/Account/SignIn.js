@@ -12,30 +12,36 @@ import { useEffect, useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { doLogin } from "../../slice/accountSlice"
+import { doLogin, clcHandler } from "../../slice/accountSlice"
 
 /* ======================================== */
 /* React Components */
 export default function SignIn() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-    const {isLogin, isHandling} = useSelector(state => state.account)
+    const {isLogin, isHandling, isOldInputs} = useSelector(state => state.account)
     const accountRef = useRef()
     const passwordRef = useRef()
-    
+
     useEffect(() => {
         document.title = "登入"
     }, [])
     useEffect(() => {
         if (isLogin) navigate("/")
-    }, [isLogin, navigate])
-    
+    }, [navigate, isLogin])
+    useEffect(() => {
+        if (isOldInputs) {
+            passwordRef.current.value = ""
+            dispatch(clcHandler())
+        }
+    }, [dispatch, isOldInputs])
+
     function submitHandler(e) {
         e.preventDefault()
         const account = accountRef.current.value
         const password = passwordRef.current.value
         const isLegal = InputChecker.noBlank(account, password)
-        if (!isLegal) alert("輸入不合法")
+        if (!isLegal) alert("輸入不可為空白")
         else dispatch(doLogin({account, password}))
     }
     function signupHandler(e) {

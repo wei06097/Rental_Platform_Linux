@@ -39,23 +39,27 @@ const initialState = {
     token : "",
     account : "",
     isLogin : false,
-    isHandling : false
+    isHandling : false,
+    resState : false //清除input用
 }
 
 const accountSlice = createSlice({
     name : "account",
     initialState : initialState,
     reducers : {
-        doLogout : (state) => {
-            const data = JSON.stringify(initialState)
-            localStorage.setItem("account", data)
-            return {...initialState}
-        },
         resetState : (state) => {
             return {...initialState}
         },
         writeState : (state, action) => {
             return {...action.payload}
+        },
+        doLogout : (state) => {
+            const data = JSON.stringify(initialState)
+            localStorage.setItem("account", data)
+            return {...initialState}
+        },
+        clcHandler : (state) => {
+            state.isOldInputs = false
         }
     },
     extraReducers : (builder) => {
@@ -78,6 +82,7 @@ const accountSlice = createSlice({
                     return newState
                 }
                 alert(message)
+                state.isOldInputs = true
                 state.isHandling = false
             })
             .addCase(doLogin.rejected, (state, action) => {
@@ -92,6 +97,7 @@ const accountSlice = createSlice({
                 const {success, message} = action.payload
                 if (success) window.location.replace("/SignIn")
                 alert(message)
+                state.isOldInputs = true
                 state.isHandling = false
             })
             .addCase(doSignup.rejected, (state, action) => {
@@ -118,5 +124,5 @@ const accountSlice = createSlice({
 })
 
 /* ============================================================ */
-export const { doLogout } = accountSlice.actions
+export const { doLogout, clcHandler } = accountSlice.actions
 export default accountSlice.reducer
