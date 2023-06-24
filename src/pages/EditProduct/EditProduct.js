@@ -2,18 +2,19 @@
 /* ======================================== */
 /* CSS */
 import style from "./EditProduct.module.css"
-/* API */
-import API from "../../API"
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
 /* Components */
 import Back from "../../global/icon/Back"
+import Photo from "./Components/Photo"
 /* Hooks */
-import { useState, useEffect, useRef } from "react"
+import { useEffect, useRef } from "react"
 import { useParams, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
 import { verifyJWT } from "../../slice/accountSlice"
+import { getInfo, addImg, submit, resetState } from "../../slice/editProductSlice"
+import { setRefreshed } from "../../slice/myProductSlice"
 
 /* ======================================== */
 /* React Components */
@@ -21,82 +22,81 @@ export default function EditProduct() {
     const {id} = useParams()
     const dispatch = useDispatch()
     const navigate = useNavigate()
-    const {isLogin} = useSelector(state => state.account)
+    const {isLogin, isHandling} = useSelector(state => state.account)
+    const {data, isAccessible, isLoading, isCompleted} = useSelector(state => state.editProduct)
     
-    const [remoteImgs, setRemoteImgs] = useState([])
-    const [inputImgs, setInputImgs] = useState([])
+    const isDisabled = isHandling || isLoading
+    const {name, description, price, amount, position, remain_imgs, imgs} = data
     const nameRef = useRef()
     const descriptionRef = useRef()
     const priceRef = useRef()
     const amountRef = useRef()
     const positionRef = useRef()
-
-    useEffect( () => {
-        document.title = (id === "new")? "新增商品": "編輯商品"
-    }, [id])
-    useEffect( () => {
+    const title = (id === "new")? "新增商品": "編輯商品"
+    
+    useEffect(() => {
+        document.title = title
+        window.scrollTo(0, 0)
+    }, [title])
+    // 檢查JWT和請求資料
+    useEffect(() => {
+        dispatch(resetState())
+        if (id === "new") dispatch(verifyJWT())
+        else dispatch(getInfo({id}))
+    }, [dispatch, id])
+    // 檢查身分是否可以讀取
+    useEffect(() => {
         if (!isLogin) navigate("/SignIn", {replace: true})
-    }, [navigate, isLogin])
-    useEffect( () => {
-        if (id === "new") {
-            dispatch(verifyJWT())
-        } else if (Number.isInteger(Number(id))) {
-            getInfo()
+        else if (!isAccessible) navigate(-1)
+    }, [navigate, isLogin, isAccessible])
+    // 完成繳交退出
+    useEffect(() => {
+        if (isCompleted) {
+            dispatch(setRefreshed())
+            dispatch(resetState())
+            navigate("/MyProducts", {replace: true})
         }
-        async function getInfo() {
-            const token = localStorage.getItem("token")
-            const {success, info} = await API.get(`${API.CRUD_PRODUCT}/?id=${id}`, token)
-            if (!success) return
-            const {imgs, name, description, price, amount, position} = info
-            setRemoteImgs(imgs.map( img => `${API.WS_URL}/${img}`))
-            nameRef.current.value = name
-            descriptionRef.current.value = description
-            priceRef.current.value = price
-            amountRef.current.value = amount
-            positionRef.current.value = position
-        }
-    }, [id, dispatch])
+    }, [navigate, dispatch, isCompleted])
+    // 載入資訊
+    useEffect(() => {
+        nameRef.current.value = name
+        descriptionRef.current.value = description
+        priceRef.current.value = price
+        amountRef.current.value = amount
+        positionRef.current.value = position
+    }, [name, description, price, amount, position])
 
-    /* ==================== 分隔線 ==================== */
     function onInputImgChange(e) {
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
             const fileData = e.target.files[i]
-            if (! InputChecker.isImageFormat(fileData)) continue
+            if (!InputChecker.isImageFormat(fileData)) continue
             const reader = new FileReader()
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
                 const base64Pic = reader.result
-                setInputImgs(prev => [...prev, base64Pic])
+                dispatch(addImg(base64Pic))
             }, false)
         }
-        e.target.value = "";
     }
-    async function postProduct(mode, launched) {
+    function submitHandler(mode, launched=false) {
         // 取得 inputs
-        const remain_imgs = remoteImgs.map( img => img.replace(`${API.WS_URL}/`, "") )
-        const imgs = inputImgs
         const name = nameRef.current.value
         const description = descriptionRef.current.value
         const price = priceRef.current.value
         const amount = amountRef.current.value
         const position = positionRef.current.value
         // 檢查 inputs
-        const notValid = !InputChecker.noBlank(name, description, price, amount, position)
-        const noImg = !remain_imgs.concat(imgs)[0]
-        if (notValid) alert("請確認欄位皆已填寫")
-        else if (noImg) alert("請確認至少上傳1張照片")
-        if (notValid || noImg) return
-        // post
-        const token = localStorage.getItem("token")
-        const payload = (mode === "add")
-            ? {launched, imgs, name, description, price, amount, position}
-            : {remain_imgs, imgs, name, description, price, amount, position}
-        const {success} = (mode === "add")
-            ? await API.post(API.CRUD_PRODUCT, token, payload)
-            : await API.put(`${API.CRUD_PRODUCT}/?id=${id}`, token, payload)
-        if (!success) alert("儲存商品失敗")
-        else navigate(-1)
+        const isLegal = InputChecker.noBlank(name, description, price, amount, position)
+        const hasImg = !(!remain_imgs.concat(imgs)[0])
+        if (isLegal && hasImg) {
+            const payload = (mode === "add")
+                ? {name, description, price, amount, position, launched}
+                : {name, description, price, amount, position}
+            dispatch(submit({mode, payload}))
+        } else {
+            alert("請確認各欄位皆已填寫")
+        }
     }
 
     /* ==================== 分隔線 ==================== */
@@ -104,90 +104,85 @@ export default function EditProduct() {
         <header>
             <div className="flex_center">
                 <Back />
-                <span>
-                    { (id === "new") && "新增商品" }
-                    { Number.isInteger(Number(id)) && "編輯商品" }
-                </span>
+                <span>{title}</span>
             </div>
         </header>
         <main className="main">
+            {
+                isDisabled &&
+                <div className="loading-ring" />
+            }
             <div className={style.container}>
                 <div>
-                    <div>圖片</div>
+                    <div>
+                        <span>圖片</span>
+                        <span style={{color:"#777"}}>(至少1張)</span>
+                    </div>
                     <div className={style.canvas}>
-                        <label>
-                            <input type="file" style={{display: "none"}} accept=".png,.jpg,.jpeg,.gif" multiple 
-                                onChange={onInputImgChange} />
-                            +加入照片
-                        </label>
                         {
-                            remoteImgs.concat(inputImgs).map( (element, i) => 
-                                <Photo
-                                    key={i}
-                                    order={i}
-                                    src={element}
-                                    sets={[setRemoteImgs, setInputImgs]}
+                            remain_imgs.concat(imgs)
+                                .map((element, i) => 
+                                    <Photo key={i} order={i} src={element} 
+                                        isNew={i>=remain_imgs.length}
+                                    />
+                                )
+                        }
+                        {
+                            (remain_imgs.concat(imgs).length < 5) &&
+                            <label>
+                                <span>+加入</span>
+                                <input type="file" style={{display: "none"}}
+                                    accept=".png,.jpg,.jpeg,.gif" multiple 
+                                    onChange={onInputImgChange}
+                                    disabled={isDisabled}
                                 />
-                            )
+                            </label>
                         }
                     </div>
                 </div>
                 <div className={style.product_name}>
                     <div>名稱</div>
-                    <input type="text" ref={nameRef} />
+                    <input type="text" ref={nameRef} disabled={isDisabled} />
                 </div>
                 <div className={style.description}>
                     <div>描述</div>
-                    <textarea rows="10" wrap="soft" ref={descriptionRef} />
+                    <textarea rows="10" wrap="soft" ref={descriptionRef} disabled={isDisabled} />
                 </div>
                 <div className={style.inline}>
                     <span>價格</span>
-                    <input type="number" placeholder="0"
-                        onClick={(e) => {e.target.select()}} ref={priceRef} />
+                    <input type="number" placeholder="0" ref={priceRef} 
+                        onClick={(e) => {e.target.select()}} disabled={isDisabled} 
+                    />
                 </div>
                 <div className={style.inline}>
                     <span>數量</span>
-                    <input type="number" placeholder="0"
-                        onClick={(e) => {e.target.select()}} ref={amountRef} />
+                    <input type="number" placeholder="0" ref={amountRef}
+                        onClick={(e) => {e.target.select()}} disabled={isDisabled}
+                    />
                 </div>
                 <div className={style.inline}>
                     <span>商品位置</span>
-                    <input type="text" placeholder="位置" ref={positionRef} />
+                    <input type="text" placeholder="位置" ref={positionRef} disabled={isDisabled} />
                 </div>
             </div>
         </main>
         <div className="base" />
         <footer>
-            { (id === "new") && <>
-                <button className="button grow" onClick={() => {postProduct('add', true)}}>上架</button>
-                <button className="button grow" onClick={() => {postProduct('add', false)}}>儲存</button>
-            </> }
-            { Number.isInteger(Number(id)) && "編輯商品" && <>
-                <button className="button grow" onClick={() => {navigate(-1)}}>取消</button>
-                <button className="button grow" onClick={() => {postProduct('edit')}}>儲存</button>
-            </> }
+            <button className="button grow" onClick={()=>{navigate(-1)}}>取消</button>
+            {
+                (id === "new")?
+                <>
+                    <button className="button grow" disabled={isDisabled}
+                        onClick={()=>{submitHandler("add", false)}}
+                    >儲存</button>
+                    <button className="button grow" disabled={isDisabled}
+                        onClick={()=>{submitHandler("add", true)}}
+                    >上架</button>
+                </>:
+                <button className="button grow" disabled={isDisabled}
+                    onClick={()=>{submitHandler("edit")}}
+                >儲存</button>
+            }
         </footer>
-    </>
-}
-
-const Photo = ({ order, src, sets }) => {
-    const first = (order === 0)
-    function deletePhoto() {
-        sets.forEach( set => {
-            set( prev => {
-                const result = [...prev]
-                const index = prev.indexOf(src)
-                if (index !== -1) result.splice(index, 1)
-                return result
-            })
-        })
-    }
-    return <>
-        <div className={style.preview_photo} cover={first? "封面照片": ""}>
-            <img src={src} alt="" />
-            <svg onClick={deletePhoto} xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="bi bi-trash-fill" viewBox="0 0 16 16">
-                <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1H2.5zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5zM8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5zm3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0z"/>
-            </svg>
-        </div>
     </>
 }

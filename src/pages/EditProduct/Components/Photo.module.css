@@ -1,0 +1,26 @@
+/* ======================================== */
+.preview_photo {
+    position: relative;
+}
+.preview_photo::after {
+    content: attr(cover); font-size: 15px;
+    width: 100px; text-align: center;
+    position: absolute; left: 5px; bottom: 10px;
+    background-color: #aaa;
+}
+
+/* ======================================== */
+.preview_photo > .img {
+    width: 100px; height: 100px; margin: 5px;
+    border: 1px dashed #aaa;
+}
+.img > img {
+    width: 100%; height: 100%;
+    object-fit: contain;
+    transition: 400ms ease-in-out;
+}
+.img > svg {
+    width: 20px; height: 20px;
+    position: absolute; right: -2px; top: -2px;
+    color: #ff0000dd; cursor: pointer;
+}
