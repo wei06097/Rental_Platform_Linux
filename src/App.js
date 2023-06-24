@@ -6,7 +6,7 @@ import "./global/css/navbar.css"
 import "./global/css/component.css"
 import "./global/css/loading-ring.css"
 /* Components: pages */
-import NotFound from "./NotFound"
+import NotFound from "./pages/NotFound"
 import HomePage from "./pages/HomePage/HomePage"
 import MyProducts from "./pages/MyProducts/MyProducts"
 import Product from "./pages/Product/Product"

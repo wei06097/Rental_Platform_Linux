@@ -1,5 +1,5 @@
 /* Components: icon */
-import Back from "./global/icon/Back"
+import Back from "../global/icon/Back"
 
 export default function NotFound() {
     return <>
