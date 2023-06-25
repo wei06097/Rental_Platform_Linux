@@ -1,13 +1,13 @@
 /* ======================================== */
 .products_area {
-    --imgSize: 200px; --fontSize: 15px;
+    --imgSize: 190px; --fontSize: 15px;
     width: 100%; display: grid;
-    grid-template-columns: repeat(auto-fill, minmax( calc(var(--imgSize) + 4px), 1fr ));
+    grid-template-columns: repeat(auto-fill, minmax(var(--imgSize), 1fr));
 }
 .product_card {
-    width: var(--imgSize); margin: 10px auto;
+    width: var(--imgSize); margin: 5px auto;
     border-radius: 5px; overflow: hidden;
-    box-shadow: 0 0 2px 2px #ddd;
+    box-shadow: 0 0 1px 1px #ddd;
     cursor: pointer; position: relative;
 }
 
@@ -24,43 +24,45 @@
 .heart > svg {
     --Size: 18px; width: var(--Size); height: var(--Size);
 }
-.none {
-    display: none;
-}
 
 /* ======================================== */
-.product_card > a {
-    color: inherit; text-decoration: none;
-}
 .product_card > a > .img {
     width: var(--imgSize); height: var(--imgSize);
 }
 .img > img {
     width: 100%; height: 100%;
     object-fit: cover;
+    transition: 400ms ease-in-out;
 }
 
-.product_card > a > .name {
-    margin: 10px 0; padding: 0 5px;
-    font-size: var(--fontSize); font-weight: normal;
+.product_card > a > .info {
+    padding: 5px; display: grid;
+    grid-template-rows: 2fr 1fr;
+}
+.info > div:nth-child(1) {
+    font-size: var(--fontSize);
     display: -webkit-box; overflow: hidden;
     -webkit-box-orient: vertical; -webkit-line-clamp: 2;
     /* word-wrap: break-word; word-break: break-all; */
 }
-.product_card > a > .price {
-    padding-right: 10px; padding-bottom: 5px;
-    font-size: var(--fontSize); font-weight: normal;
+.info > div:nth-child(2) {
+    font-size: calc(var(--fontSize) - 1px);
     text-align: right; color: #ff0000aa;
 }
 
 /* ======================================== */
 @media(max-width: 1250px) {
     .products_area {
-        --imgSize: calc(100vw * 0.3);
+        --imgSize: calc(100vw * 0.24);
+    }
+}
+@media(max-width: 900px) {
+    .products_area {
+        --imgSize: calc(100vw * 0.32);
     }
 }
 @media(max-width: 600px) {
     .products_area {
-        --imgSize: calc(100vw * 0.45);
+        --imgSize: calc(100vw * 0.49);
     }
 }
