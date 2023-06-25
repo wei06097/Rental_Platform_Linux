@@ -9,7 +9,7 @@ import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { changeOnOff, recordScrollY, getMyProducts, reloadTab } from "../../slice/myProductSlice"
+import { changeOnOff, recordScrollY, getMyProducts, setRefreshed } from "../../slice/myProductSlice"
 
 /* ======================================== */
 export default function MyProducts() {
@@ -23,13 +23,15 @@ export default function MyProducts() {
         document.title = "我的商品"
     }, [])
     useEffect(() => {
+        // 進入頁面
         if (!isLogin) navigate("/SignIn", {replace: true})
         else if (!isRefreshed) dispatch(getMyProducts())
     }, [navigate, dispatch, isLogin, isRefreshed])
     useEffect(() => {
+        // 重新整理
         function reloadHandler(e) {
             e.preventDefault()
-            dispatch(reloadTab())
+            dispatch(setRefreshed(false))
         }
         window.addEventListener('beforeunload', reloadHandler)
         return () => {
