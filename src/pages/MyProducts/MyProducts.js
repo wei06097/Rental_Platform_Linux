@@ -40,7 +40,7 @@ export default function MyProducts() {
     }, [dispatch])
 
     function changePage(state) {
-        if (isHandling) return
+        if (isHandling || state === on) return
         const target = scrollY
         dispatch(recordScrollY(window.scrollY))
         dispatch(changeOnOff(state))
