@@ -38,27 +38,25 @@ export default function EditProduct() {
         document.title = title
         window.scrollTo(0, 0)
     }, [title])
-    // 檢查JWT和請求資料
     useEffect(() => {
-        dispatch(resetState())
-        if (id === "new") dispatch(verifyJWT())
-        else dispatch(getInfo({id}))
-    }, [dispatch, id])
-    // 檢查身分是否可以讀取
-    useEffect(() => {
+        // 檢查身分是否可以讀取
         if (!isLogin) navigate("/SignIn", {replace: true})
         else if (!isAccessible) navigate(-1)
     }, [navigate, isLogin, isAccessible])
-    // 完成繳交退出
     useEffect(() => {
+        // 完成繳交退出
         if (isCompleted) {
-            dispatch(setRefreshed())
             dispatch(resetState())
+            dispatch(setRefreshed(false))
             navigate("/MyProducts", {replace: true})
         }
-    }, [navigate, dispatch, isCompleted])
-    // 載入資訊
+        // 檢查JWT/請求資料
+        dispatch(resetState())
+        if (id === "new") dispatch(verifyJWT())
+        else dispatch(getInfo({id}))
+    }, [navigate, dispatch, id, isCompleted])
     useEffect(() => {
+        // 載入資訊
         nameRef.current.value = name
         descriptionRef.current.value = description
         priceRef.current.value = price
