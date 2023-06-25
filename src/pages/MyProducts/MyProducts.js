@@ -4,40 +4,30 @@
 import Back from "../../global/icon/Back"
 import Home from "../../global/icon/Home"
 import Card from "./Components/Card"
+import Reload from "../../global/icon/Reload"
+import GotoTop from "../../global/icon/GotoTop"
 /* Hooks */
 import { useEffect } from "react"
 import { Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { changeOnOff, recordScrollY, getMyProducts, setRefreshed } from "../../slice/myProductSlice"
+import { changeOnOff, recordScrollY, getMyProducts } from "../../slice/myProductSlice"
 
 /* ======================================== */
 export default function MyProducts() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {isLogin} = useSelector(state => state.account)
-    const {on, scrollY, products, isLoading, isHandling, isRefreshed} = useSelector(state => state.myProduct)
+    const {on, scrollY, products, isLoading, isHandling} = useSelector(state => state.myProduct)
     const {product_on, product_off} = products
 
     useEffect(() => {
         document.title = "我的商品"
     }, [])
     useEffect(() => {
-        // 進入頁面
         if (!isLogin) navigate("/SignIn", {replace: true})
-        else if (!isRefreshed) dispatch(getMyProducts())
-    }, [navigate, dispatch, isLogin, isRefreshed])
-    useEffect(() => {
-        // 重新整理
-        function reloadHandler(e) {
-            e.preventDefault()
-            dispatch(setRefreshed(false))
-        }
-        window.addEventListener('beforeunload', reloadHandler)
-        return () => {
-            window.removeEventListener('beforeunload', reloadHandler)
-        }
-    }, [dispatch])
+        else dispatch(getMyProducts())
+    }, [navigate, dispatch, isLogin])
 
     function changePage(state) {
         if (isHandling || state === on) return
@@ -47,6 +37,9 @@ export default function MyProducts() {
         setTimeout(() => {
             window.scroll(window.scrollX, target)
         }, 10)
+    }
+    function reloadHandler() {
+        dispatch(getMyProducts())
     }
 
     /* ==================== 分隔線 ==================== */
@@ -69,6 +62,8 @@ export default function MyProducts() {
             </div>
         </header>
         <main className="main">
+            <GotoTop />
+            <Reload reloadHandler={reloadHandler} />
             {   
                 (isLoading || isHandling) &&
                 <div className = "loading-ring" />

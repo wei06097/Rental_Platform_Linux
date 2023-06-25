@@ -46,7 +46,6 @@ const initialState = {
     },
     isLoading : false, //第一次載入
     isHandling : false, //處理 刪除/編輯
-    isRefreshed : false 
 }
 
 const myProductSlice = createSlice({
@@ -58,9 +57,6 @@ const myProductSlice = createSlice({
         },
         recordScrollY : (state, action) => {
             state.scrollY = action.payload
-        },
-        setRefreshed : (state, action) => {
-            state.isRefreshed = action.payload
         }
     },
     extraReducers : (builder) => {
@@ -76,7 +72,6 @@ const myProductSlice = createSlice({
                         product_on : [...avl_products],
                         product_off : [...na_products]
                     }
-                    state.isRefreshed = true
                     state.isLoading = false
                 } else {
                     return {...initialState}
@@ -153,4 +148,4 @@ const myProductSlice = createSlice({
 
 /* ============================================================ */
 export default myProductSlice.reducer
-export const { changeOnOff, recordScrollY, setRefreshed } = myProductSlice.actions
+export const { changeOnOff, recordScrollY } = myProductSlice.actions
