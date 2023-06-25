@@ -22,6 +22,7 @@ export default function Store() {
     const [info, setInfo] = useState({})
     const [products, setProducts] = useState([])
     const {seller} = useParams()
+    const [title, setTitle] = useState(seller)
     useEffect( () => {
         init()
         window.scrollTo({"top": 0})
@@ -31,15 +32,17 @@ export default function Store() {
             if (!success) window.location.replace("/")
             setProducts(products || [])
             setInfo(provider || {})
-            document.title = `${provider?.nickname || seller} 的賣場`
+            setTitle(`${provider?.nickname || seller} 的賣場`)
+            document.title = title
         }
-    }, [seller])
+    }, [seller, title])
+
     /* ==================== 分隔線 ==================== */
     return <>
         <header>
             <div className="flex_center">
                 <Back />
-                <span>賣場</span>
+                <span>{title}</span>
             </div>
             <div className="flex_center">
                 <Home />
@@ -47,37 +50,13 @@ export default function Store() {
         </header>
         <main className="main">
             <div className={style.info}>
-                <div className={style.seller}>
-                    <div>{info?.nickname || ""}</div>
-                    <div>
-                        {(account === seller) &&
-                        <>
-                            <Link to="/MyProducts">
-                                <button className="button">我的商品</button>
-                            </Link>
-                            <Link to="/MyOrder">
-                                <button className="button">我的訂單</button>
-                            </Link>
-                        </>}
-                        {(account && account !== seller) &&
-                        <>
-                            <Link to={`/ChatRoom/${seller}`}>
-                                <button className="button">聊天</button>
-                            </Link>
-                        </>}
-                    </div>
-                </div>
-                <div className={style.intro}>{info?.intro || ""}</div>
-                <div className={style.contact}>
-                    <div>
-                        <span>手機</span>
-                        <span>{info?.phone || ""}</span>
-                    </div>
-                    <div>
-                        <span>信箱</span>
-                        <span>{info?.mail || ""}</span>
-                    </div>
-                </div>
+                <p>簡介</p>
+                <div className="fill skeleton" style={{height:"30px"}} />
+                {/* <div>{info?.intro || ""}</div> */}
+                <p>聯絡方式</p>
+                <div className="fill skeleton" style={{height:"30px"}} />
+                {/* <div>{`手機: ${info?.phone}` || ""}</div>
+                <div>{`信箱: ${info?.mail}` || ""}</div> */}
             </div>
             {
                 ! (products[0])
@@ -98,5 +77,24 @@ export default function Store() {
                 </OverviewCards>
             }
         </main>
+        <div className="base"></div>
+        <footer>
+            {
+                (account === seller)?
+                <>
+                    <Link className="link flex_center grow" to="/MyOrder">
+                        <button className="button grow">我的訂單</button>
+                    </Link>
+                    <Link className="link flex_center grow" to="/MyProducts">
+                        <button className="button grow">我的商品</button>
+                    </Link>
+                </>:
+                <>
+                    <Link className="link flex_center grow" to={`/ChatRoom/${seller}`}>
+                        <button className="button grow">聊天</button>
+                    </Link>
+                </>
+            }
+        </footer>
     </>
 }

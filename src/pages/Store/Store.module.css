@@ -1,39 +1,17 @@
 /* ============================== */
 .info {
-    width: calc(100% - 10px); 
-    border-radius: 10px; margin: 0 auto 10px;
-    box-shadow: 0 0 2px 2px #ddd;
+    width: 98%; margin: 0 auto;
+    padding: 0 10px 10px; margin-bottom: 10px;
+    border: 1px solid #ddd; border-radius: 5px;
 }
-
-/* ============================== */
-.seller {
-    width: 100%;
-    display: flex; border-bottom: 1px solid #ddd;
-    justify-content: space-between; align-items: center;
+.info > p {
+    margin: 10px 0;
+    font-size: 18px; font-weight: bold;
 }
-.seller > div:nth-child(1) {
-    padding: 10px;
-    font-size: 20px; font-weight: 500;
+.info > div {
+    width: 100%; color: #777;
 }
-/* ============================== */
-.intro {
-    width: 100%; padding: 10px;
+.info > div:nth-child(2) {
     word-break: break-all; word-wrap: break-word;
-    white-space: pre-line; color: #777;
+    white-space: pre-line; 
 }
-
-/* ============================== */
-.contact {
-    width: 100%; padding: 0 10px 10px;
-}
-.contact > div {
-    margin: 1px 0;
-}
-.contact > div > span:nth-child(1) {
-    font-weight: bold;
-}
-.contact > div > span:nth-child(2) {
-    color: #777; padding-left: 20px;
-}
-
-/* ============================== */
