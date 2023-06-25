@@ -14,7 +14,6 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { verifyJWT } from "../../slice/accountSlice"
 import { getInfo, addImg, submit, resetState } from "../../slice/editProductSlice"
-import { setRefreshed } from "../../slice/myProductSlice"
 
 /* ======================================== */
 /* React Components */
@@ -39,24 +38,23 @@ export default function EditProduct() {
         window.scrollTo(0, 0)
     }, [title])
     useEffect(() => {
-        // 檢查身分是否可以讀取
-        if (!isLogin) navigate("/SignIn", {replace: true})
-        else if (!isAccessible) navigate(-1)
-    }, [navigate, isLogin, isAccessible])
-    useEffect(() => {
-        // 完成繳交退出
-        if (isCompleted) {
+        if (!isLogin || !isAccessible) {
+            // 權限不符合
             dispatch(resetState())
-            dispatch(setRefreshed(false))
+            navigate("/", {replace: true})
+        } else if (isCompleted) {
+            // 完成繳交退出
+            dispatch(resetState())
             navigate("/MyProducts", {replace: true})
+        } else {
+            // 檢查JWT/請求資料
+            dispatch(resetState())
+            if (id === "new") dispatch(verifyJWT())
+            else dispatch(getInfo({id}))
         }
-        // 檢查JWT/請求資料
-        dispatch(resetState())
-        if (id === "new") dispatch(verifyJWT())
-        else dispatch(getInfo({id}))
-    }, [navigate, dispatch, id, isCompleted])
+    }, [navigate, dispatch, isLogin, isAccessible, isCompleted, id])
+
     useEffect(() => {
-        // 載入資訊
         nameRef.current.value = name
         descriptionRef.current.value = description
         priceRef.current.value = price
