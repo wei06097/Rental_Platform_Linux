@@ -19,6 +19,32 @@
     width: var(--size); height: var(--size);
 }
 
+/* 浮起來的 純icon button */
+/* ============================== */
+.reload {
+    right: calc(0.5 * (100vw - var(--width)) + 10px);
+    bottom: calc(var(--height) + 20px);
+}
+.gotoTop {
+    right: calc(0.5 * (100vw - var(--width)) + 10px);
+    bottom: calc(var(--height) + 80px);
+}
+.float-button {
+    --size: 50px; --bgColor: #0d6efdcc;
+    user-select: none; cursor: pointer;
+    position: fixed; z-index: 99;
+    width: var(--size); height: var(--size);
+    border: none; border-radius: 50%;
+    color: white; background-color: var(--bgColor);
+    box-shadow: 0 0 5px 5px #0002;
+}
+.float-button:hover {
+    --bgColor: #0d6efdee;
+}
+.float-button:active {
+    transform: scale(1.1);
+}
+
 /* 純icon button */
 /* ============================== */
 .icon-button {
