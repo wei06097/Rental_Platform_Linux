@@ -8,6 +8,8 @@ import API from "../../API"
 import ShoppingCart from "../../global/icon/ShoppingCart"
 import Message from "../../global/icon/Message"
 import User from "../../global/icon/User"
+import Reload from "../../global/icon/Reload"
+import GotoTop from "../../global/icon/GotoTop"
 import SearchBar from "../../global/components/SearchBar"
 import OverviewCards from "../../global/components/OverviewCards"
 /* Hooks */
@@ -26,9 +28,13 @@ export default function HomePage() {
         document.title = "台科大租借平台"
     }, [])
     useEffect( () => {
-        dispatch(getRecommend())
-    }, [dispatch])
+        if (!products[0]) dispatch(getRecommend())
+    }, [dispatch, products])
 
+    function reloadHandler() {
+        dispatch(getRecommend())
+    }
+    
     /* ==================== 分隔線 ==================== */
     return <>
         <header className="header3">
@@ -45,6 +51,8 @@ export default function HomePage() {
             <SearchBar />
         </header>
         <main className="main">
+            <GotoTop />
+            <Reload reloadHandler={reloadHandler} />
             <div className={style.announcement_area}>
                 <div className={style.img}>
                     <img src="https://dengekidaioh.jp/archives/003/201908/7abf06c543302ba23fa6e35a50db895b.png" alt=""></img>
