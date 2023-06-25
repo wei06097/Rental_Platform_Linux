@@ -5,8 +5,8 @@ import { current, createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 export const method = createAsyncThunk(
     "xxx/method",
     async ({id}, thunkAPI) => {
-        const token = localStorage.getItem("token") || ""
         try {
+            const token = thunkAPI.getState().account.token
             return await API.get(`${API.LAUNCH_PRODUCT}/?id=${id}`, token)
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
@@ -16,23 +16,24 @@ export const method = createAsyncThunk(
 
 /* ============================================================ */
 const initialState = {
-
+    isLoading : false
 }
 
-const xxxSlice = createSlice({
+const storeSlice = createSlice({
     name : "xxx",
     initialState : initialState,
     reducers : {},
     extraReducers : (builder) => {
         builder
-            .addCase(method.pending, (state) => {
-
+            .addCase(xxx.pending, (state) => {
+                state.isLoading = true
             })
-            .addCase(method.fulfilled, (state, action) => {
-
+            .addCase(xxx.fulfilled, (state, action) => {
+                console.log(action.payload)
+                state.isLoading = false
             })
-            .addCase(method.rejected, (state, action) => {
-
+            .addCase(xxx.rejected, (state, action) => {
+                state.isLoading = false
             })
     }
 })
