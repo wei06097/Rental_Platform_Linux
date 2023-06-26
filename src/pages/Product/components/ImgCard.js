@@ -1,60 +1,31 @@
 /* import */
 /* ======================================== */
-/* CSS */
-import style from "../Product.module.css"
 /* API */
 import API from "../../../API"
-/* React Hooks */
-import { useEffect, useRef } from "react"
+/* css */
+import style from "./ImgCard.module.css"
+/* Import Swiper React components */
+import { Swiper, SwiperSlide } from "swiper/react"
+import "swiper/css"
+import "swiper/css/pagination"
+import "./styles.css"
+import { Pagination } from "swiper"
 
 /* ======================================== */
-let presentPage = 1, displacement = 0, startPosition = 0
-/* React Components */
 export default function ImgCard({ ImgArray }) {
-    const container = useRef()
-    useEffect( () => {
-        container.current.setAttribute("page", `${presentPage}/${ImgArray.length}`)
-        return ( () => {
-            presentPage = 1
-            displacement = 0
-            startPosition = 0
-        })
-    }, [ImgArray])
-    function onPointerdown() {
-        displacement = 0
-        startPosition = container.current.scrollLeft
-        window.addEventListener("pointerup", onPointerup)
-        window.addEventListener("pointermove", onPointermove)
-    }
-    function onPointermove(e) {
-        const width = container.current.querySelector("div").getBoundingClientRect().width
-        const start = (presentPage - 1) * width
-        displacement += e.movementX * -1
-        if (Math.abs(startPosition - start) > 5) return
-        container.current.scrollLeft = startPosition + displacement
-    }
-    function onPointerup() {
-        if (displacement > 2 && presentPage !== ImgArray.length) {
-            presentPage += 1
-        } else if (displacement < -2 && presentPage !== 1) {
-            presentPage -= 1
-        }
-        const width = container.current.querySelector("div").getBoundingClientRect().width
-        const goal = (presentPage - 1) * width
-        container.current.setAttribute("page", `${presentPage}/${ImgArray.length}`)
-        container.current.scrollTo({'behavior': 'smooth', 'left': goal})
-        window.removeEventListener("pointermove", onPointermove)
-        window.removeEventListener("pointerup", onPointerup)
-    }
-    return <>
-        <div className={style.product_imgs} onPointerDown={onPointerdown} ref={container} page="">
+    return <div className={style.frame}>
+        <Swiper pagination={true} modules={[Pagination]} className="mySwiper">
             {
-                ImgArray.map( (element, i) => {
-                    return <div key={i}>
-                        <img src={`${API.WS_URL}/${element}`} alt="" />
-                    </div>
+                ImgArray.map( (name, i) => {
+                    return (
+                        <SwiperSlide key={i}>
+                            <div className={style.img}>
+                                <img src={`${API.WS_URL}/${name}`} alt="" />
+                            </div>
+                        </SwiperSlide>
+                    )
                 })
             }
-        </div>
-    </>
+        </Swiper>
+    </div>
 }
