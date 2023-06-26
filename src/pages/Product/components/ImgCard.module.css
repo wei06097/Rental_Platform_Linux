@@ -1,6 +1,7 @@
 .frame {
     --size: 500px;
     width: var(--size); height: var(--size);
+    border: 1px solid #ddd;
 }
 
 .img {
