@@ -3,31 +3,63 @@
 /* CSS */
 import style from "./SearchBar.module.css"
 /* Hooks */
-import { useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useNavigate, useLocation } from "react-router"
+/* Redux */
+import { useDispatch } from "react-redux"
+/* Function */
+export function encodeURLfromArr(array) {
+    return array
+        .map(param => encodeURIComponent(param))
+        .join("%20")
+}
 
 /* ======================================== */
-export default function SearchBar({ setQueryParams=null }) {
+export default function SearchBar({ setQueryParams=null, forceQuery=null, history=null }) {
     const KEYNAME = "s"
     const navigate = useNavigate()
     const location = useLocation()
+    const dispatch = useDispatch()
     const inputRef = useRef()
+    const [isFirst, setIsFirst] = useState(true)
+    const [lastInput, setLastInput] = useState({record : "", trigger : false})
     
+    useEffect(() => {
+        if (lastInput.trigger && forceQuery) {
+            const queryString = lastInput.record
+            dispatch(forceQuery({queryString}))
+            setLastInput({record : queryString, trigger : false})
+        }
+    }, [dispatch, forceQuery, lastInput])
     useEffect( () => {
-        const queryParams = (new URLSearchParams(location.search).get(KEYNAME) || "").split(" ")
-        if (setQueryParams) setQueryParams(queryParams)
-        inputRef.current.value = queryParams.join(" ")
-    }, [location, KEYNAME, setQueryParams])
-    
+        /* 從網址抓參數 */
+        const queryArray = (new URLSearchParams(location.search).get(KEYNAME) || "").split(" ")
+        if (setQueryParams) setQueryParams(queryArray)
+        inputRef.current.value = queryArray.join(" ")
+        /* 剛mount這個component */
+        if (!isFirst) return
+        setIsFirst(false)
+        setLastInput(prev => {
+            return {record : encodeURLfromArr(queryArray), trigger : false}
+        })
+    }, [location, KEYNAME, setQueryParams, isFirst])
+
     function submitHandler(e) {
         e.preventDefault()
         const queryArray = inputRef.current.value
             .split(" ")
             .filter(element => element !== "")
-        const queryString = queryArray
-            .map(param => encodeURIComponent(param))
-            .join("%20")
-        if (queryString !== "") navigate(`/result?${KEYNAME}=${queryString}`)
+        const queryString = encodeURLfromArr(queryArray)
+        // 檢查輸入空白
+        if (queryString === "") return
+        navigate(`/result?${KEYNAME}=${queryString}`)
+        // 檢查是否要重新抓資料
+        setLastInput(prev => {
+            const reload = (!history)
+                ? prev.record
+                : Object.keys(history).includes(queryString)
+            return {record : queryString, trigger : reload}
+        })
     }
 
     /* ==================== 分隔線 ==================== */
