@@ -11,23 +11,26 @@ import ShoppingCart from "../../global/icon/ShoppingCart"
 import Home from "../../global/icon/Home"
 /* React Hooks */
 import { useState, useEffect } from "react"
-import { useLocation } from "react-router-dom"
 
 /* ======================================== */
 /* React Components */
 export default function Result() {
-    const path = useLocation()
+    const [queryParams, setQueryParams] = useState([])
     const [products, setProducts] = useState([])
-    useEffect( () => {
-        window.scrollTo({"top": 0})
-        const keyword = decodeURI(path.search.split("?s=")[1])
-        document.title = `${keyword} - 台科大租借平台`
-        searchProducts(keyword)
-        async function searchProducts(keyword) {
-            const {result} = await API.get(`${API.RESULT}/?keyword=${keyword}`, null)
-            setProducts(result)
-        }
-    }, [path])
+
+    useEffect(() => {
+        document.title = `搜尋結果 : ${queryParams.join(" ")}`
+        const queryString = queryParams
+            .map(param => encodeURIComponent(param))
+            .join("%20")
+        searchProducts(queryString)
+    }, [queryParams])
+
+    async function searchProducts(queryString) {
+        const {result} = await API.get(`${API.RESULT}/?queryString=${queryString}`, null)
+        setProducts(result)
+    }
+
     /* ==================== 分隔線 ==================== */
     return <>
         <header className="header3">
@@ -41,7 +44,9 @@ export default function Result() {
                     <Home />
                 </div>
             </div>
-            <SearchBar />
+            <SearchBar
+                setQueryParams={setQueryParams}
+            />
         </header>
         <main className="main">
             {

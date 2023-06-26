@@ -375,8 +375,12 @@ app.get('/homepage', async (req, res) => {
 })
 // 搜尋商品
 app.get('/result', async (req, res) => {
-    const keyword = req.query?.keyword || undefined
-    const response = await fetch(`${DB_URL}/products?name_like=${keyword}`)
+    const {queryString} = req?.query || []
+    const params = queryString
+        .split(" ")
+        .map(element => `&name_like=${element}`)
+        .join("")
+    const response = await fetch(`${DB_URL}/products?launched=true${params}`)
     const result = await response.json()
     res.json( {result} )
 })
