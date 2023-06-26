@@ -2,8 +2,8 @@ import API from "../API"
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit"
 
 /* ============================================================ */
-export const getInfo = createAsyncThunk(
-    "editProduct/getInfo",
+export const getProductInfo = createAsyncThunk(
+    "editProduct/getProductInfo",
     async ({id}, thunkAPI) => {
         try {
             const token = thunkAPI.getState().account.token
@@ -41,8 +41,8 @@ const initialState = {
         imgs : [],
         name : "",
         description : "",
-        price : 0,
-        amount : 0,
+        price : null,
+        amount : null,
         position : ""
     },
     isAccessible : true,
@@ -74,10 +74,10 @@ const editProductSlice = createSlice({
     extraReducers : (builder) => {
         builder
         /* 載入商品資訊 */
-            .addCase(getInfo.pending, (state) => {
+            .addCase(getProductInfo.pending, (state) => {
                 state.isLoading = true
             })
-            .addCase(getInfo.fulfilled, (state, action) => {
+            .addCase(getProductInfo.fulfilled, (state, action) => {
                 const {success, info} = action.payload
                 if (!success) {
                     state.isAccessible = false
@@ -95,7 +95,7 @@ const editProductSlice = createSlice({
                 }
                 state.isLoading = false
             })
-            .addCase(getInfo.rejected, (state, action) => {
+            .addCase(getProductInfo.rejected, (state, action) => {
                 state.isLoading = false
             })
         /* 繳交 */
