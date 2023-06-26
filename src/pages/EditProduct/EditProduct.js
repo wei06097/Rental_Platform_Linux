@@ -14,7 +14,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { useSelector, useDispatch } from "react-redux"
 import { verifyJWT } from "../../slice/accountSlice"
 import { getProductInfo, addImg, submit, resetState } from "../../slice/editProductSlice"
-import { getMyProducts, recordScrollY } from "../../slice/myProductSlice"
+import { setIsUpdatedProducts, getMyProducts, recordScrollY } from "../../slice/myProductSlice"
 
 /* ======================================== */
 /* React Components */
@@ -53,6 +53,7 @@ export default function EditProduct() {
             dispatch(resetState())
             dispatch(getMyProducts())
             dispatch(recordScrollY(0))
+            dispatch(setIsUpdatedProducts())
             navigate(-1)
         } else {
             // 檢查JWT/請求資料

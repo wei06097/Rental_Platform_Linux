@@ -15,8 +15,8 @@ import { useEffect } from "react"
 import { useParams, Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
-import { getStoreInfo } from "../../slice/storeSlice"
-import { resetExistState } from "../../slice/storeSlice"
+import { getStoreInfo, resetExistState } from "../../slice/storeSlice"
+import { resetState } from "../../slice/myProductSlice"
 
 /* ======================================== */
 /* React Components */
@@ -26,6 +26,7 @@ export default function Store() {
     const dispatch = useDispatch()
     const {account} = useSelector(state => state.account)
     const {store, isExist, isLoading} = useSelector(state => state.store)
+    const {isUpdatedProducts} = useSelector(state => state.myProduct)
 
     const PATHNAME = window.location.pathname
     const haveData = Object.keys(store).includes(PATHNAME)
@@ -37,8 +38,9 @@ export default function Store() {
         document.title = title
     }, [title])
     useEffect(() => {
-        if (!haveData) dispatch(getStoreInfo({seller}))
-    }, [dispatch, seller, haveData])
+        dispatch(resetState())
+        if (isUpdatedProducts || !haveData) dispatch(getStoreInfo({seller}))
+    }, [dispatch, seller, haveData, isUpdatedProducts])
     useEffect(() => {
         if (!isExist) {
             dispatch(resetExistState())
