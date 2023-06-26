@@ -18,24 +18,25 @@ export default function MyProducts() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const {isLogin} = useSelector(state => state.account)
-    const {on, scrollY, products, isLoading, isHandling} = useSelector(state => state.myProduct)
+    const {on, scrollY, products, isLoading, isHandling, isChecked} = useSelector(state => state.myProduct)
     const {product_on, product_off} = products
+    const isNothing = ((product_on?.length || 0) + (product_off?.length || 0)) === 0
 
     useEffect(() => {
         document.title = "我的商品"
     }, [])
     useEffect(() => {
         if (!isLogin) navigate("/SignIn", {replace: true})
-        else if(!product_on[0] && !product_off[0]) dispatch(getMyProducts())
-    }, [navigate, dispatch, isLogin, product_on, product_off])
-
+        else if (isNothing && !isChecked) dispatch(getMyProducts())
+    }, [navigate, dispatch, isLogin, isNothing, isChecked])
+    
     function changePage(state) {
         if (isHandling || state === on) return
         const target = scrollY
         dispatch(recordScrollY(window.scrollY))
         dispatch(changeOnOff(state))
         setTimeout(() => {
-            window.scroll(window.scrollX, target)
+            window.scroll(0, target)
         }, 10)
     }
     function reloadHandler() {

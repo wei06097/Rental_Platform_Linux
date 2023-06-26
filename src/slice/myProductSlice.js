@@ -50,14 +50,22 @@ const initialState = {
         product_on : [],
         product_off : []
     },
-    isLoading : false, //第一次載入
-    isHandling : false, //處理 刪除/編輯
+    isLoading : false, //當頁面第1次載入
+    isHandling : false, //處理刪除/編輯
+    isChecked : false, //是否至少拿1次資料
+    isUpdatedProducts : false //是否有更新過資料(上/下架 新增 刪除 儲存)
 }
 
 const myProductSlice = createSlice({
     name : "myProduct",
     initialState : initialState,
     reducers : {
+        resetState : (state) => {
+            return {...initialState}
+        },
+        setIsUpdatedProducts : (state) => {
+            state.isUpdatedProducts = true
+        },
         changeOnOff : (state, action) => {
             state.on = action.payload
         },
@@ -78,6 +86,7 @@ const myProductSlice = createSlice({
                         product_on : [...avl_products],
                         product_off : [...na_products]
                     }
+                    state.isChecked = true
                     state.isLoading = false
                 } else {
                     return {...initialState}
@@ -105,6 +114,7 @@ const myProductSlice = createSlice({
                             .filter(element => Number(element.id) !== Number(id))
                         state.products.product_off = [...newArray]
                     }
+                    state.isUpdatedProducts = true
                 } else {
                     alert("刪除時發生錯誤")
                 }
@@ -140,6 +150,7 @@ const myProductSlice = createSlice({
                         state.products.product_on = [...newArray1]
                         state.products.product_off = [...newArray2]
                     }
+                    state.isUpdatedProducts = true
                 } else {
                     alert("操作時發生錯誤")
                 }
@@ -154,4 +165,4 @@ const myProductSlice = createSlice({
 
 /* ============================================================ */
 export default myProductSlice.reducer
-export const { changeOnOff, recordScrollY } = myProductSlice.actions
+export const { resetState, setIsUpdatedProducts, changeOnOff, recordScrollY } = myProductSlice.actions
