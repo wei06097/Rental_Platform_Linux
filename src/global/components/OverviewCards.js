@@ -24,8 +24,10 @@ function ProductCard({ id, link, name, price, showHeart }) {
             <Link className="link" to={`/Product/${id}`}>
                 <div className={style.img}>
                     {!loaded && <div className="fill skeleton" />}
-                    <img style={{opacity:loaded?1:0}}
-                        src={link} alt="" ref={imgRef}
+                    <img 
+                        ref={imgRef}
+                        style={{opacity:loaded?1:0}} loading="lazy" alt=""
+                        src={link}
                     />
                 </div>
                 <div className={style.info}>
