@@ -37,6 +37,11 @@ export default function EditProduct() {
     useEffect(() => {
         document.title = title
         window.scrollTo(0, 0)
+        const unloadHandler = (e) => {e.returnValue = ""}
+        window.addEventListener("beforeunload", unloadHandler)
+        return () => {
+            window.removeEventListener("beforeunload", unloadHandler)
+        }
     }, [title])
     useEffect(() => {
         if (!isLogin || !isAccessible) {
