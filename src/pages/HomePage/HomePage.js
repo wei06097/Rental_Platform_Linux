@@ -22,15 +22,16 @@ import { getRecommend } from "../../slice/homepageSlice"
 /* React Components */
 export default function HomePage() {
     const dispatch = useDispatch()
-    const {products, isLoading} = useSelector(state => state.homepage)
+    const {products, isLoading, isChecked} = useSelector(state => state.homepage)
+    const noData = !isChecked || !products[0]
 
     useEffect(() => {
         document.title = "台科大租借平台"
     }, [])
     useEffect( () => {
-        if (!products[0]) dispatch(getRecommend())
-    }, [dispatch, products])
-
+        if (noData) dispatch(getRecommend())
+    }, [dispatch, noData])
+    
     function reloadHandler() {
         dispatch(getRecommend())
     }

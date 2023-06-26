@@ -16,13 +16,18 @@ export const getRecommend = createAsyncThunk(
 /* ============================================================ */
 const initialState = {
     products : [],
-    isLoading : false
+    isLoading : false,
+    isChecked : false
 }
 
 const homepage = createSlice({
     name : "homepage",
     initialState : initialState,
-    reducers : {},
+    reducers : {
+        resetIsChecked : (state) => {
+            state.isChecked = false
+        }
+    },
     extraReducers : (builder) => {
         builder
         /* 推薦商品 */
@@ -32,6 +37,7 @@ const homepage = createSlice({
             .addCase(getRecommend.fulfilled, (state, action) => {
                 const {result} = action.payload
                 state.products = [...result]
+                state.isChecked = true
                 state.isLoading = false
             })
             .addCase(getRecommend.rejected, (state, action) => {
@@ -42,5 +48,5 @@ const homepage = createSlice({
 })
 
 /* ============================================================ */
-// export const {} = homepage.actions
+export const { resetIsChecked } = homepage.actions
 export default homepage.reducer
