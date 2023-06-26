@@ -26,8 +26,8 @@ export default function MyProducts() {
     }, [])
     useEffect(() => {
         if (!isLogin) navigate("/SignIn", {replace: true})
-        else dispatch(getMyProducts())
-    }, [navigate, dispatch, isLogin])
+        else if(!product_on[0] && !product_off[0]) dispatch(getMyProducts())
+    }, [navigate, dispatch, isLogin, product_on, product_off])
 
     function changePage(state) {
         if (isHandling || state === on) return
