@@ -8,15 +8,15 @@ import ShoppingCart from "../../global/icon/ShoppingCart"
 import Home from "../../global/icon/Home"
 import Reload from "../../global/icon/Reload"
 import GotoTop from "../../global/icon/GotoTop"
-import SearchBar from "../../global/components/SearchBar"
 import OverviewCards from "../../global/components/OverviewCards"
+import SearchBar from "./Components/SearchBar"
 /* Hooks */
 import { useState, useEffect } from "react"
 /* Redux */
 import { queryProducts } from "../../slice/resultSlice"
 import { useSelector, useDispatch } from "react-redux"
 /* Fcntion */
-import { encodeURLfromArr } from "../../global/components/SearchBar"
+import { encodeURLfromArr } from "./Components/SearchBar"
 
 /* ======================================== */
 /* React Components */

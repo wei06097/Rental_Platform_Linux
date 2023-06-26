@@ -10,7 +10,7 @@ import Message from "../../global/icon/Message"
 import User from "../../global/icon/User"
 import Reload from "../../global/icon/Reload"
 import GotoTop from "../../global/icon/GotoTop"
-import SearchBar from "../../global/components/SearchBar"
+import SearchBar from "../Result/Components/SearchBar"
 import OverviewCards from "../../global/components/OverviewCards"
 /* Hooks */
 import { useEffect } from "react"
