@@ -6,6 +6,8 @@ import API from "../../API"
 import Back from "../../global/icon/Back"
 import ShoppingCart from "../../global/icon/ShoppingCart"
 import Home from "../../global/icon/Home"
+import Reload from "../../global/icon/Reload"
+import GotoTop from "../../global/icon/GotoTop"
 import SearchBar from "../../global/components/SearchBar"
 import OverviewCards from "../../global/components/OverviewCards"
 /* Hooks */
@@ -36,6 +38,10 @@ export default function Result() {
         if(!haveData) dispatch(queryProducts({queryString}))
     }, [dispatch, title, queryString, haveData])
 
+    function reloadHandler() {
+        dispatch(queryProducts({queryString}))
+    }
+
     /* ==================== 分隔線 ==================== */
     return <>
         <header className="header3">
@@ -56,6 +62,8 @@ export default function Result() {
             />
         </header>
         <main className="main">
+            <GotoTop />
+            <Reload reloadHandler={reloadHandler} />
             {
                 isLoading?
                 <div className="loading-ring" />:
