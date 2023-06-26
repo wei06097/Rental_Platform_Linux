@@ -13,7 +13,8 @@ import { useParams, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
 import { verifyJWT } from "../../slice/accountSlice"
-import { getInfo, addImg, submit, resetState } from "../../slice/editProductSlice"
+import { getProductInfo, addImg, submit, resetState } from "../../slice/editProductSlice"
+import { getMyProducts, recordScrollY } from "../../slice/myProductSlice"
 
 /* ======================================== */
 /* React Components */
@@ -45,12 +46,14 @@ export default function EditProduct() {
         } else if (isCompleted) {
             // 完成繳交退出
             dispatch(resetState())
-            navigate("/MyProducts", {replace: true})
+            dispatch(getMyProducts())
+            dispatch(recordScrollY(0))
+            navigate(-1)
         } else {
             // 檢查JWT/請求資料
             dispatch(resetState())
             if (id === "new") dispatch(verifyJWT())
-            else dispatch(getInfo({id}))
+            else dispatch(getProductInfo({id}))
         }
     }, [navigate, dispatch, isLogin, isAccessible, isCompleted, id])
 
