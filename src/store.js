@@ -7,6 +7,7 @@ import storageSession from "redux-persist/lib/storage/session"
 
 import accountSlice from "./slice/accountSlice"
 import homepageSlice from "./slice/homepageSlice"
+import resultSlice from "./slice/resultSlice"
 import storeSlice from "./slice/storeSlice"
 import myProductSlice from "./slice/myProductSlice"
 import editProductSlice from "./slice/editProductSlice.js"
@@ -18,6 +19,10 @@ const account_PersistConfig = {
 }
 const homepage_PersistConfig = {
     key : "homepage",
+    storage : storageSession
+}
+const result_PersistConfig = {
+    key : "result",
     storage : storageSession
 }
 const store_PersistConfig = {
@@ -33,6 +38,7 @@ const myProduct_PersistConfig = {
 const reducer = combineReducers({
     account : persistReducer(account_PersistConfig, accountSlice),
     homepage : persistReducer(homepage_PersistConfig, homepageSlice),
+    result : persistReducer(result_PersistConfig, resultSlice),
     store :  persistReducer(store_PersistConfig, storeSlice),
     myProduct : persistReducer(myProduct_PersistConfig, myProductSlice),
     editProduct : editProductSlice
