@@ -287,14 +287,14 @@ app.delete('/api/commodity/commodity_CRUD', async (req, res) => {
     let response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
     let result = await response.json()
     if (!result[0]) {
-        res.json( {success : false, id : null} )
+        res.json( {success : false} )
         return
     }
     // 刪除不要的圖片
     (result[0]?.imgs || []).forEach(path => fs.unlink(`${__dirname}/${path}`, () => {}))
     // 從資料庫刪除
     await fetch(`${DB_URL}/products/${id}`, {method : "DELETE"})
-    res.json( {success : true, id : Number(id)} )
+    res.json( {success : true} )
 })
 // 取得我的所有商品
 app.get('/api/commodity/my_commodity', async (req, res) => {
@@ -326,7 +326,7 @@ app.put('/launch_product', async (req, res) => {
     const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
     const result = await response.json()
     if (!result[0]) {
-        res.json( {success : false, id : null} )
+        res.json( {success : false} )
         return
     }
     // 更新資料庫的商品
@@ -336,7 +336,7 @@ app.put('/launch_product', async (req, res) => {
         headers : { "Content-Type" : "application/json" },
         body : JSON.stringify(product)
     })
-    res.json( {success : true, id : Number(id)} )
+    res.json( {success : true} )
 })
 
 /* ======================================== */
