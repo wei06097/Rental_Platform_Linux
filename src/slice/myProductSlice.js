@@ -18,7 +18,10 @@ export const deleteProduct = createAsyncThunk(
     async ({id}, thunkAPI) => {
         try {
             const token = thunkAPI.getState().account.token
-            return await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
+            return {
+                id : id, 
+                data : await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
+            }
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
         }
@@ -29,7 +32,10 @@ export const launchProduct = createAsyncThunk(
     async ({id, launched}, thunkAPI) => {
         try {
             const token = thunkAPI.getState().account.token
-            return await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
+            return {
+                id : id, 
+                data : await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
+            }
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
         }
@@ -86,8 +92,8 @@ const myProductSlice = createSlice({
                 state.isHandling = true
             })
             .addCase(deleteProduct.fulfilled, (state, action) => {
-                const {success, id} = action.payload
-                if (success) {
+                const {id , data} = action.payload
+                if (data?.success) {
                     const {on, products} = current(state)
                     const {product_on, product_off} = products
                     if (on) {
@@ -113,10 +119,10 @@ const myProductSlice = createSlice({
                 state.isHandling = true
             })
             .addCase(launchProduct.fulfilled, (state, action) => {
-                const {success, id} = action.payload
+                const {id , data} = action.payload
                 const {on, products} = current(state)
                 const {product_on, product_off} = products
-                if (success) {
+                if (data?.success) {
                     if (on) {
                         const newArray1 = product_on
                             .filter(element => Number(element.id) !== Number(id))
