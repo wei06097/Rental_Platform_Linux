@@ -2,46 +2,53 @@
 /* ======================================== */
 /* CSS */
 import style from "./ChatRoom.module.css"
-/* Components */
-import PhotoViewer from "../../global/components/PhotoViewer"
-/* header 的按鈕 */
-import Back from "../../global/icon/Back"
 /* API */
 import API from "../../API"
 /* Functions */
 import InputChecker from "../../global/functions/InputChecker"
-/* React Hooks */
+/* Components */
+import Back from "../../global/icon/Back"
+import PhotoViewer from "../../global/components/PhotoViewer"
+/* Hooks */
 import { useSocket } from "../../global/hooks/SocketProvider"
 import { useState, useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate } from "react-router-dom"
+/* Redux */
+import { useSelector } from "react-redux"
 
 /* ======================================== */
 /* React Components */
 const onMOBILE = (/Mobi|Android|iPhone/i.test(navigator.userAgent))
 export default function ChatRoom() {
     const params = useParams()
-    const receiver = params.receiver
-    const provider = localStorage.getItem("account")
     const socket = useSocket()
+    const navigate = useNavigate()
+    const {account, token, isLogin} = useSelector(state => state.account)
+    const receiver = params.receiver
+    const provider = account
+    
     const textareaRef = useRef()
-    const [fullscreen, setFullscreen] = useState("")
     const [messages, setMessages] = useState([])
-    useEffect( () => {
+    const [fullscreen, setFullscreen] = useState("")
+    
+    useEffect(() => {
+        if (!isLogin) navigate("/SignIn", {replace : true})
+    }, [navigate, isLogin])
+    useEffect(() => {
+        document.title = `對話 : ${receiver}`
+        init()
+        async function init() {
+            const {success, history} = await API.get(`${API.CHAT_HISTORY}/?receiver=${receiver}`, token)
+            if (success) setMessages(history)
+        }
+    }, [token, receiver])
+
+    useEffect(() => {
         const body = document.body
         const bottomDistance = body.scrollHeight + body.getBoundingClientRect().y
         const toBottom = (bottomDistance < 1000 || messages?.at(-1)?.provider === provider)
         if (toBottom) window.scrollTo("top", body.clientHeight)
     }, [messages, provider])
-    useEffect( () => {
-        document.title = `對話 - ${receiver}`
-        init()
-        async function init() {
-            const token = localStorage.getItem("token")
-            const {success, history} = await API.get(`${API.CHAT_HISTORY}/?receiver=${receiver}`, token)
-            if (!success) window.location.replace("/")
-            setMessages(history || [])
-        }
-    }, [receiver])
     useEffect( () => {
         socket.on("message", messageHandler)
         function messageHandler(message) {
@@ -54,6 +61,7 @@ export default function ChatRoom() {
         }
     }, [socket, provider, receiver])
 
+    /* ==================== 分隔線 ==================== */
     function sendMessage() {
         const type = "text"
         const content = textareaRef.current.value
@@ -73,7 +81,7 @@ export default function ChatRoom() {
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
             const fileData = e.target.files[i]
-            if (! InputChecker.isImageFormat(fileData)) continue
+            if (!InputChecker.isImageFormat(fileData)) continue
             // const url = URL.createObjectURL(fileData)
             // setInputImgs(prev => [...prev, url])
             const reader = new FileReader()
@@ -83,8 +91,9 @@ export default function ChatRoom() {
                 socket.emit("message", {provider, receiver, type, img})
             }, false)
         }
-        e.target.value = "";
     }
+
+    /* ==================== 分隔線 ==================== */
     return <>
         <header>
             <div className="flex_center">
