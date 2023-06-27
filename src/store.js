@@ -29,10 +29,6 @@ const store_PersistConfig = {
     key : "store",
     storage : storageSession
 }
-const myProduct_PersistConfig = {
-    key : "myProduct",
-    storage : storageSession
-}
 
 /* ======================================== */
 const reducer = combineReducers({
@@ -40,7 +36,7 @@ const reducer = combineReducers({
     homepage : persistReducer(homepage_PersistConfig, homepageSlice),
     result : persistReducer(result_PersistConfig, resultSlice),
     store :  persistReducer(store_PersistConfig, storeSlice),
-    myProduct : persistReducer(myProduct_PersistConfig, myProductSlice),
+    myProduct : myProductSlice,
     editProduct : editProductSlice
 })
 const store = configureStore({
