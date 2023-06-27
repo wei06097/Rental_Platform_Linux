@@ -11,28 +11,35 @@ import ShoppingCar from "../../global/icon/ShoppingCart"
 import Home from "../../global/icon/Home"
 /* React Hooks */
 import { useEffect, useState } from "react"
-import { useParams, Link } from "react-router-dom"
+import { useParams, Link ,useNavigate } from "react-router-dom"
+/* Redux */
+import { useSelector } from "react-redux"
 
 /* ======================================== */
 /* React Components */
 export default function Product() {
-    const account = localStorage.getItem("account")
     const {id} = useParams()
-    const [product, setProduct] = useState({})
+    const navigate = useNavigate()
+    const {account} = useSelector(state => state.account)
     const [viewPicture, setViewPicture] = useState(false)
+    const [product, setProduct] = useState({})
+    const [isLoading, setIsloading] = useState(false)
 
+    useEffect(() => {
+        document.title = `商品 : ${product?.name || ""}`
+    }, [product])
     useEffect( () => {
         init()
-        window.scrollTo({"top": 0})
+        window.scroll(0, 0)
         async function init() {
+            setIsloading(true)
             const {success, product} = await API.get(`${API.PRODUCT}/?id=${id}`, null)
-            if (!success) window.location.replace("/")
-            else setProduct(product)
+            if (success) setProduct(product)
+            else navigate("/", {replace : true})
+            setIsloading(false)
         }
-    }, [id])
-    useEffect(() => {
-        document.title = `商品 - ${product?.name || ""}`
-    }, [product])
+    }, [navigate, id])
+
     /* ==================== 分隔線 ==================== */
     return <>
         {
@@ -49,6 +56,10 @@ export default function Product() {
             </header>
         }
         <main className={style.main}>
+            {
+                isLoading && 
+                <div className="loading-ring" />
+            }
             <div className={viewPicture? "": style.top}>
                 <ImgCard
                     ImgArray={product?.imgs || []}
@@ -56,47 +67,42 @@ export default function Product() {
                     setViewPicture={setViewPicture}
                 />
                 {
-                    !viewPicture &&
-                    <div className={style.product_info}>
-                        <div className={style.product_name}>
-                            <h1>{product?.name || ""}</h1>
-                        </div>
-                        <div className={style.product_price}>NT$ {product?.price || ""} / 每天</div>
-                        <div className={style.detail}>
+                    !viewPicture && !isLoading &&
+                    <div className={style.info}>
+                        <div>{product?.name || ""}</div>
+                        <div>$NT{product?.price || ""} / 每天</div>
+                        <div>
                             <div>
-                                <span>剩餘數量</span>
-                                <span>{product?.amount || 0}</span>
+                                <span>數量</span>
+                                <span>{product?.amount || ""}</span>
                             </div>
                             <div>
-                                <span>付款方式</span>
-                                <span>面交</span>
-                            </div>
-                            <div>
-                                <span>商品地點</span>
-                                <span>{product?.position || "未知"}</span>
+                                <span>地點</span>
+                                <span>{product?.position || ""}</span>
                             </div>
                         </div>
                     </div>
                 }
             </div>
             {
-                !viewPicture &&
-                <div className={style.product_description}>
-                    <div>賣家資訊</div>
+                !viewPicture && !isLoading &&
+                <div className={style.des}>
+                    <div>賣場名稱</div>
                     <div>
                         <div>{product?.provider || ""}</div>
                         <div>
-                            {account && account !== product?.provider &&
+                            {
+                                (account !== product?.provider) &&
                                 <Link to={`/ChatRoom/${product?.provider || ""}`}>
-                                    <button className="button" style={{marginRight:0}}>聊天</button>
+                                    <button className="button" style={{margin:"0"}}>聊天</button>
                                 </Link>
                             }
                             <Link to={`/Store/${product?.provider || ""}`}>
-                                <button className="button" style={{marginRight:0}}>進入賣場</button>
+                                <button className="button" style={{margin:"0"}}>進入賣場</button>
                             </Link>
                         </div>
                     </div>
-                    <div>商品詳情</div>
+                    <div>商品描述</div>
                     <div>{product?.description || ""}</div>
                 </div>
             }

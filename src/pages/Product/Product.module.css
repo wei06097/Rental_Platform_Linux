@@ -1,99 +1,84 @@
 /* ======================================== */
 .main {
-    --imgSize: 500px; --fontSize: 23px;
+    --imgSize: 420px;
     width: var(--width); margin: 20px auto;
 }
-
-/* ======================================== */
 .top {
-    display: flex; gap: 10px;
-    justify-content: space-between;
+    --gap: 5px;
+    display: grid; place-items: center;
+    width: 100%; height: 100%;
+    grid-template-columns: var(--imgSize);
+    grid-template-columns: var(--imgSize) calc(100% - var(--imgSize) - var(--gap));
+    gap: var(--gap); overflow: hidden;
 }
 
 /* ======================================== */
-.product_info {
-    width: calc(95% - var(--imgSize)); flex-grow: 1;
-    padding: 10px; border: 1px solid #ddd;
-    display: flex; flex-direction: column;
+.info,
+.des {
+    width: 100%; height: 100%;
+    border-radius: 10px; overflow: hidden;
+    border: 1px solid #ddd;
+    padding: 0 20px; margin: 0 auto;
+}
+.info > div:nth-child(1),
+.info > div:nth-child(2){
+    margin-top: 10px;
+}
+.info > div:nth-child(3) {
+    margin: 40px 0 10px;
 }
 
-.product_info > .product_name {
-    display: -webkit-box; overflow: hidden;
-    -webkit-box-orient: vertical; -webkit-line-clamp: 3;
+.info > div:nth-child(1),
+.info > div:nth-child(2) {
+    font-size: 20px; font-weight: 600;
+    overflow: hidden;
+    /* display: -webkit-box; overflow: hidden;
+    -webkit-box-orient: vertical;-webkit-line-clamp: 3; */
 }
-.product_info > .product_name > h1 {
-    font-size: var(--fontSize); align-items: center;
+.info > div:nth-child(2) {
+    color: red;
 }
-
-.product_info > .product_price {
-    --height: 50px; padding: 0 15px;
-    height: var(--height); line-height: var(--height);
-    font-size: var(--fontSize); font-weight: bold;
-    color: #ff0000aa; background-color: #eee;
-}
-
-.product_info > .detail {
-    width: 100%; padding: 10px 0;
-}
-.product_info > .detail > div {margin-top: 5px;}
-.product_info > .detail > div:nth-child(1) {margin-top: 0;}
-.product_info > .detail > div > span:nth-child(1) {
-    width: 100%; color: #777;
-}
-.product_info > .detail > div > span:nth-child(2) {
-    width: 100%;
-    display: inline-block; white-space: nowrap;
-    overflow: hidden; text-overflow: ellipsis;
-}
-
-/* ======================================== */
-.product_description {
-    width: 100%; margin-top: 10px;
-    border: 1px solid #ddd; padding: 10px 15px;
-}
-.product_description > div:nth-child(1),
-.product_description > div:nth-child(3) {
-    font-weight: bold; padding: 5px 0;
-    border-bottom: 1px solid #ddd;
-}
-.product_description > div:nth-child(2) {
-    width: 100%; padding: 5px 0;
+.info > div:nth-child(3) > div > span {
     display: flex;
-    align-items: center; justify-content: space-between;
 }
-.product_description > div:nth-child(4) {
-    width: 100%; padding: 15px 0;
+.info > div:nth-child(3) > div > span:nth-child(1) {
+    color: #777;
+}
+
+/* ======================================== */
+.des {
+    margin: 10px auto;
+}
+.des > div:nth-child(1),
+.des > div:nth-child(3) {
+    font-size: large; font-weight: bold;
+    border-bottom: 1px solid #ddd;
+    margin: 10px auto 5px;
+}
+.des > div:nth-child(2) {
+    display: grid; align-items: center;
+    grid-template-columns: auto 120px;
+}
+.des > div:nth-child(4) {
+    width: 100%; margin-bottom: 10px;
     word-break: break-all; word-wrap: break-word;
     white-space: pre-line;
 }
 
 /* ======================================== */
 @media(max-width: 1250px) {
-    .main {
-        --fontSize: 18px;
-    }
     .top {
-        flex-direction: column; 
-        align-items: center;
-    }
-    .product_info {
-        width: var(--width);
-    }
-    .product_info > .product_price {
-        --height: 0; background-color: inherit;
-        padding: 0; margin: 10px 0 20px;
-    }
-    .product_description {
-        padding: 10px;
+        --gap: 10px; grid-template-columns: 100vw;
+    } .info, .des {
+        width: 80%;
     }
 }
-
 @media(max-width: 600px) {
     .main {
-        --imgSize: 100vw;
-        margin-top: 0;
+        --imgSize: 100vw; margin: 5px auto;
+    }.top {
+        --gap: 5px;
+    } .info, .des {
+        width: 100%;
     }
-    .top { gap: 0; }
-    .product_imgs { border: 0; }
-    .product_info { padding: 0 10px; }
 }

@@ -2,6 +2,7 @@
     --size: var(--imgSize);
     width: var(--size); height: var(--size);
     border: 1px solid #ddd; z-index: 0;
+    border-radius: 10px; overflow: hidden;
 }
 .view {
     width: 100vw; height: 100vh;
