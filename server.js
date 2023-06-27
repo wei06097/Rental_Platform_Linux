@@ -5,6 +5,7 @@ const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const fetch = require('node-fetch')
 const fs = require('fs')
+const { v4: uuidv4 } = require('uuid')
 
 /* ======================================== */
 const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET
@@ -21,25 +22,27 @@ const io = require('socket.io')(server, {cors: {origin: "*"}})
 /* ======================================== */
 let online = {}
 
+/* 前端登入後會連接 socket */
 io.on('connection', socket => {
-    let user = null
-    socket.on("login", (token, account) => {
-        if (!token || !account) return
-        const data = decodeToken(token)
-        const success = (data?.account === account)
-        if (!success) return
-        user = account
-        if (!online[user]) online[user] = []
-        online[user].push(socket.id)
-        // console.log(online)
-    })
+    /* 此時可以從 headers 拿 token */
+    const token = socket?.handshake?.headers?.authorization || null
+    const {account} = decodeToken(token)
+    /* 如果 token 解析錯誤，就離開函式 */
+    if (!token || !account) return
+    /* 加入線上列表 */
+    if (!online[account]) online[account] = []
+    online[account].push(socket.id)
+    // console.log("已登入", online)
+    
+    /* 前端登出後或是關閉分頁，會產生 socket 斷線的事件 */
     socket.on("disconnect", () => {
-        if (!user) return
-        const index = online[user].indexOf(socket.id)
-        if (index !== -1) online[user].splice(index, 1)
-        if (!online[user][0]) delete online[user]
-        // console.log(online)
+        /* 從線上列表移除 */
+        const index = online[account].indexOf(socket.id)
+        if (index !== -1) online[account].splice(index, 1)
+        if (!online[account][0]) delete online[account]
+        // console.log("已登出", online)
     })
+
     socket.on("message", async ({provider, receiver, type, content, img}) => {
         // 檢查傳送者身分
         if (!online[provider]) return
@@ -79,24 +82,16 @@ io.on('connection', socket => {
 /* ======================================== */
 // 儲存圖片並回傳子網址
 async function saveImg(img, doSave) {
-    // 取得資料庫的計數器 (圖片檔案編號)
-    const response = await fetch(`${DB_URL}/parameter`)
-    const params = await response.json()
-    const number = parseInt(params?.img_counter)
-    // 更新資料庫的計數器
-    await fetch(`${DB_URL}/parameter`, {
-        method: "PATCH",
-        headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify({img_counter : number + 1})
-    })
+    /* 產生 id */
+    const uniqueId = uuidv4()
     // 儲存圖片到 img 資料夾
     const type = img.replace("data:image/","").split(";")[0]
-    const path = `${__dirname}/img/${number}.${type}`
+    const path = `${__dirname}/img/${uniqueId}.${type}`
     const data = img.replace(/^data:image\/\w+;base64,/, "")
     const buf = Buffer.from(data, 'base64')
     if (doSave) fs.writeFile(path, buf, () => {})
     // 回傳子網址
-    return Promise.resolve(`img/${number}.${type}`)
+    return Promise.resolve(`img/${uniqueId}.${type}`)
 }
 // 將token解密
 function decodeToken(token) {
@@ -137,7 +132,10 @@ app.post("/api/login", async (req, res) => {
     let message = ""
     if (!result[0]) message = "尚未註冊"
     else if (!success) message = "登入失敗"
-    else message = jwt.sign(result[0], JWT_SECRET)
+    else message = jwt.sign({
+        account : result[0]?.account || "",
+        nickname : result[0]?.nickname || ""  
+    }, JWT_SECRET)
     res.json( {success, message, account} )
 })
 app.get('/api/token_verify', async (req, res) => {
