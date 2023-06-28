@@ -21,6 +21,7 @@ export default function Photo({ order, src, isNew }) {
         const imgElement = imgRef.current
         const loaded = () => setLoaded(true)
         imgElement.addEventListener("load", loaded)
+        if (imgElement.complete) setLoaded(true)
         return () => {
             imgElement.removeEventListener("load", loaded)
         }

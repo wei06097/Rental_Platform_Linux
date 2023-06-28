@@ -21,6 +21,7 @@ export default function Card({ item, launched, toEditPage }) {
         const imgElement = imgRef.current
         const loaded = () => setLoaded(true)
         imgElement.addEventListener("load", loaded)
+        if (imgElement.complete) setLoaded(true)
         return () => {
             imgElement.removeEventListener("load", loaded)
         }

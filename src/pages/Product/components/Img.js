@@ -14,6 +14,7 @@ export default function Img({src, openhandler}) {
         const imgElement = imgRef.current
         const loaded = () => setLoaded(true)
         imgElement.addEventListener("load", loaded)
+        if (imgElement.complete) setLoaded(true)
         return () => {
             imgElement.removeEventListener("load", loaded)
         }
