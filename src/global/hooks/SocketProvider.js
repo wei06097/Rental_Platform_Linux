@@ -14,7 +14,32 @@ export const useSocket = () => useContext(SocketContext)
 export default function SocketProvider({ children }) {
     const [socket, setSocket] = useState(null)
     const {token} = useSelector(state => state.account)
+    
+    /* 獲取瀏覽器通知權限 */
+    useEffect(() => {
+        function requestNotifyPermission() {
+            window.removeEventListener("mousemove", requestNotifyPermission)
+            if (!("Notification" in window)) {
+                console.log('This browser does not support notification')
+            } else {
+                Notification.requestPermission()
+                    .then((permission) => {
+                        // permission: 1. granted 2.denied 3.default
+                        const config = {
+                            body: `Notification is ${permission}`,
+                            tag: "permission"
+                        }
+                        new Notification("Notification", config)
+                    })
+            }
+        }
+        window.addEventListener("mousemove", requestNotifyPermission)
+        return () => {
+            window.removeEventListener("mousemove", requestNotifyPermission)
+        }
+    }, [])
 
+    /* 登入後要socket連線 */
     useEffect(() => {
         if (!token) return
         const newSocket = webSocket(API.WS_URL, {
@@ -27,12 +52,12 @@ export default function SocketProvider({ children }) {
             newSocket.close()
         }
     }, [token])
-    
+    /* 登出後要清除socket */
     useEffect(() => {
-        // 登出了但還沒斷線
         if (!token && socket) setSocket(null)
     }, [token, socket])
 
+    /* 簡單測試socket */
     useEffect(() => {
         if (!socket) return
         socket.on("connect", () => {
