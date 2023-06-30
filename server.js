@@ -19,7 +19,7 @@ app.use(express.json({limit: '50mb'}))
 const server = require('http').Server(app)
 const io = require('socket.io')(server, {cors: {origin: "*"}})
 
-/* ======================================== */
+/* ======================================== *//* ======================================== */
 let online = {}
 
 /* 前端登入後會連接 socket */
@@ -102,7 +102,7 @@ function decodeToken(token) {
     }
 }
 
-/* ======================================== */
+/* ======================================== *//* ======================================== */
 app.post("/api/signup", async (req, res) => {
     const {account} = req.body
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
@@ -383,7 +383,61 @@ app.get('/result', async (req, res) => {
     res.json( {result} )
 })
 
-/* ======================================== */
+/* ======================================== *//* ======================================== */
+// C 加入商品到購物清單 id為商品的id
+app.post('/cart/cart_CRUD', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
+    // 驗證身分
+    const {account} = decodeToken(token)
+    // 商品是否存在
+    const response = await fetch(`${DB_URL}/products/${id}`)
+    const result = await response.json()
+    if (!account || !result) {
+        res.json( {success : false} )
+        return
+    }
+    // 加入一筆資料到購物車list
+    const payload = {
+        product_id : id,
+        account : account
+    }
+    await fetch(`${DB_URL}/shopping_cart`, {
+        method : "POST",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(payload)
+    })
+    res.json( {success : true} )
+})
+// R 讀取商品是否在購物清單 id為商品的id
+app.get('/cart/cart_CRUD', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
+    // 驗證身分
+    const {account} = decodeToken(token)
+    if (!account) res.json( {success : false} )
+    // 商品是否存在
+    const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&account=${account}`)
+    const result = await response.json()
+    res.json( {success : true, isAdded : result.length!==0} )
+})
+// D 從購物清單刪除商品 id為商品的id
+app.del('/cart/cart_CRUD', async (req, res) => {
+    const id = req.query?.id || undefined
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    // 查看是否存在並取得預設id
+    const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&account=${account}`)
+    const result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    await fetch(`${DB_URL}/shopping_cart/${result[0].id}`, {method : "DELETE"})
+    res.json( {success : true} )
+})
+
+/* ======================================== *//* ======================================== */
 server.listen(PORT, HOST, () => {
     console.log("\n===== Start =====")
     console.log(`at ${HOST}:${PORT}\n`)

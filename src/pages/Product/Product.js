@@ -20,10 +20,12 @@ import { useSelector } from "react-redux"
 export default function Product() {
     const {id} = useParams()
     const navigate = useNavigate()
-    const {account} = useSelector(state => state.account)
+    const {account, token} = useSelector(state => state.account)
     const [viewPicture, setViewPicture] = useState(false)
     const [product, setProduct] = useState({})
+    const [isAdded, setIsAdded] = useState(false)
     const [isLoading, setIsloading] = useState(false)
+    const [isHandling, setIsHandling] = useState(false)
 
     useEffect(() => {
         document.title = `商品 : ${product?.name || ""}`
@@ -36,9 +38,22 @@ export default function Product() {
             const {success, product} = await API.get(`${API.PRODUCT}/?id=${id}`, null)
             if (success) setProduct(product)
             else navigate("/", {replace : true})
+            if (token) {
+                const {success, isAdded} = await API.get(`${API.CRUD_CART}/?id=${id}`, token)
+                if (success) setIsAdded(isAdded)
+            }
             setIsloading(false)
         }
-    }, [navigate, id])
+    }, [navigate, id, token])
+
+    async function submitToCart() {
+        setIsHandling(true)
+        const {success} = isAdded
+            ? await API.del(`${API.CRUD_CART}/?id=${id}`, token)
+            : await API.post(`${API.CRUD_CART}/?id=${id}`, token)
+        if (success) setIsAdded(prev => !prev)
+        setIsHandling(false)
+    }
 
     /* ==================== 分隔線 ==================== */
     return <>
@@ -57,15 +72,18 @@ export default function Product() {
         }
         <main className={style.main}>
             {
-                isLoading && 
+                (isLoading || isHandling) && 
                 <div className="loading-ring" />
             }
             <div className={viewPicture? "": style.top}>
-                <ImgCard
-                    ImgArray={product?.imgs || []}
-                    viewPicture={viewPicture}
-                    setViewPicture={setViewPicture}
-                />
+                {
+                    !isLoading &&
+                    <ImgCard
+                        ImgArray={product?.imgs || []}
+                        viewPicture={viewPicture}
+                        setViewPicture={setViewPicture}
+                    />
+                }
                 {
                     !viewPicture && !isLoading &&
                     <div className={style.info}>
@@ -91,12 +109,10 @@ export default function Product() {
                     <div>
                         <div>{product?.provider || ""}</div>
                         <div>
-                            {
-                                (account !== product?.provider) &&
-                                <Link to={`/ChatRoom/${product?.provider || ""}`}>
-                                    <button className="button" style={{margin:"0"}}>聊天</button>
-                                </Link>
-                            }
+                            <Link to={`/ChatRoom/${product?.provider || ""}`} 
+                                style={{visibility: (account !== product?.provider)? "visible": "hidden"}}>
+                                <button className="button" style={{margin:"0"}}>聊天</button>
+                            </Link>
                             <Link to={`/Store/${product?.provider || ""}`}>
                                 <button className="button" style={{margin:"0"}}>進入賣場</button>
                             </Link>
@@ -112,19 +128,30 @@ export default function Product() {
             <>
                 <div className="base" />
                 <footer>
-                    <button className="button buttonText grow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-heart-fill" viewBox="0 0 16 16">
-                            <path fillRule="evenodd" d="M8 1.314C12.438-3.248 23.534 4.735 8 15-7.534 4.736 3.562-3.248 8 1.314z"/>
-                        </svg>
-                        <span>收藏</span>
+                    <button className="button buttonText grow" 
+                        onClick={submitToCart} disabled={isLoading || isHandling}>
+                        {
+                            isAdded?
+                            <>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-cart-dash-fill" viewBox="0 0 16 16">
+                                    <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM6.5 7h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1 0-1z"/>
+                                </svg>
+                                <span>移除</span>
+                            </>:
+                                <>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-cart-plus-fill" viewBox="0 0 16 16">
+                                    <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM9 5.5V7h1.5a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0V8H6.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0z"/>
+                                </svg>
+                                <span>加入</span>
+                            </>
+                        }         
                     </button>
                     <button className="button buttonText grow">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-cart-plus-fill" viewBox="0 0 16 16">
-                            <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM9 5.5V7h1.5a.5.5 0 0 1 0 1H9v1.5a.5.5 0 0 1-1 0V8H6.5a.5.5 0 0 1 0-1H8V5.5a.5.5 0 0 1 1 0z"/>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-cart-fill" viewBox="0 0 16 16">
+                            <path d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4zm-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
                         </svg>
-                        <span>加入購物車</span>
+                        <span>租借</span>
                     </button>
-                    <button className="button grow">直接購買</button>
                 </footer>
             </>
         }
