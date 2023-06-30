@@ -22,13 +22,13 @@ export default function Img({src, openhandler}) {
     
     /* ==================== 分隔線 ==================== */
     return <>
-        <label className={style.img} htmlFor="img">
+        <div className={style.img} onClick={openhandler}>
             {!loaded && <div className="fill skeleton" />}
             <img
                 ref={imgRef}
                 style={{opacity:loaded?1:0}} loading="eager" alt=""
-                src={src} name="img" onClick={openhandler}
+                src={src}
             />
-        </label>
+        </div>
     </>
 }
