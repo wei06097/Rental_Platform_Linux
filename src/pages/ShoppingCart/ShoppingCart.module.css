@@ -1,66 +1,10 @@
-/* ======================================== */
-.store_card {
-    --imgSize: 200px; --fontSize: 20px;
-    width: 100%; margin-bottom: 20px;
-    box-shadow: 0 0 2px 2px #ddd;
-}
-.store_card > .store_card_top {
-    padding: 10px 5px;
-    display: flex; align-items: center;
+.main {
+    display: grid; gap: 8px;
+    grid-template-columns: 1fr 1fr;
 }
 
-/* ======================================== */
-.footer {
-    height: max-content; padding: 2px;
-    display: grid; grid-template-columns: repeat(2, 1fr);
-}
-
-/* ======================================== */
-.front {
-    padding: 5px; margin: auto 0 auto auto;
-    text-align: right; font-size: var(--fontSize);
-}
-.front > div {
-    display: flex; gap: 15px; margin: 2px;
-    justify-content: space-between; align-items: center;
-}
-
-/* ======================================== */
-.front > div > span {
-    margin: 0 5px;
-}
-.front > div > span:nth-child(1) {
-    font-weight: normal; color: #777;
-}
-.front > div > span:nth-child(2) {
-    font-weight: bold; color: #ff0000dd;
-}
-
-/* ======================================== */
-.checkbox {
-    height: 17px; width: 17px;
-    margin: 0 10px 0 0;
-}
-.bill {
-    height: 100%;
-    display: grid; align-items: center;
-    color: inherit; text-decoration: none;
-}
-
-/* ======================================== */
-@media(max-width: 1250px) {
-    .store_card {
-        --fontSize: 18px;
-    }
-}
-@media(max-width: 600px) {
-    .store_card {
-        --imgSize: 110px; --fontSize: 16px;
-    }
-    .footer {
-        grid-template-columns: 4fr 3fr;
-    }
-    .front {
-        margin: auto auto auto 0;
+@media(max-width: 800px) {
+    .main {
+        grid-template-columns: 1fr;
     }
 }

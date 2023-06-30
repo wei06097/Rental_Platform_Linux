@@ -384,7 +384,7 @@ app.get('/result', async (req, res) => {
 })
 
 /* ======================================== *//* ======================================== */
-// C 加入商品到購物清單 id為商品的id
+// C 加入商品到購物清單 id為商品的id (注意:不能將自己的商品加入購物清單)
 app.post('/cart/cart_CRUD', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
@@ -397,10 +397,12 @@ app.post('/cart/cart_CRUD', async (req, res) => {
         res.json( {success : false} )
         return
     }
+    const {provider} = result
     // 加入一筆資料到購物車list
     const payload = {
         product_id : id,
-        account : account
+        provider : provider,
+        consumer : account
     }
     await fetch(`${DB_URL}/shopping_cart`, {
         method : "POST",
@@ -417,7 +419,7 @@ app.get('/cart/cart_CRUD', async (req, res) => {
     const {account} = decodeToken(token)
     if (!account) res.json( {success : false} )
     // 商品是否存在
-    const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&account=${account}`)
+    const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&consumer=${account}`)
     const result = await response.json()
     res.json( {success : true, isAdded : result.length!==0} )
 })
@@ -427,7 +429,7 @@ app.del('/cart/cart_CRUD', async (req, res) => {
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
     // 查看是否存在並取得預設id
-    const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&account=${account}`)
+    const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&consumer=${account}`)
     const result = await response.json()
     if (!result[0]) {
         res.json( {success : false} )
@@ -435,6 +437,43 @@ app.del('/cart/cart_CRUD', async (req, res) => {
     }
     await fetch(`${DB_URL}/shopping_cart/${result[0].id}`, {method : "DELETE"})
     res.json( {success : true} )
+})
+
+/* ======================================== */
+// 取得購物車的所有商品
+app.get('/cart/my_cart', async (req, res) => {
+    const token = req.headers?.authorization || undefined
+    // 驗證身分
+    const {account} = decodeToken(token)
+    if (!account) res.json( {success : false} )
+    // 取得帳號的購物清單
+    let response = await fetch(`${DB_URL}/shopping_cart?consumer=${account}`)
+    let result = await response.json()
+    // 取得這些商品名稱
+    let params = result.map(element => element.product_id).join("&id=")
+    response = await fetch(`${DB_URL}/products?id=${params}&launched=true&_sort=provider`)
+    result = await response.json()
+    // 準備回傳的資料
+    const data = {}
+    result.forEach(element => {
+        const {provider, name, imgs} = element
+        if (!data[provider]) data[provider] = {cover : null, items : []}
+        data[provider].cover = imgs[0]
+        data[provider].items.unshift(name)
+    })
+    // 用賣家帳號取得暱稱
+    params = Object.keys(data).join("&account=")
+    response = await fetch(`${DB_URL}/accounts?account=${params}`)
+    result = await response.json()
+    // 回傳資料加入暱稱
+    result.forEach(element => {
+        const {account, nickname} = element
+        data[account] = {
+            nickname : nickname,
+            ...data[account]
+        }
+    })
+    res.json( {success : true, result: data} )
 })
 
 /* ======================================== *//* ======================================== */

@@ -1,0 +1,50 @@
+/* ======================================== */
+.card {
+    --imgSize: 140px;
+    border: 1px solid #ddd; border-radius: 10px;
+    width: 100%; display: grid; gap: 10px; padding: 5px;
+    grid-template-rows: 1fr 4fr; align-items: center;
+    grid-template-columns: var(--imgSize) auto;
+    grid-template-areas:
+        "img store"
+        "img items";
+}
+.card:hover {
+    cursor: pointer;
+    box-shadow: 0 0 2px 2px #ddd;
+}
+@media(max-width: 800px) {
+    .card {
+        --imgSize: 120px; gap: 5px;
+    }
+}
+
+/* ======================================== */
+.img {
+    grid-area: img;
+    width: var(--imgSize); height: var(--imgSize);
+    border-radius: 5px; overflow: hidden;
+}
+.img > img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    transition: 400ms ease-in-out;
+}
+.store {
+    font-size: large; font-weight: bold;
+    grid-area: store;
+}
+.items {
+    grid-area: items;
+}
+
+/* ======================================== */
+.store,
+.items,
+.items > div {
+    word-break: keep-all; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
+}
+.items > div > span:nth-child(1) {
+    color: #777; margin-right: 10px;
+}
