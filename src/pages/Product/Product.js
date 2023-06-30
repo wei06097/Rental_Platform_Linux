@@ -47,6 +47,7 @@ export default function Product() {
     }, [navigate, id, token])
 
     async function submitToCart() {
+        if (!account) navigate("/SignIn")
         setIsHandling(true)
         const {success} = isAdded
             ? await API.del(`${API.CRUD_CART}/?id=${id}`, token)
@@ -54,7 +55,7 @@ export default function Product() {
         if (success) setIsAdded(prev => !prev)
         setIsHandling(false)
     }
-
+    
     /* ==================== 分隔線 ==================== */
     return <>
         {
@@ -124,7 +125,7 @@ export default function Product() {
             }
         </main>
         {
-            !viewPicture &&
+            !viewPicture && (account !== product?.provider) &&
             <>
                 <div className="base" />
                 <footer>
