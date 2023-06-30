@@ -48,23 +48,25 @@ export default function ShoppingCart() {
                 <Home />
             </div>
         </header>
-        <main className={`main ${style.main}`} >
-            {
-                isLoading?
-                <div className="loading-ring" />:
-                Object.keys(data).length !== 0?
-                Object.keys(data)
-                    .map(account => {
-                        return (
-                            <Card 
-                                key={account}
-                                account={account}
-                                data={data[account]} 
-                            />
-                        )
-                    }):
-                <div style={{textAlign: "center"}}>清單是空的</div>
-            }
-        </main>
+        {
+            isLoading?
+            <div className="loading-ring" />:
+            (Object.keys(data).length !== 0)?
+            <main className={`main ${style.main}`} >
+                {
+                    Object.keys(data)
+                        .map(account => {
+                            return (
+                                <Card 
+                                    key={account}
+                                    account={account}
+                                    data={data[account]} 
+                                />
+                            )
+                        })
+                }
+            </main>:
+            <div style={{textAlign: "center", marginTop: "20px"}}>清單是空的</div>
+        }
     </>
 }
