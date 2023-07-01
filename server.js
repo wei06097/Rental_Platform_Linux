@@ -417,7 +417,10 @@ app.get('/cart/cart_CRUD', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
-    if (!account) res.json( {success : false} )
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
     // 商品是否存在
     const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&consumer=${account}`)
     const result = await response.json()
@@ -445,7 +448,10 @@ app.get('/cart/my_cart', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
-    if (!account) res.json( {success : false} )
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
     // 取得帳號的購物清單
     let response = await fetch(`${DB_URL}/shopping_cart?consumer=${account}`)
     let result = await response.json()
@@ -474,6 +480,32 @@ app.get('/cart/my_cart', async (req, res) => {
         }
     })
     res.json( {success : true, result: data} )
+})
+// 取得購物車在特定賣場的商品
+app.get('/cart/my_storecart', async (req, res) => {
+    const seller = req.query?.seller || undefined
+    const token = req.headers?.authorization || undefined
+    // 驗證身分
+    const {account} = decodeToken(token)
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
+    // 取得帳號在特定賣場的購物清單
+    let response = await fetch(`${DB_URL}/shopping_cart?consumer=${account}&provider=${seller}`)
+    let result = await response.json()
+    // 取得商品資訊
+    const params = result.map(element => element.product_id).join("&id=")
+    response = await fetch(`${DB_URL}/products?id=${params}&launched=true`)
+    result = await response.json()
+    // 修改商品資訊
+    const data = []
+    result.forEach(element => {
+        const {id, name, imgs, price, amount} = element
+        const payload = {id, name, cover:imgs[0], price, amount}
+        data.push(payload) 
+    })
+    res.json( {success : true, result : data} )
 })
 
 /* ======================================== *//* ======================================== */
