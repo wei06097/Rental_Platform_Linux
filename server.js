@@ -465,7 +465,7 @@ app.get('/cart/my_cart', async (req, res) => {
         const {provider, name, imgs} = element
         if (!data[provider]) data[provider] = {cover : null, items : []}
         data[provider].cover = imgs[0]
-        data[provider].items.unshift(name)
+        data[provider].items.push(name)
     })
     // 用賣家帳號取得暱稱
     params = Object.keys(data).join("&account=")
