@@ -1,6 +1,6 @@
 /* ======================================== */
 .card {
-    --imgSize: 140px;
+    --imgSize: 140px; position: relative;
     width: 100%; padding: 5px;
     border-bottom: 1px solid #ddd; 
     display: grid; gap: 10px; align-items: center;
@@ -9,6 +9,11 @@
     grid-template-areas: 
         "img name name"
         "img number price";
+}
+.card > svg {
+    width: 20px; height: 20px;
+    position: absolute; left: -5px; top: -5px;
+    color: #ff0000dd; cursor: pointer;
 }
 @media(max-width: 800px) {
     .products {
