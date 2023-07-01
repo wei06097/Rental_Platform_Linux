@@ -11,7 +11,7 @@ export default function Card({ account, data }) {
     const [loaded, setLoaded] = useState(false)
     const imgRef = useRef()
 
-    if (items.length > 3) {
+    if (items.length > 4) {
         items.length = 4
         items[3] = "......"
     }
