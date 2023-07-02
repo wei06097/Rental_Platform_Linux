@@ -24,9 +24,9 @@ export default function Product() {
     const [viewPicture, setViewPicture] = useState(false)
     const [product, setProduct] = useState({})
     const [isAdded, setIsAdded] = useState(false)
-    const [isLoading, setIsloading] = useState(false)
+    const [isLoading, setIsloading] = useState(true)
     const [isHandling, setIsHandling] = useState(false)
-
+    
     useEffect(() => {
         document.title = `商品 : ${product?.name || ""}`
     }, [product])
@@ -34,7 +34,6 @@ export default function Product() {
         init()
         window.scroll(0, 0)
         async function init() {
-            setIsloading(true)
             const {success, product} = await API.get(`${API.PRODUCT}/?id=${id}`, null)
             if (success) setProduct(product)
             else navigate("/", {replace : true})
@@ -125,7 +124,7 @@ export default function Product() {
             }
         </main>
         {
-            !viewPicture && (account !== product?.provider) &&
+            !viewPicture && !isLoading && (account !== product?.provider) &&
             <>
                 <div className="base" />
                 <footer>

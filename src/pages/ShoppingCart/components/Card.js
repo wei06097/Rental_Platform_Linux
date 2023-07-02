@@ -55,3 +55,22 @@ export default function Card({ account, data }) {
         </Link>
     </>
 }
+
+export function LoadingCard() {
+    return <>
+        <div className={style.card}>
+            <div className={style.img}>
+                <div className="fill skeleton" />
+            </div>
+            <div className={style.store}>
+                <div className="fill skeleton" style={{height:"20px", width:"60%"}} />
+            </div>
+            <div className={style.items}>
+                <div className="fill skeleton" style={{height:"15px", width:"80%"}} />
+                <div className="fill skeleton" style={{height:"15px", width:"80%", marginTop:"5px"}} />
+                <div className="fill skeleton" style={{height:"15px", width:"80%", marginTop:"5px"}} />
+                <div className="fill skeleton" style={{height:"15px", width:"80%", marginTop:"5px"}} />
+            </div>
+        </div>
+    </>
+}

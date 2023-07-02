@@ -8,7 +8,7 @@ import API from "../../API"
 import Back from "../../global/icon/Back"
 import Message from "../../global/icon/Message"
 import Home from "../../global/icon/Home"
-import Card from "./components/Card"
+import Card, { LoadingCard } from "./components/Card"
 /* Hooks */
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -20,7 +20,7 @@ export default function ShoppingCart() {
     const navigate = useNavigate()
     const {token, isLogin} = useSelector(state => state.account)
     const [data, setData] = useState({})
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(true)
 
     useEffect( () => {
         document.title = "購物車"
@@ -29,7 +29,6 @@ export default function ShoppingCart() {
     useEffect(() => {
         init()
         async function init() {
-            setIsLoading(true)
             const {success, result} = await API.get(API.MY_CART, token)
             if (success) setData(result)
             setIsLoading(false)
@@ -50,7 +49,12 @@ export default function ShoppingCart() {
         </header>
         {
             isLoading?
-            <div className="loading-ring" />:
+            <main className={`main ${style.main}`} >
+                <LoadingCard />
+                <LoadingCard />
+                <LoadingCard />
+                <LoadingCard />
+            </main>:
             (Object.keys(data).length !== 0)?
             <main className={`main ${style.main}`} >
                 {
