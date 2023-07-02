@@ -508,6 +508,108 @@ app.get('/cart/my_storecart', async (req, res) => {
     res.json( {success : true, result : data} )
 })
 
+/* ======================================== */
+app.post('/order/new_order', async (req, res) => {
+    const {expect, options, comment, order} = req.body
+    // 驗證帳號
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
+    // 取得資料庫的商品
+    const params = Object.keys(order).join("&id=")
+    const response = await fetch(`${DB_URL}/products?id=${params}&launched=true`)
+    const result = await response.json()
+    // 留下需要的商品資訊 (array)
+    const productInfo = result
+        .map(product => {
+            return {
+                id: product.id,
+                price: product.price,
+                amount: product.amount,
+            }
+        })
+    // 用來紀錄商品剩餘數量 (json)
+    const newProductInfo = {}
+    // 計算總金額並記錄剩餘數量
+    let totalPrice = 0
+    let success = (Object.keys(order).length === productInfo.length)
+    productInfo
+        .forEach(product => {
+            if (!success) return
+            if (order[product.id]) {
+                const {amount, price} = order[product.id]
+                if (product.price !== price) success = false
+                else if (product.amount < amount) success = false
+                else {
+                    totalPrice += Number(amount) * Number(price)
+                    newProductInfo[product.id] = {amount : Number(product.amount) - Number(amount)}
+                }
+            }
+        })
+    if (!success) {
+        res.json({success : false})
+        return 
+    }
+    // 將剩餘數量存回資料庫同時清空購物車
+    for (let i=0; i<Object.keys(newProductInfo).length; i++) {
+        const id = Object.keys(newProductInfo)[i]
+        //更改剩餘數量
+        await fetch(`${DB_URL}/products/${id}`, {
+            method : "PATCH",
+            headers : { "Content-Type" : "application/json" },
+            body : JSON.stringify(newProductInfo[id])
+        })
+        //從購物車刪掉
+        const response = await fetch(`${DB_URL}/shopping_cart?product_id=${id}&consumer=${account}`)
+        const result = await response.json()
+        if (result[0].length !== 0) await fetch(`${DB_URL}/shopping_cart/${result[0].id}`, {method : "DELETE"})
+    }
+    // 留下需要的商品資料
+    let provider = null
+    const products = result
+        .map(product => {
+            provider = product.provider
+            return {
+                id: product.id,
+                name: product.name,
+                cover: product.imgs[0],
+                price: product.price,
+                amount: order[product.id].amount,
+            }
+        })
+    // 紀錄訂單
+    const order_id = uuidv4()
+    const payload = {
+        order_id : order_id, //自己定義的訂單編號
+        consumer : account, //買家
+        provider : provider, //賣家
+        order : products, //商品數量價格等資訊
+        totalprice : totalPrice, //總金額
+        expect, //買家預期租借時間
+        options, //買家提供的時間地點選項
+        comment, //買家留言
+        actual : { //實際租借時間
+            start : {date: "", time: ""},
+            end : {date: "", time: ""}
+        },
+        selectedIndex : { //賣家選擇的時間和地點(用index表示)
+            start : -1,
+            end : -1,
+            position : -1,
+        }
+    }
+    console.log(payload)
+    await fetch(`${DB_URL}/order`, {
+        method : "POST",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(payload)
+    })
+    res.json({success : true})
+})
+
 /* ======================================== *//* ======================================== */
 server.listen(PORT, HOST, () => {
     console.log("\n===== Start =====")

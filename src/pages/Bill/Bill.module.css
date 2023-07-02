@@ -13,7 +13,16 @@
 /* ======================================== */
 .title {
     font-weight: bold; padding-left: 10px;
+    display: flex; align-items: center;
 }
+.icon {
+    user-select: none; cursor: pointer;
+    width: 40px; height: 40px;
+    border: none; border-radius: 50%;
+    color: #0d6efd; background-color: white;
+}
+
+/* ======================================== */
 .data {
     width: calc(100% - 10px); margin: 10px auto;
     display: flex; align-items: center;
@@ -21,6 +30,12 @@
 .data > input {
     height: 35px; outline: none; margin-right: 10px;
     border: 1px solid #ddd; border-radius: 5px;
+}
+.position {
+    height: 35px; outline: none; display: block;
+    width: calc(100% - 10px); margin: 0 auto;
+    padding: 0 5px; font-size: 15px;
+    border: 1px solid #ddd; border-radius: 10px;
 }
 .textarea {
     width: calc(100% - 10px); margin: 10px auto;

@@ -2,5 +2,6 @@
   "accounts": [],
   "products": [],
   "chat_history": [],
-  "shopping_cart": []
+  "shopping_cart": [],
+  "order": []
 }
