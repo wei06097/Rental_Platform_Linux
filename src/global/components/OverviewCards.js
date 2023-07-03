@@ -33,7 +33,7 @@ function ProductCard({ id, link, name, price, showHeart }) {
                 </div>
                 <div className={style.info}>
                     <div>{name}</div>
-                    <div>{`NT$${price} / 每天`}</div>
+                    <div>NT${price} / 天</div>
                 </div>
             </Link>
             <button className={`${style.heart}`} style={{display:showHeart?"block":"none"}}>

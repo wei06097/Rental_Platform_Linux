@@ -31,7 +31,7 @@
     transition: 400ms ease-in-out;
 }
 .store {
-    font-size: large; font-weight: bold;
+    font-size: large; font-weight: 600;
     grid-area: store;
 }
 .items {
@@ -45,6 +45,6 @@
     word-break: keep-all; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
 }
-.items > div > span:nth-child(1) {
-    color: #777; margin-right: 10px;
+.items > div > span {
+    color: #777;
 }

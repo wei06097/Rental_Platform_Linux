@@ -38,12 +38,12 @@
 
 /* ======================================== */
 .name {
-    grid-area: name; padding-left: 10px;
+    grid-area: name; padding-left: 5px;
     word-break: keep-all; white-space: nowrap;
     overflow: hidden; text-overflow: ellipsis;
 }
 .price {
-    grid-area: price;
+    grid-area: price; color: #ff0000dd;
 }
 .number {
     grid-area: number;

@@ -36,7 +36,7 @@ export default function Product() {
         async function init() {
             const {success, product} = await API.get(`${API.PRODUCT}/?id=${id}`, null)
             if (success) setProduct(product)
-            else navigate("/", {replace : true})
+            else navigate("/NotFound", {replace : true})
             if (token) {
                 const {success, isAdded} = await API.get(`${API.CRUD_CART}/?id=${id}`, token)
                 if (success) setIsAdded(isAdded)
@@ -97,14 +97,14 @@ export default function Product() {
                     !viewPicture && !isLoading &&
                     <div className={style.info}>
                         <div>{product?.name || ""}</div>
-                        <div>$NT{product?.price || ""} / 每天</div>
+                        <div>$NT{product?.price || ""} / 天</div>
                         <div>
                             <div>
-                                <span>數量</span>
+                                <span>- 數量</span>
                                 <span>{product?.amount || ""}</span>
                             </div>
                             <div>
-                                <span>地點</span>
+                                <span>- 地點</span>
                                 <span>{product?.position || ""}</span>
                             </div>
                         </div>

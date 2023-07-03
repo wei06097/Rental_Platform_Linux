@@ -45,7 +45,7 @@ export default function Card({ account, data }) {
                         items
                             .map((item, i) => 
                                 <div key={i}>
-                                    <span>*</span>
+                                    <span>- </span>
                                     <span>{item}</span>
                                 </div>
                             )

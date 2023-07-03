@@ -53,5 +53,5 @@
     place-self: center; font-weight: 600;
 }
 .footer > div > span:nth-child(2) {
-    color: red; 
+    color: #ff0000dd; 
 }

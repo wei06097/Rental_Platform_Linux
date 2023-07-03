@@ -47,7 +47,7 @@
     font-size: var(--fontSize);
     display: -webkit-box; overflow: hidden;
     -webkit-box-orient: vertical; -webkit-line-clamp: 2;
-    /* word-wrap: break-word; word-break: break-all; */
+    word-break: break-all; word-wrap: break-word;
 }
 .info > div:nth-child(2) {
     font-size: calc(var(--fontSize) - 1px);

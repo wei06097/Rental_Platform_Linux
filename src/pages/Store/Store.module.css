@@ -12,6 +12,6 @@
     width: 100%; color: #777;
 }
 .info > div:nth-child(2) {
-    word-break: break-all; word-wrap: break-word;
+    word-break: normal; word-wrap: break-word;
     white-space: pre-line; 
 }
