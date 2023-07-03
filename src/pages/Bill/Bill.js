@@ -10,8 +10,8 @@ import Card from "./Components/Card"
 import MyDate from "./Components/MyDate"
 import Position from "./Components/Position"
 /* Hooks */
-import { useEffect, useRef, useState } from "react"
-import { useParams, useNavigate } from "react-router-dom"
+import { useState, useEffect, useRef } from "react"
+import { useParams, useNavigate, Link } from "react-router-dom"
 /* Redux */
 import { useSelector } from "react-redux"
 /* else */
@@ -22,7 +22,7 @@ import InputChecker from "../../global/functions/InputChecker"
 export default function Bill() {
     const {seller} = useParams()
     const navigate = useNavigate()
-    const {token, isLogin} = useSelector(state => state.account)
+    const {token, account, isLogin} = useSelector(state => state.account)
     const [data, setData] = useState([]) // res 獲取購物車商品
     const [isLoading, setIsLoading] = useState(false)
     const [isHandling, setIsHandling] = useState(false)
@@ -43,9 +43,10 @@ export default function Bill() {
     const [positions, setPositions] = useState([{key:uuidv4(), position:""}])
 
     useEffect(() => {
-        document.title = "結帳"
+        document.title = "填寫資料"
         if (!isLogin) navigate("/SignIn", {replace : true})
-    }, [navigate, isLogin])
+        if (seller === account) navigate(-1, {replace : true})
+    }, [navigate, isLogin, seller, account])
     useEffect(() => {
         init()
         async function init() {
@@ -108,7 +109,6 @@ export default function Bill() {
         const blank3 = positions
             .filter(content => !content.position)
             .length !== 0
-        console.log(blank1 || blank2 || blank3)
         if (blank1 || blank2 || blank3) {
             alert("請檢查是否填寫完成")
             return
@@ -145,7 +145,7 @@ export default function Bill() {
     async function submitOrder(body) {
         setIsHandling(true)
         const {success} = await API.post(API.NEW_ORDER, token, body)
-        if (success) navigate("/MyShopping")
+        if (success) navigate("/MyShopping", {replace : true})
         else alert("請重新整理後再試一次")
         setIsHandling(false)
     }
@@ -155,8 +155,14 @@ export default function Bill() {
         <header>
             <div className="flex_center">
                 <Back />
-                <span>結帳</span>
+                <span>填寫資料</span>
             </div>
+            <div className="flex_center">
+                <button className="button">
+                    <Link className="link" to={`/Store/${seller}`}>前往賣場</Link>
+                </button>
+            </div>
+            
         </header>
         <main className="main">
             {
@@ -321,7 +327,7 @@ export default function Bill() {
                 className="button" onClick={submitHandler}
                 disabled={isLoading || isHandling}
             >
-                確定
+                申請租借
             </button>
         </footer>
     </>
