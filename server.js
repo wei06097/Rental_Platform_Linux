@@ -556,7 +556,10 @@ app.post('/order/new_order', async (req, res) => {
                 else if (product.amount < amount) success = false
                 else {
                     totalPrice += Number(amount) * Number(price)
-                    newProductInfo[product.id] = {amount : Number(product.amount) - Number(amount)}
+                    newProductInfo[product.id] = {
+                        amount : Number(product.amount) - Number(amount),
+                        BorrowedAmount : Number(amount)
+                    }
                 }
             }
         })
@@ -610,7 +613,8 @@ app.post('/order/new_order', async (req, res) => {
             start : -1,
             end : -1,
             position : -1,
-        }
+        },
+        progress : 0 //訂單進度 0待確認 1待收貨 2待歸還 3已完成 -1未完成
     }
     await fetch(`${DB_URL}/order`, {
         method : "POST",
@@ -618,6 +622,19 @@ app.post('/order/new_order', async (req, res) => {
         body : JSON.stringify(payload)
     })
     res.json({success : true})
+    // 發送及時通知 provider account
+    if (online[account]) {
+        online[account].forEach(consumerId => {
+            const socket = io.sockets.sockets.get(consumerId)
+            socket.emit("notify", "訂單處理中")
+        })
+    }
+    if (online[provider]) {
+        online[provider].forEach(providerId => {
+            const socket = io.sockets.sockets.get(providerId)
+            socket.emit("notify", "有一筆新的訂單")
+        })
+    }
 })
 
 /* ======================================== *//* ======================================== */
