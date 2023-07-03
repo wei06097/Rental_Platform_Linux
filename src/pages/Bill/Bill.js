@@ -7,7 +7,7 @@ import API from "../../API"
 /* Components */
 import Back from "../../global/icon/Back"
 import Card from "./Components/Card"
-import MyDate from "./Components/MyDate"
+import MyDateTime from "./Components/MyDateTime"
 import Position from "./Components/Position"
 /* Hooks */
 import { useState, useEffect, useRef } from "react"
@@ -16,7 +16,6 @@ import { useParams, useNavigate, Link } from "react-router-dom"
 import { useSelector } from "react-redux"
 /* else */
 import { v4 as uuidv4 } from "uuid"
-import InputChecker from "../../global/functions/InputChecker"
 
 /* ======================================== */
 export default function Bill() {
@@ -29,16 +28,11 @@ export default function Bill() {
     /* req body */
     //留言
     const commentRef = useRef()
-    //預計借用日期、歸還日期
-    const rentDateRef = useRef()
-    const rentTimeRef = useRef()
-    const returnDateRef = useRef()
-    const returnTimeRef = useRef()
     //商品數量及單項價格
     const [payload, setPayload] = useState({})
     //期望交貨時間、歸還時間
-    const [myRentDates, setMyRentDates] = useState([{key:uuidv4(), date:"", time:""}]) 
-    const [myReturnDates, setMyReturnDates] = useState([{key:uuidv4(), date:"", time:""}])
+    const [myRentDates, setMyRentDates] = useState([{key:uuidv4(), datetime:""}]) 
+    const [myReturnDates, setMyReturnDates] = useState([{key:uuidv4(), datetime:""}])
     //期望交貨地點
     const [positions, setPositions] = useState([{key:uuidv4(), position:""}])
 
@@ -77,7 +71,7 @@ export default function Bill() {
         setIsHandling(false)
     }
     function addMyDates(setDates) {
-        setDates(prev => [...prev, {key:uuidv4(), date:"", time:""}])
+        setDates(prev => [...prev, {key:uuidv4(), datetime:""}])
     }
     function deleteMyDates(setDates, index) {
         setDates(prev => {
@@ -97,46 +91,22 @@ export default function Bill() {
         })
     }
     function submitHandler() {
-        const startDate = rentDateRef.current.value
-        const startTime = rentTimeRef.current.value
-        const endDate = returnDateRef.current.value
-        const endTime = returnTimeRef.current.value
-        const blank1 = !InputChecker
-            .noBlank(startDate, startTime, endDate, endTime)
-        const blank2 = myRentDates.concat(myReturnDates)
-            .filter(element => (!element.date || !element.time))
+        const blank1 = myRentDates.concat(myReturnDates)
+            .filter(element => !element.datetime)
             .length !== 0
-        const blank3 = positions
+        const blank2 = positions
             .filter(content => !content.position)
             .length !== 0
-        if (blank1 || blank2 || blank3) {
+        if (blank1 || blank2) {
             alert("請檢查是否填寫完成")
             return
         }
-        const expect = {
-            start : {date: startDate, time: startTime},
-            end : {date: endDate, time: endTime}
-        }
-        const options = {
-            start : myRentDates
-                .map(element => {
-                    return {
-                        date : element.date,
-                        time : element.time
-                    }
-                }),
-            end : myReturnDates
-                .map(element => {
-                    return {
-                        date : element.date,
-                        time : element.time
-                    }
-                }),
-            position : positions.map(element => element.position)
-        }
         const body = {
-            expect : expect,
-            options : options,
+            options : {
+                start : myRentDates.map(element => element.datetime),
+                end : myReturnDates.map(element => element.datetime),
+                position : positions.map(element => element.position)
+            },
             comment : commentRef.current.value,
             order : payload
         }
@@ -172,23 +142,6 @@ export default function Bill() {
             {/* ======================================== */}
             <div className={style.products} style={{width:"100%", border:"0"}}>
                 <div>
-                    <div className={style.title}>預計借用日期</div>
-                    <div className={style.data}>
-                        <input type="date" disabled={isLoading || isHandling} ref={rentDateRef} />
-                        <input type="time" disabled={isLoading || isHandling} ref={rentTimeRef} />
-                    </div>
-                </div>
-                <div>
-                    <div className={style.title}>預計歸還日期</div>
-                    <div className={style.data}>
-                        <input type="date" disabled={isLoading || isHandling} ref={returnDateRef} />
-                        <input type="time" disabled={isLoading || isHandling} ref={returnTimeRef} />
-                    </div>
-                </div>
-            </div>
-            {/* ======================================== */}
-            <div className={style.products} style={{width:"100%", border:"0"}}>
-                <div>
                     <div className={style.title}>
                         <span>期望交貨時間</span>
                         <button className={style.icon}
@@ -203,7 +156,7 @@ export default function Bill() {
                     </div>
                     {
                         myRentDates
-                            .map((element, i) => <MyDate
+                            .map((element, i) => <MyDateTime
                                 key={element.key}
                                 index={i}
                                 length={myRentDates.length}
@@ -228,7 +181,7 @@ export default function Bill() {
                     </div>
                     {
                         myReturnDates
-                            .map((element, i) => <MyDate
+                            .map((element, i) => <MyDateTime
                                 key={element.key}
                                 index={i}
                                 length={myReturnDates.length}

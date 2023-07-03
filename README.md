@@ -171,31 +171,17 @@
         - body
         ```JavaScript
         {
-            expect : { //預計借用日期、預計歸還日期
-                start : { date: '2023-07-07', time: '20:40' },
-                end : { date: '2023-07-14', time: '20:40' }
+            options: { //買家提供的時段
+                start: [ '2023-07-07T12:00', '2023-07-08T10:00' ],
+                end: [ '2023-07-14T12:00', '2023-07-14T13:00' ],
+                position: [ '台科大 IB 1樓', '台科大 語言中心', '捷運公館 1號出口' ]
             },
-            options : { //買家提供的選項 讓賣家選擇
-                start : [ //交貨時間 (最多4個最少1個)
-                    { date: '2023-07-07', time: '20:40' },
-                    { date: '2023-07-07', time: '20:40' }
-                ],
-                end : [ //歸還時間 (最多4個最少1個)
-                    { date: '2023-07-07', time: '20:40' },
-                    { date: '2023-07-07', time: '20:40' }
-                ],
-                position : [ //交貨地點 (最多4個最少1個)
-                    '台科大 TR 1樓',
-                    '台科大 圖書館 1樓',
-                    '台科大 語言中心'
-                ]
-            },
-            comment : '你好', //留言
-            order : { //訂單本體 (json)
-                '商品id': { amount: 數量, price: 金額 },
-                '3': { amount: 1, price: 1000 },
-                '8': { amount: 3, price: 500 },
-                '15': { amount: 10, price: 10 }
+            comment: '你好', //買家留言
+            order: { //訂單本體
+                '商品id': { amount: 數量, price: 單項金額 },
+                '1': { amount: 5, price: 1000 },
+                '2': { amount: 2, price: 500 },
+                '7': { amount: 1, price: 1290 }
             }
         }
         ```
@@ -203,6 +189,28 @@
         ```JavaScript
         {
             success : true or false //訂單是否成功
+        }
+        ```
+        - 要存到資料庫的 (參考用)
+        ```JavaScript
+        const payload = {
+            order_id : order_id, //自己定義的訂單編號
+            consumer : account, //買家
+            provider : provider, //賣家
+            order : products, //商品數量價格等資訊
+            totalprice : totalPrice, //總金額
+            comment, //買家留言
+            options, //買家提供的時間地點選項
+            selectedOption : { //賣家選擇的時間和地點
+                start : "",
+                end : "",
+                position : ""
+            },
+            actual : { //實際租借時間
+                start : "",
+                end : ""
+            }, 
+            progress : 0 //訂單進度 0待確認 1待收貨 2待歸還 3已完成 -1未完成
         }
         ```
 </details>

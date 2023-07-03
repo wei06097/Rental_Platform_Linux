@@ -521,7 +521,7 @@ app.get('/cart/my_storecart', async (req, res) => {
 
 /* ======================================== */
 app.post('/order/new_order', async (req, res) => {
-    const {expect, options, comment, order} = req.body
+    const {options, comment, order} = req.body
     // 驗證帳號
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -602,18 +602,10 @@ app.post('/order/new_order', async (req, res) => {
         provider : provider, //賣家
         order : products, //商品數量價格等資訊
         totalprice : totalPrice, //總金額
-        expect, //買家預期租借時間
-        options, //買家提供的時間地點選項
         comment, //買家留言
-        actual : { //實際租借時間
-            start : {date: "", time: ""},
-            end : {date: "", time: ""}
-        },
-        selectedIndex : { //賣家選擇的時間和地點(用index表示)
-            start : -1,
-            end : -1,
-            position : -1,
-        },
+        options, //買家提供的時間地點選項
+        selectedOption : {start : "", end : "", position : ""}, //賣家選擇的時間和地點
+        actual : {start : "", end : ""}, //實際租借時間
         progress : 0 //訂單進度 0待確認 1待收貨 2待歸還 3已完成 -1未完成
     }
     await fetch(`${DB_URL}/order`, {

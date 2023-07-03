@@ -6,17 +6,15 @@ import style from "../Bill.module.css"
 import { useRef } from "react"
 
 /* ======================================== */
-export default function MyDate({ index, length, setDates, deleteHandler, isLoading }) {
-    const dateRef = useRef()
-    const timeRef = useRef()
+export default function MyDateTime({ index, length, setDates, deleteHandler, isLoading }) {
+    const datetimeRef = useRef()
     function getDateTime() {
         setDates(prev => {
             const newDates = [...prev]
             const element = {...prev[index]}
             newDates[index] = {
                 ...element,
-                date : dateRef.current.value,
-                time : timeRef.current.value
+                datetime : datetimeRef.current.value
             }
             return newDates
         })
@@ -24,8 +22,7 @@ export default function MyDate({ index, length, setDates, deleteHandler, isLoadi
     /* ==================== 分隔線 ==================== */
     return <>
         <div className={style.data}>
-            <input type="date" ref={dateRef} onChange={getDateTime} disabled={isLoading} />
-            <input type="time" ref={timeRef} onChange={getDateTime} disabled={isLoading} />
+            <input type="datetime-local" ref={datetimeRef} onChange={getDateTime} disabled={isLoading} />
             <button className={style.icon}
                 style={{visibility:(length !== 1)? "visible":"hidden"}}
                 onClick={deleteHandler}
