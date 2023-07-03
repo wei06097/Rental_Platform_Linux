@@ -88,8 +88,8 @@ export default function EditProduct() {
         // 取得 inputs
         const name = nameRef.current.value
         const description = descriptionRef.current.value
-        const price = priceRef.current.value
-        const amount = amountRef.current.value
+        const price = Number(priceRef.current.value)
+        const amount = Number(amountRef.current.value)
         const position = positionRef.current.value
         // 檢查 inputs
         const isLegal = InputChecker.noBlank(name, description, price, amount, position)
@@ -154,13 +154,13 @@ export default function EditProduct() {
                     <textarea rows="10" wrap="soft" ref={descriptionRef} disabled={isDisabled} />
                 </div>
                 <div className={style.inline}>
-                    <span>價格</span>
+                    <span>價格 / 天</span>
                     <input type="number" placeholder="0" ref={priceRef} 
                         onClick={(e) => {e.target.select()}} disabled={isDisabled} 
                     />
                 </div>
                 <div className={style.inline}>
-                    <span>數量</span>
+                    <span>剩餘數量</span>
                     <input type="number" placeholder="0" ref={amountRef}
                         onClick={(e) => {e.target.select()}} disabled={isDisabled}
                     />

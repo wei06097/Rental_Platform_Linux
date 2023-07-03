@@ -16,7 +16,8 @@ export default function Card({ item, launched, toEditPage }) {
     const {isHandling} = useSelector(state => state.myProduct)
     const imgRef = useRef()
     const [loaded, setLoaded] = useState(false)
-
+    const {imgs, name, price, amount, BorrowedAmount} = item
+    
     useEffect(() => {
         const imgElement = imgRef.current
         const loaded = () => setLoaded(true)
@@ -45,12 +46,16 @@ export default function Card({ item, launched, toEditPage }) {
                     <img
                         ref={imgRef}
                         style={{opacity:loaded?1:0}} loading="lazy" alt=""
-                        src={`${API.WS_URL}/${item?.imgs[0] || "img/error"}`}
+                        src={`${API.WS_URL}/${imgs[0] || "img/error"}`}
                     />
                 </div>
                 <div className={style.content}>
-                    <p className={style.product_name}>{item?.name || "error"}</p>
-                    <div className={style.product_price}>NT$ {item?.price || "error"} / 每天</div>
+                    <div>{name}</div>
+                    <div>
+                        <div>- NT${price} / 天</div>
+                        <div>- 剩餘數量 {amount}</div>
+                        <div>- 借出數量 {BorrowedAmount}</div>
+                    </div>
                 </div>
             </div>
             <div className={style.product_btnGroup}>

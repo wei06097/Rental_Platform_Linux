@@ -214,8 +214,15 @@ app.post('/api/commodity/commodity_CRUD', async (req, res) => {
     }
     // 處理產品資訊
     const product = {
-        provider : account, launched, imgs : urls,
-        name, description, price, amount, position
+        provider : account,
+        imgs : urls,
+        name,
+        description,
+        price : Number(price),
+        amount : Number(amount),
+        BorrowedAmount : Number(0),
+        position,
+        launched
     }
     // 丟到資料庫
     await fetch(`${DB_URL}/products`, {
@@ -266,7 +273,11 @@ app.put('/api/commodity/commodity_CRUD', async (req, res) => {
     // 處理產品資訊
     const product = {
         imgs : remain_imgs.concat(urls),
-        name, description, price, amount, position
+        name,
+        description,
+        price : Number(price),
+        amount : Number(amount),
+        position
     }
     // 丟到資料庫
     await fetch(`${DB_URL}/products/${id}`, {
@@ -601,7 +612,6 @@ app.post('/order/new_order', async (req, res) => {
             position : -1,
         }
     }
-    console.log(payload)
     await fetch(`${DB_URL}/order`, {
         method : "POST",
         headers : { "Content-Type" : "application/json" },
