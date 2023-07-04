@@ -520,6 +520,7 @@ app.get('/cart/my_storecart', async (req, res) => {
 })
 
 /* ======================================== */
+// 下訂單
 app.post('/order/new_order', async (req, res) => {
     const {options, comment, order} = req.body
     // 驗證帳號
@@ -627,6 +628,38 @@ app.post('/order/new_order', async (req, res) => {
             socket.emit("notify", "有一筆新的訂單")
         })
     }
+})
+// 買家賣家取得數個訂單 progress為訂單的進度 status顯示provider或是consumer
+app.get('/order/overview', async (req, res) => {
+    const status = req.query?.status || undefined
+    const progress = req.query?.progress || undefined
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
+    const response = await fetch(`${DB_URL}/order?progress=${progress}&${status}=${account}`)
+    const result = await response.json()
+    const orders = result
+        .map(element => {
+            const {order_id, consumer, provider, order, totalprice} = element
+            const cover = order[0].cover || "img/NotFound"
+            const items = order.map(item => item.name)
+            const nickname = account===provider? consumer: provider
+            return {
+                order_id, nickname, cover, totalprice, items
+            }
+        })
+    for (let i=0; i<orders.length; i++) {
+        const response = await fetch(`${DB_URL}/accounts?account=${orders[i].nickname}`)
+        const result = await response.json()
+        orders[i] = {
+            ...orders[i],
+            nickname : result[0].nickname
+        }
+    }
+    res.json( {success : true, orders : orders} )
 })
 
 /* ======================================== *//* ======================================== */

@@ -1,0 +1,9 @@
+.main {
+    display: grid; gap: 8px;
+    grid-template-columns: 1fr 1fr;
+}
+@media(max-width: 800px) {
+    .main {
+        grid-template-columns: 1fr;
+    }
+}

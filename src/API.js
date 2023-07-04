@@ -22,7 +22,9 @@ const CHAT_HISTORY = `${API_URL}/chat_history`
 const CRUD_CART = `${API_URL}/cart/cart_CRUD`
 const MY_CART = `${API_URL}/cart/my_cart`
 const MY_STORECART = `${API_URL}/cart/my_storecart`
+/* 訂單 */
 const NEW_ORDER = `${API_URL}/order/new_order`
+const OVERVIEW_ORDER = `${API_URL}/order/overview`
 
 /* ============================================================ */
 async function get(url, token) {
@@ -76,6 +78,7 @@ const API = {
     STORE, MY_PRODUCTS, CRUD_PRODUCT, LAUNCH_PRODUCT,
     HOMEPAGE, RESULT, PRODUCT,
     CHAT_LIST, CHAT_HISTORY,
-    CRUD_CART, MY_CART, MY_STORECART, NEW_ORDER
+    CRUD_CART, MY_CART, MY_STORECART,
+    NEW_ORDER, OVERVIEW_ORDER
 }
 export default API
