@@ -8,13 +8,10 @@ import { Link } from "react-router-dom"
 /* ======================================== */
 export default function Card({ account, data }) {
     const {nickname, cover, items} = data
+    if (items?.length > 4) items.length = 4
     const [loaded, setLoaded] = useState(false)
     const imgRef = useRef()
-
-    if (items.length > 4) {
-        items.length = 4
-        items[3] = "......"
-    }
+    
     useEffect(() => {
         const imgElement = imgRef.current
         const loaded = () => setLoaded(true)
@@ -43,7 +40,7 @@ export default function Card({ account, data }) {
                 <div className={style.items}>
                     {
                         items
-                            .map((item, i) => 
+                            ?.map((item, i) => 
                                 <div key={i}>
                                     <span>- </span>
                                     <span>{item}</span>
