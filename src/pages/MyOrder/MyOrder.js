@@ -12,38 +12,41 @@ import GotoTop from "../../global/icon/GotoTop"
 import Card, { LoadingCard } from "./components/Card"
 /* Hooks */
 import { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useParams } from "react-router-dom"
 /* Redux */
 import { useSelector } from "react-redux"
 
 /* ======================================== */
-async function getRemoteOrders(progress, token, setOrders, setIsLoading) {
+async function getRemoteOrders(progress, status, token, setOrders, setIsLoading) {
     setIsLoading(true)
-    const {success, orders} = await API.get(`${API.OVERVIEW_ORDER}/?progress=${progress}&status=provider`, token)
+    const {success, orders} = await API.get(`${API.OVERVIEW_ORDER}/?progress=${progress}&status=${status}`, token)
     if (success) setOrders(orders || [])
     setIsLoading(false)
 }
 
 export default function MyOrder() {
+    const {status} = useParams()
     const navigate = useNavigate()
     const {token, isLogin} = useSelector(state => state.account)
     const [state, setState] = useState(0)
     const [orders, setOrders] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-
+    const title = (status==="provider")? "我的訂單": (status==="consumer")? "購買清單": null
+    
     useEffect(() => {
-        document.title = "我的訂單"
+        document.title = title
         if (!isLogin) navigate("/SignIn", {replace : true})
-    }, [navigate, isLogin])
+        if (!title) navigate("/", {replace : true})
+    }, [navigate, isLogin, title])
     useEffect(() => {
-        getRemoteOrders(0, token, setOrders, setIsLoading)
-    }, [token])
-
+        getRemoteOrders(0, status, token, setOrders, setIsLoading)
+    }, [status, token])
+    
     function changeState(e) {
         const progress = Number(e.target.id)
         if (progress === state) return
         setState(progress)
-        getRemoteOrders(progress, token, setOrders, setIsLoading)
+        getRemoteOrders(progress, status, token, setOrders, setIsLoading)
     }
     
     /* ==================== 分隔線 ==================== */
@@ -52,7 +55,7 @@ export default function MyOrder() {
             <div>
                 <div className="flex_center">
                     <Back />
-                    <span>我的訂單</span>
+                    <span>{title}</span>
                 </div>
                 <div className="flex_center">
                     <Home />
@@ -68,7 +71,7 @@ export default function MyOrder() {
         </header>
         <main className={`main ${style.main}`} >
             <Reload reloadHandler={
-                () => {getRemoteOrders(state, token, setOrders, setIsLoading)}}
+                () => {getRemoteOrders(state, status, token, setOrders, setIsLoading)}}
             />
             <GotoTop/>
             {

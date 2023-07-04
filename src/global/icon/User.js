@@ -52,7 +52,7 @@ export default function User() {
                     <Link to="/MyCollect">
                         <button>我的收藏</button>
                     </Link>
-                    <Link to="/MyShopping">
+                    <Link to="/MyOrder/consumer">
                         <button>購買清單</button>
                     </Link>
                     <Link to="/">

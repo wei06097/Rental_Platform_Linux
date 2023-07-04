@@ -20,7 +20,6 @@ import ChatRoom from "./pages/ChatRoom/ChatRoom"
 import ShoppingCart from "./pages/ShoppingCart/ShoppingCart"
 import Bill from "./pages/Bill/Bill"
 import MyOrder from "./pages/MyOrder/MyOrder"
-import MyShopping from "./pages/MyShopping/MyShopping"
 import Profile from "./pages/Profile/Profile"
 import OrderDetail from "./pages/OrderDetail/OrderDetail"
 import MyCollect from "./pages/MyCollect/MyCollect"
@@ -51,8 +50,7 @@ function App() {
             <Route path="/ChatRoom/:receiver" element={<ChatRoom />} />       
             <Route path="/ShoppingCart" element={<ShoppingCart />} /> 
             <Route path="/Bill/:seller" element={<Bill />} />
-            <Route path="/MyOrder" element={<MyOrder />} />
-            <Route path="/MyShopping" element={<MyShopping />} />
+            <Route path="/MyOrder/:status" element={<MyOrder />} />
             <Route path="/OrderDetail" element={<OrderDetail />} />
             <Route path="/Profile" element={<Profile />} />
             <Route path="/MyCollect" element={<MyCollect />} />

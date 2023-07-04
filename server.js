@@ -629,7 +629,7 @@ app.post('/order/new_order', async (req, res) => {
         })
     }
 })
-// 買家賣家取得數個訂單 progress為訂單的進度 status顯示provider或是consumer
+// 取得數個訂單 progress為訂單的進度 status為provider(賣家)或是consumer(買家)
 app.get('/order/overview', async (req, res) => {
     const status = req.query?.status || undefined
     const progress = req.query?.progress || undefined

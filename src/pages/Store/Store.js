@@ -110,7 +110,7 @@ export default function Store() {
             {
                 (seller === account)?
                 <>
-                    <Link className="link flex_center grow" to="/MyOrder">
+                    <Link className="link flex_center grow" to="/MyOrder/provider">
                         <button className="button grow">我的訂單</button>
                     </Link>
                     <Link className="link flex_center grow" to="/MyProducts">
