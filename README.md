@@ -18,7 +18,7 @@
     - 加入商品到購物車
     - 從購物車移除商品
 - params
-    - `/:id`
+    - `?id=`
         - 需要加上商品的 id
     - headers
         ```JavaScript
@@ -114,7 +114,7 @@
     - 未上架商品不行回傳
     - ![](https://drive.google.com/u/0/uc?id=1QG-9rhzBx4tiZiVfnQNIg2M5flUkgsLt&export=download)
 - params
-    - `/:seller`
+    - `?seller=`
         - 需要加上賣家的帳號
     - headers
     ```JavaScript
