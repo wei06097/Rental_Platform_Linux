@@ -104,7 +104,7 @@ function decodeToken(token) {
 //取得現在日期時間
 function getCurrentDateTime() {
     const current = new Date().toLocaleString('zh-TW', {
-        timeZone: 'Asia/Taipei', hour12: false,
+        timeZone: 'Asia/Taipei', hourCycle: 'h23',
         day: '2-digit', month: '2-digit', year: 'numeric',
         hour: '2-digit', minute: '2-digit'
     })
