@@ -209,8 +209,13 @@ export default function OrderDetail() {
                     }
                 </div>
                 {/* ======================================== */}
-                <div className={style.title}>買家留言</div>
-                <div className={style.textarea}>{comment}</div>
+                {
+                    comment &&
+                    <>
+                        <div className={style.title}>買家留言</div>
+                        <div className={style.textarea}>{comment}</div>
+                    </>
+                }
                 <div className={style.title}>聯絡方式</div>
                 <div className={style.products} style={{gap:"5px", border:"0"}}>
                     <div className={style.info}>
