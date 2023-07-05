@@ -24,3 +24,5 @@ yarn-error.log*
 
 # custom
 .env
+/img
+db.json
