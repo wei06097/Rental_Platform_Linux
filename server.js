@@ -486,7 +486,7 @@ app.get('/cart/my_cart', async (req, res) => {
         const {provider, name, imgs} = element
         if (!data[provider]) data[provider] = {cover : null, items : []}
         data[provider].cover = imgs[0]
-        data[provider].items.push(name)
+        data[provider].items.unshift(name)
     })
     // 用賣家帳號取得暱稱
     params = Object.keys(data).join("&account=")
@@ -524,7 +524,7 @@ app.get('/cart/my_storecart', async (req, res) => {
     result.forEach(element => {
         const {id, name, imgs, price, amount} = element
         const payload = {id, name, cover:imgs[0], price, amount}
-        data.push(payload) 
+        data.unshift(payload) 
     })
     res.json( {success : true, result : data} )
 })
@@ -601,7 +601,7 @@ app.post('/orders/order', async (req, res) => {
                     totalPrice += Number(amount) * Number(price)
                     newProductInfo[product.id] = {
                         amount : Number(product.amount) - Number(amount),
-                        BorrowedAmount : Number(amount)
+                        BorrowedAmount : Number(product.BorrowedAmount) + Number(amount)
                     }
                 }
             }
@@ -613,7 +613,7 @@ app.post('/orders/order', async (req, res) => {
     // 將剩餘數量存回資料庫同時清空購物車
     for (let i=0; i<Object.keys(newProductInfo).length; i++) {
         const id = Object.keys(newProductInfo)[i]
-        //更改剩餘數量
+        //更改商品數量
         await fetch(`${DB_URL}/products/${id}`, {
             method : "PATCH",
             headers : { "Content-Type" : "application/json" },
@@ -741,7 +741,7 @@ app.put('/orders/order', async (req, res) => {
     // 檢查操作與對應身分是否符合(可參考文件)，並處理要更新的訂單資訊
     let payload = {}
     let isAccessable = false
-    const {id, provider, consumer, actual, progress} = result[0]
+    const {id, provider, consumer, order, actual, progress} = result[0]
     switch (mode) {
         case 1: { //確認訂單
             isAccessable = (progress===0) || (account===provider)
@@ -789,11 +789,34 @@ app.put('/orders/order', async (req, res) => {
         res.json( {success : false} )
         return
     }
+    // 歸還商品
+    if (mode === 2 || mode === 4) {
+        const newProductInfo = {} // 用來紀錄商品數量 (json)
+        for (let i=0; i<order.length; i++) {
+            const response = await fetch(`${DB_URL}/products/${order[i].id}`)
+            const result = await response.json()
+            const {BorrowedAmount, amount} = result
+            newProductInfo[order[i].id] = {
+                amount : Number(amount) + Number(order[i].amount),
+                BorrowedAmount : Number(BorrowedAmount) - Number(order[i].amount)
+            }
+        }
+        for (let i=0; i<Object.keys(newProductInfo).length; i++) {
+            const id = Object.keys(newProductInfo)[i]
+            console.log(newProductInfo[id])
+            //更改商品數量
+            await fetch(`${DB_URL}/products/${id}`, {
+                method : "PATCH",
+                headers : { "Content-Type" : "application/json" },
+                body : JSON.stringify(newProductInfo[id])
+            })
+        }
+    }
     // 更新資料庫
     await fetch(`${DB_URL}/order/${id}`, {
         method : "PATCH",
         headers : { "Content-Type" : "application/json" },
-        body : JSON.stringify({...result[0], ...payload})
+        body : JSON.stringify(payload)
     })
     res.json( {success : true} )
 })
