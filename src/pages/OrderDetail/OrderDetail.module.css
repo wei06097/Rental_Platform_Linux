@@ -1,61 +1,67 @@
-/* ============================== */
-.state {
-    width: calc(100% - 10px); margin: 0 auto;
-    height: 50px; line-height: 50px;
-    text-align: center; font-size: 20px;  
-    border: 1px solid #ddd; border-radius: 10px;
+/* ======================================== */
+.products {
+    width: calc(100% - 10px); margin: 10px auto;
+    border: 1px solid #ddd; border-radius: 10px 10px 0 0;
+    display: grid; grid-template-columns: 1fr 1fr;
 }
-
-/* ============================== */
-.usercards {
-    display: grid; 
-    grid-template-rows: auto;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-areas: 
-        "seller client"
-        "comment comment";
-}
-.client {grid-area: client;}
-.seller {grid-area: seller;}
-.comment {grid-area: comment;}
-
-/* ============================== */
-.usercards > div {
-    width: calc(100% - 10px); border: 1px solid #ddd;
-    margin: 10px auto; padding: 5px 0; border-radius: 10px;
-}
-.usercards > div > div {
-    margin: 5px 0; padding: 0 5px; font-size: 17px;
-    display: flex; justify-content: space-between;
-}
-.usercards > div > div > span:nth-child(1) {
-    font-weight: bold;
-}
-.usercards > div > div > span:nth-child(2) {
-    color: #777;
-}
-
-/* ============================== */
-.comment > div:nth-child(1) {
-    padding-bottom: 5px; font-weight: bold;
-    border-bottom: 1px solid #ddd;
-}
-.comment > div:nth-child(2) {
-    padding-top: 5px; color: #777;
-    word-break: break-all; word-wrap: break-word;
-}
-
-/* ============================== */
-@media(max-width: 600px) {
-    .usercards {
-        grid-template-rows: auto;
+@media(max-width: 800px) {
+    .products {
         grid-template-columns: 1fr;
-        grid-template-areas: 
-            "seller"
-            "client"
-            "comment";
     }
-    .usercards > div {
-        margin: 10px auto 0;
-    }
+}
+
+.totalprice {
+    width: calc(100% - 10px); margin: 0 auto 10px;
+    border: 1px solid #ddd; border-radius: 0 0 10px 10px;
+    border-top: 0; padding: 10px 20px;
+    display: flex; align-items: flex-end;
+    flex-direction: column;
+}
+.totalprice > div {
+    width: 180px; display: grid;
+    grid-template-columns: 80px auto;
+}
+.totalprice > div > span:nth-child(2) {
+    text-align: right; color: #ff0000dd;
+}
+
+/* ======================================== */
+.state {
+    --lh:50px; text-align: center;
+    font-size: 20px; font-weight: 600;
+    height: var(--lh); line-height: var(--lh);
+    border-radius: calc(0.5 * var(--lh));
+    background-color: #eeea;
+}
+.title {
+    font-weight: bold; padding-left: 10px;
+    display: flex; align-items: center;
+}
+.switch {
+    display: flex; margin: 10px 0; gap: 10px;
+}
+
+/* ======================================== */
+.info {
+    width: 100%; margin: 0 auto; 
+    padding: 5px 10px; border-radius: 10px;
+    background-color:#eeea; color: #777;
+    word-break: keep-all; white-space: nowrap;
+    overflow: scroll; text-overflow: ellipsis;
+}
+.info::-webkit-scrollbar {
+    width: 0; height: 0;
+}
+.info > div {
+    display: grid; margin: 2px 0;
+    grid-template-columns: 50px auto;
+}
+
+/* ======================================== */
+.textarea {
+    width: calc(100% - 10px); margin: 10px auto;
+    padding: 10px; border-radius: 10px;
+    background-color:#eeea; color: #777;
+    word-break: normal; word-wrap: break-word;
+    white-space: pre-line;
 }

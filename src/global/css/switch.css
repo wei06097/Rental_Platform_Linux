@@ -1,0 +1,42 @@
+/*  Follow me for more pens like this! */
+/*
+    Note: This demo could have easily been written in vanilla CSS.
+    The reason I opted into using SCSS, was just so that I could
+    enable easy customization for you, the viewer.
+    If you want to use this control in your own project as vanilla CSS;
+    customize the variables to whatever you'd like, and then click on the
+    down arrow button in the top right of this CSS editor and then select
+    "View Compiled CSS".
+*/
+.toggle-control {
+    display: block; position: relative;
+    padding-left: 0; margin-bottom: 0;
+    cursor: pointer; font-size: 22px; user-select: none;
+}
+.toggle-control input {
+    position: absolute;
+    opacity: 0; cursor: pointer;
+    height: 0; width: 0;
+}
+.toggle-control input:checked ~ .control {
+    background-color: dodgerblue;
+}
+.toggle-control input:checked ~ .control:after {
+    left: 22px;
+}
+.toggle-control .control {
+    position: absolute;
+    top: 0; left: 0;
+    height: 24px; width: 44px;
+    border-radius: 25px;
+    background-color: #eee;
+    transition: background-color 0.15s ease-in-out;
+}
+.toggle-control .control:after {
+    content: ""; position: absolute;
+    left: 4px; top: 3px;
+    width: 18px; height: 18px;
+    border-radius: 25px;
+    background: white;
+    transition: left 0.15s ease-in-out;
+}

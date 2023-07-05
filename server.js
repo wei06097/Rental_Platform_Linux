@@ -101,6 +101,16 @@ function decodeToken(token) {
         return {}
     }
 }
+//取得現在日期時間
+function getCurrentDateTime() {
+    const current = new Date().toLocaleString('zh-TW', {
+        timeZone: 'Asia/Taipei', hour12: false,
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    })
+    const [date, time] = current.split(" ")
+    return [date.split("/").join("-"), time].join("T")
+}
 
 /* ======================================== *//* ======================================== */
 app.post("/api/signup", async (req, res) => {
@@ -520,8 +530,40 @@ app.get('/cart/my_storecart', async (req, res) => {
 })
 
 /* ======================================== */
-// 下訂單
-app.post('/order/new_order', async (req, res) => {
+// 取得數個訂單/購買清單 progress為訂單的進度，status為provider(賣家)或是consumer(買家)
+app.get('/orders/overview', async (req, res) => {
+    const status = req.query?.status || undefined
+    const progress = req.query?.progress || undefined
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
+    const response = await fetch(`${DB_URL}/order?progress=${progress}&${status}=${account}`)
+    const result = await response.json()
+    const orders = result
+        .map(element => {
+            const {order_id, consumer, provider, order, totalprice} = element
+            const cover = order[0].cover || "img/NotFound"
+            const items = order.map(item => item.name)
+            const nickname = account===provider? consumer: provider
+            return {
+                order_id, nickname, cover, totalprice, items
+            }
+        })
+    for (let i=0; i<orders.length; i++) {
+        const response = await fetch(`${DB_URL}/accounts?account=${orders[i].nickname}`)
+        const result = await response.json()
+        orders[i] = {
+            ...orders[i],
+            nickname : result[0].nickname
+        }
+    }
+    res.json( {success : true, orders : orders} )
+})
+// C 下訂單
+app.post('/orders/order', async (req, res) => {
     const {options, comment, order} = req.body
     // 驗證帳號
     const token = req.headers?.authorization || undefined
@@ -606,6 +648,7 @@ app.post('/order/new_order', async (req, res) => {
         comment, //買家留言
         options, //買家提供的時間地點選項
         selectedOption : {start : "", end : "", position : ""}, //賣家選擇的時間和地點
+        usingMessage : false, //賣家是否選擇只使用訊息決定時間地點
         actual : {start : "", end : ""}, //實際租借時間
         progress : 0 //訂單進度 0待確認 1待收貨 2待歸還 3已完成 -1未完成
     }
@@ -629,37 +672,130 @@ app.post('/order/new_order', async (req, res) => {
         })
     }
 })
-// 取得數個訂單 progress為訂單的進度 status為provider(賣家)或是consumer(買家)
-app.get('/order/overview', async (req, res) => {
-    const status = req.query?.status || undefined
-    const progress = req.query?.progress || undefined
+// R 透過訂單id(自定義的) 取得訂單資訊
+app.get('/orders/order', async (req, res) => {
+    const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
+    // 驗證帳號
     if (!account) {
         res.json( {success : false} )
         return
     }
-    const response = await fetch(`${DB_URL}/order?progress=${progress}&${status}=${account}`)
+    const response = await fetch(`${DB_URL}/order?order_id=${id}`)
     const result = await response.json()
-    const orders = result
-        .map(element => {
-            const {order_id, consumer, provider, order, totalprice} = element
-            const cover = order[0].cover || "img/NotFound"
-            const items = order.map(item => item.name)
-            const nickname = account===provider? consumer: provider
-            return {
-                order_id, nickname, cover, totalprice, items
+    // 訂單是否存在
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 身分是否符合
+    const {provider, consumer} = result[0]
+    if (account !== provider && account !== consumer) {
+        res.json( {success : false} )
+        return
+    }
+    // 取得暱稱
+    const response2 = await fetch(`${DB_URL}/accounts?account=${provider}`)
+    const result2 = await response2.json()
+    const response3 = await fetch(`${DB_URL}/accounts?account=${consumer}`)
+    const result3 = await response3.json()
+    // 修改回傳資料
+    const {progress, order, totalprice, comment, options, usingMessage, selectedOption, actual} = result[0]
+    const payload = {
+        provider : {
+            account : result[0].provider,
+            nickname : result2[0].nickname,
+            mail : result2[0].mail,
+            phone : result2[0].phone
+        },
+        consumer : {
+            account : result[0].consumer,
+            nickname : result3[0].nickname,
+            mail : result3[0].mail,
+            phone : result3[0].phone
+        },
+        progress, order, totalprice, comment, options, usingMessage, selectedOption, actual
+    }
+    res.json( {success : true, order : payload} )
+})
+// U 透過訂單id(自定義的) 更新訂單狀態，mode為操作模式 1確認 2取消 3已收貨 4已歸還
+app.put('/orders/order', async (req, res) => {
+    const {usingMessage, selectedOption} = req.body
+    const order_id = req.query?.id || undefined
+    const mode = Number(req.query?.mode) || -1
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    // 驗證帳號
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
+    const response = await fetch(`${DB_URL}/order?order_id=${order_id}`)
+    const result = await response.json()
+    // 訂單是否存在
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 檢查操作與對應身分是否符合(可參考文件)，並處理要更新的訂單資訊
+    let payload = {}
+    let isAccessable = false
+    const {id, provider, consumer, actual, progress} = result[0]
+    switch (mode) {
+        case 1: { //確認訂單
+            isAccessable = (progress===0) || (account===provider)
+            if (!isAccessable) break
+            payload = {
+                usingMessage,
+                selectedOption,
+                progress : 1
             }
-        })
-    for (let i=0; i<orders.length; i++) {
-        const response = await fetch(`${DB_URL}/accounts?account=${orders[i].nickname}`)
-        const result = await response.json()
-        orders[i] = {
-            ...orders[i],
-            nickname : result[0].nickname
+            break
+        }
+        case 2: { //取消訂單
+            isAccessable = (progress===0||progress===1) && (account===provider||account===consumer)
+            if (!isAccessable) break
+            payload = {progress : -1}
+            break
+        }
+        case 3: { //已收貨
+            isAccessable = (progress===1) && (account===consumer)
+            if (!isAccessable) break
+            payload = {
+                actual : {
+                    ...actual,
+                    start : getCurrentDateTime()
+                },
+                progress : 2
+            }
+            break
+        }
+        case 4: { //已歸還
+            isAccessable = (progress===2) && (account===provider)
+            if (!isAccessable) break
+            payload = {
+                actual : {
+                    ...actual,
+                    end : getCurrentDateTime()
+                },
+                progress : 3
+            }
+            break
         }
     }
-    res.json( {success : true, orders : orders} )
+    // 請求不正當
+    if (!isAccessable) {
+        res.json( {success : false} )
+        return
+    }
+    // 更新資料庫
+    await fetch(`${DB_URL}/order/${id}`, {
+        method : "PATCH",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify({...result[0], ...payload})
+    })
+    res.json( {success : true} )
 })
 
 /* ======================================== *//* ======================================== */
