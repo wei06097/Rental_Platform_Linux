@@ -114,7 +114,7 @@ export default function Bill() {
     }
     async function submitOrder(body) {
         setIsHandling(true)
-        const {success} = await API.post(API.NEW_ORDER, token, body)
+        const {success} = await API.post(API.ORDER, token, body)
         if (success) navigate("/MyShopping", {replace : true})
         else alert("請重新整理後再試一次")
         setIsHandling(false)
@@ -264,7 +264,7 @@ export default function Bill() {
         <div className="base"></div>
         <footer className={style.footer}>
             <div>
-                <span>總金額 </span>
+                <span>單日金額 </span>
                 <span>
                     NT$
                     {
@@ -274,7 +274,6 @@ export default function Bill() {
                             .reduce((accumulator, currentValue) => accumulator + currentValue, 0)
                     }
                 </span>
-                <span> / 天</span>
             </div>
             <button
                 className="button" onClick={submitHandler}
