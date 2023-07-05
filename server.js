@@ -576,21 +576,12 @@ app.post('/orders/order', async (req, res) => {
     const params = Object.keys(order).join("&id=")
     const response = await fetch(`${DB_URL}/products?id=${params}&launched=true`)
     const result = await response.json()
-    // 留下需要的商品資訊 (array)
-    const productInfo = result
-        .map(product => {
-            return {
-                id: product.id,
-                price: product.price,
-                amount: product.amount,
-            }
-        })
-    // 用來紀錄商品剩餘數量 (json)
+    // 用來紀錄商品數量 (json)
     const newProductInfo = {}
-    // 計算總金額並記錄剩餘數量
+    // 計算總金額並記錄數量
     let totalPrice = 0
-    let success = (Object.keys(order).length === productInfo.length)
-    productInfo
+    let success = (Object.keys(order).length === result.length)
+    result
         .forEach(product => {
             if (!success) return
             if (order[product.id]) {
@@ -610,7 +601,7 @@ app.post('/orders/order', async (req, res) => {
         res.json({success : false})
         return 
     }
-    // 將剩餘數量存回資料庫同時清空購物車
+    // 將數量存回資料庫同時清空購物車
     for (let i=0; i<Object.keys(newProductInfo).length; i++) {
         const id = Object.keys(newProductInfo)[i]
         //更改商品數量
