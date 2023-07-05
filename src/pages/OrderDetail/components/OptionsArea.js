@@ -6,7 +6,7 @@ import style from "../OrderDetail.module.css"
 import Option from "./Option"
 
 /* ======================================== */
-export default function OptionsArea({ isProvider, options, setDecision }) {
+export default function OptionsArea({ isProvider, options, setDecision, isHandling }) {
     return <>
         <div className={style.products} style={{width:"100%", border:"0"}}>
             <div>
@@ -23,6 +23,7 @@ export default function OptionsArea({ isProvider, options, setDecision }) {
                                 value={datetime}
                                 setDecision={setDecision}
                                 hideRadio={!isProvider}
+                                isHandling={isHandling}
                             />  
                         })
                 }
@@ -41,6 +42,7 @@ export default function OptionsArea({ isProvider, options, setDecision }) {
                                 value={datetime}
                                 setDecision={setDecision}
                                 hideRadio={!isProvider}
+                                isHandling={isHandling}
                             />  
                         })
                 }
@@ -59,6 +61,7 @@ export default function OptionsArea({ isProvider, options, setDecision }) {
                         value={position}
                         setDecision={setDecision}
                         hideRadio={!isProvider}
+                        isHandling={isHandling}
                     />
                 })
         }

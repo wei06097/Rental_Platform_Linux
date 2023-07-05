@@ -11,6 +11,7 @@ import resultSlice from "./slice/resultSlice"
 import storeSlice from "./slice/storeSlice"
 import myProductSlice from "./slice/myProductSlice"
 import editProductSlice from "./slice/editProductSlice.js"
+import globalSlice from "./slice/globalSlice"
 
 /* ======================================== */
 const account_PersistConfig = {
@@ -37,7 +38,8 @@ const reducer = combineReducers({
     result : persistReducer(result_PersistConfig, resultSlice),
     store :  persistReducer(store_PersistConfig, storeSlice),
     myProduct : myProductSlice,
-    editProduct : editProductSlice
+    editProduct : editProductSlice,
+    global : globalSlice
 })
 const store = configureStore({
     reducer : reducer,

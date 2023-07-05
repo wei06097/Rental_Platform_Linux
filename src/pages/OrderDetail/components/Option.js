@@ -5,12 +5,12 @@ import style from "./Option.module.css"
 import { useRef } from "react"
 
 /* ======================================== */
-export default function Option({ mode, value, setDecision, hideRadio }) {
+export default function Option({ mode, value, setDecision, hideRadio, isHandling=false}) {
     const radioRef = useRef()
     const inputRef = useRef()
     
     function radioClickHandler() {
-        if (hideRadio) return
+        if (hideRadio || isHandling) return
         setDecision(prev => {
             return {
                 ...prev,
@@ -19,7 +19,7 @@ export default function Option({ mode, value, setDecision, hideRadio }) {
         })
     }
     function labelClickHandler() {
-        if (hideRadio) return
+        if (hideRadio || isHandling) return
         radioRef.current.checked = true
         radioClickHandler()
     }
@@ -29,7 +29,8 @@ export default function Option({ mode, value, setDecision, hideRadio }) {
         <div className={style.option}>
             {
                 !hideRadio &&
-                <input type="radio" name={mode} ref={radioRef} onClick={radioClickHandler} />
+                <input type="radio" name={mode} ref={radioRef} 
+                    onClick={radioClickHandler} disabled={isHandling} />
             }
             <label onClick={labelClickHandler}>
                 {
