@@ -13,7 +13,8 @@ import Position from "./Components/Position"
 import { useState, useEffect, useRef } from "react"
 import { useParams, useNavigate, Link } from "react-router-dom"
 /* Redux */
-import { useSelector } from "react-redux"
+import { useSelector, useDispatch } from "react-redux"
+import { setOrderPage } from "../../slice/globalSlice"
 /* else */
 import { v4 as uuidv4 } from "uuid"
 
@@ -21,6 +22,7 @@ import { v4 as uuidv4 } from "uuid"
 export default function Bill() {
     const {seller} = useParams()
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const {token, account, isLogin} = useSelector(state => state.account)
     const [data, setData] = useState([]) // res 獲取購物車商品
     const [isLoading, setIsLoading] = useState(false)
@@ -115,8 +117,10 @@ export default function Bill() {
     async function submitOrder(body) {
         setIsHandling(true)
         const {success} = await API.post(API.ORDER, token, body)
-        if (success) navigate("/MyShopping", {replace : true})
-        else alert("請重新整理後再試一次")
+        if (success) {
+            dispatch(setOrderPage(0))
+            navigate("/MyOrder/consumer", {replace : true})
+        } else alert("請重新整理後再試一次")
         setIsHandling(false)
     }
     
