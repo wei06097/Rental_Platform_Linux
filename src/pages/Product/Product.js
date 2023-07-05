@@ -28,7 +28,7 @@ export default function Product() {
     const [isHandling, setIsHandling] = useState(false)
     
     useEffect(() => {
-        document.title = `商品 : ${product?.name || ""}`
+        document.title = `商品 : ${product?.name}`
     }, [product])
     useEffect( () => {
         init()
@@ -96,16 +96,16 @@ export default function Product() {
                 {
                     !viewPicture && !isLoading &&
                     <div className={style.info}>
-                        <div>{product?.name || ""}</div>
-                        <div>$NT{product?.price || ""} / 天</div>
+                        <div>{product?.name}</div>
+                        <div>$NT{product?.price} / 天</div>
                         <div>
                             <div>
                                 <span>- 數量</span>
-                                <span>{product?.amount || ""}</span>
+                                <span>{product?.amount}</span>
                             </div>
                             <div>
                                 <span>- 地點</span>
-                                <span>{product?.position || ""}</span>
+                                <span>{product?.position}</span>
                             </div>
                         </div>
                     </div>
@@ -116,19 +116,19 @@ export default function Product() {
                 <div className={style.des}>
                     <div>賣場名稱</div>
                     <div>
-                        <div>{product?.provider || ""}</div>
+                        <div>{product?.provider}</div>
                         <div>
-                            <Link to={`/ChatRoom/${product?.provider || ""}`} 
+                            <Link to={`/ChatRoom/${product?.provider}`} 
                                 style={{visibility: (account !== product?.provider)? "visible": "hidden"}}>
                                 <button className="button" style={{margin:"0"}}>聊天</button>
                             </Link>
-                            <Link to={`/Store/${product?.provider || ""}`}>
+                            <Link to={`/Store/${product?.provider}`}>
                                 <button className="button" style={{margin:"0"}}>進入賣場</button>
                             </Link>
                         </div>
                     </div>
                     <div>商品描述</div>
-                    <div>{product?.description || ""}</div>
+                    <div>{product?.description}</div>
                 </div>
             }
         </main>
