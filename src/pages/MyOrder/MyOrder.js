@@ -47,7 +47,6 @@ export default function MyOrder() {
         const progress = Number(e.target.id)
         if (progress === state) return
         setState(progress)
-        getRemoteOrders(progress, status, token, setOrders, setIsLoading)
     }
     
     /* ==================== 分隔線 ==================== */
