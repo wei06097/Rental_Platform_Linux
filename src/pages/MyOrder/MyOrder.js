@@ -12,23 +12,24 @@ import GotoTop from "../../global/icon/GotoTop"
 import Card, { LoadingCard } from "./components/Card"
 /* Hooks */
 import { useState, useEffect } from "react"
-import { useNavigate, useParams } from "react-router-dom"
+import { useNavigate, useParams, useLocation } from "react-router-dom"
 /* Redux */
 import { useSelector } from "react-redux"
 
 /* ======================================== */
 async function getRemoteOrders(progress, status, token, setOrders, setIsLoading) {
     setIsLoading(true)
-    const {success, orders} = await API.get(`${API.OVERVIEW_ORDER}/?progress=${progress}&status=${status}`, token)
+    const {success, orders} = await API.get(`${API.OVERVIEW_ORDERS}/?progress=${progress}&status=${status}`, token)
     if (success) setOrders(orders || [])
     setIsLoading(false)
 }
 
 export default function MyOrder() {
     const {status} = useParams()
+    const location = useLocation()
     const navigate = useNavigate()
     const {token, isLogin} = useSelector(state => state.account)
-    const [state, setState] = useState(0)
+    const [state, setState] = useState(location.state?.state || 0)
     const [orders, setOrders] = useState([])
     const [isLoading, setIsLoading] = useState(true)
     const title = (status==="provider")? "我的訂單": (status==="consumer")? "購買清單": null
@@ -39,8 +40,8 @@ export default function MyOrder() {
         if (!title) navigate("/", {replace : true})
     }, [navigate, isLogin, title])
     useEffect(() => {
-        getRemoteOrders(0, status, token, setOrders, setIsLoading)
-    }, [status, token])
+        getRemoteOrders(state, status, token, setOrders, setIsLoading)
+    }, [state, status, token])
     
     function changeState(e) {
         const progress = Number(e.target.id)
