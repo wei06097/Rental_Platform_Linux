@@ -149,16 +149,16 @@
 </details>
 
 ## 訂單
-### `/order/new_order`
+### `/orders/order`
 <details>
 
 - 用途
     - 下訂單用
-    - 需比對每項商品金額，若與前端傳的不一樣要回傳失敗
-    - 商品剩餘數量不足要回傳失敗
-    - 總金額要在後端計算
-    - 成功後要用 socket 傳及時通知 (還沒用好)
-    - ![](https://drive.google.com/u/0/uc?id=1nyzeu_f3AntBqWMZFg3DlxGPgbCsEEM3&export=download)
+    - ![](https://drive.google.com/u/0/uc?id=1c_L22dvQOX7ZULwQcVzl7Jj8bAcyakmE&export=download)
+    - 取得單筆訂單資料
+    - ![](https://drive.google.com/u/0/uc?id=1ILrGnFpMh6s7qO8vX3ANBc7BxoeqF5gc&export=download)
+    - ![](https://drive.google.com/u/0/uc?id=1Wl-Ito0QOaIGnbhaJJf59CrpgguKyRUr&export=download)
+    
 - params
     - headers
         ```JavaScript
@@ -166,6 +166,31 @@
             authorization : token //JWT token
         }
         ```
+    - `?id=`
+        - for `get` `put`
+        - 讀取和更新訂單要加上自定義的訂單 id
+        
+    - `?mode=`
+        - for `put`
+        - 更新訂單時所對應的操作
+        - 1: 確認訂單
+        - 2: 取消訂單
+        - 3: 已收貨
+        - 4: 已歸還
+    - progress
+        - 非參數，回傳資料用
+        - 定義訂單進度
+        - 不同身分在不同 progress 能做的操作不一樣
+        -  0: 待確認
+            - 買家: 取消訂單
+            - 賣家: 取消訂單 確認訂單
+        -  1: 待交貨
+            - 買家: 取消訂單 已收貨
+            - 賣家: 取消訂單
+        -  2: 待歸還
+            - 賣家: 已歸還
+        -  3: 已完成
+        - -1: 未完成
 - method
     - `post`
         - body
@@ -198,7 +223,7 @@
             consumer : account, //買家
             provider : provider, //賣家
             order : products, //商品數量價格等資訊
-            totalprice : totalPrice, //總金額
+            totalprice : totalPrice, //總金額/天
             comment, //買家留言
             options, //買家提供的時間地點選項
             selectedOption : { //賣家選擇的時間和地點
@@ -206,16 +231,154 @@
                 end : "",
                 position : ""
             },
+            usingMessage : false, //只用訊息決定時間和地點
             actual : { //實際租借時間
                 start : "",
                 end : ""
-            }, 
-            progress : 0 //訂單進度 0待確認 1待收貨 2待歸還 3已完成 -1未完成
+            },
+            progress : 0 //上方定義有說明
+        }
+        ```
+        - 提醒
+            - 需比對每項商品金額，若與前端傳的不一樣要回傳失敗
+            - 商品剩餘數量不足要回傳失敗
+            - 總金額要在後端計算
+            - 成功後要用 socket 傳及時通知 (還沒用好)
+    - `get`
+        - response
+        ```JavaScript
+        {
+            success : true or false,
+            order : {
+                provider: { //賣家資訊
+                    account: 'kokoro123',
+                    nickname: '弦巻こころ',
+                    mail: 'kokoro123@gmail.com',
+                    phone: '0911222333'
+                },
+                consumer: { //買家資訊
+                    account: 'hhh123', 
+                    nickname: '鱷魚', 
+                    mail: 'hhh123@gmail.com', 
+                    phone: '09xxxxxxxx' 
+                },
+                progress: 3, //訂單進度
+                order: [ //訂單本體
+                    {
+                        id: 2,
+                        name: '承太郎',
+                        cover: 'img/xxx.img',
+                        price: 500,
+                        amount: 5
+                    },
+                    {
+                        id: 7,
+                        name: 'Elden Ring',
+                        cover: 'img/xxx.img',
+                        price: 1290,
+                        amount: 1
+                    }
+                ],
+                totalprice: 3790, //總金額/天
+                comment: '你好', //買家留言
+                options: { //買家提供的選項
+                    start: [ '2023-07-07T02:59' ],
+                    end: [ '2023-07-14T02:01' ],
+                    position: [ '台科大', '你家' ]
+                },
+                usingMessage: false, //只使用訊息討論時間地點
+                selectedOption: { //賣家選擇的選項
+                    start: '2023-07-07T02:59',
+                    end: '2023-07-14T02:01',
+                    position: '台科大'
+                },
+                actual: {  //實際借用歸還時間
+                    start: '2023-07-06T03:03',
+                    end: '2023-07-06T03:04' 
+                }
+            }
+        }
+        ```
+    - `put`
+        - body when `mode=1`
+        ```JavaScript
+        {   //有選擇時間
+            usingMessage : false,
+            selectedOption : {
+                start: '2023-07-07T02:59',
+                end: '2023-07-14T02:01',
+                position: '台科大'
+            }
+        }
+        or
+        {   //只使用訊息討論時間地點
+            usingMessage : true,
+            selectedOption : {
+                start: '',
+                end: '',
+                position: ''
+            }
+        }
+        ```
+        - body when `mode=2,3,4`
+        ```JavaScript
+        {
+
+        }
+        ```
+        - response
+        ```JavaScript
+        {
+            success : true or false //操作是否成功
         }
         ```
 </details>
 
-### `/`
+### `/orders/overview`
 <details>
 
+- 用途
+    - 取得數個訂單 (status=provider)
+    - 取得數個購買清單 (status=consumer)
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+    - `?progress=`
+        - 表示訂單進度
+    - `?status=`
+        - 表示目前身分
+        - provider 賣家
+        - consumer 買家
+- method
+    - `get`
+        - response
+        ```JavaScript
+        {
+            success : true or false,
+            orders : [
+                {
+                    order_id: 'a7b1cd20-f4e6-4b62-b013-250e2ceb3610',
+                    nickname: '弦巻こころ',
+                    cover: 'img/8da5912c-48a5-4aec-a61b-377789dfd8a9.png',
+                    totalprice: 100,
+                    items: [ '石頭' ]
+                },
+                {
+                    order_id: 'asdfsdfsdf-fsdfsd-f-sdfsdf',
+                    nickname: '弦巻こころ',
+                    cover: 'img/8da5912c-48a5-4aec-a61b-377789dfd8a9.png',
+                    totalprice: 1290,
+                    items: [ 'Elden Ring' ]
+                }
+            ]
+        }
+        ```
 </details>
+
+### `<== to be continued`
+<!-- <details>
+</details> -->
