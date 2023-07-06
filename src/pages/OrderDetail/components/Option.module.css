@@ -8,7 +8,7 @@
     outline: none; cursor: pointer;
 }
 .option > label > input {
-    width: 140px; height: 35px;
+    width: 150px; height: 35px;
     margin: 5px; padding: 10px;
     border: 1px solid #ddd; border-radius: 5px;
     outline: none; cursor: pointer; font-size: 15px;
