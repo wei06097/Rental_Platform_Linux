@@ -484,9 +484,8 @@ app.get('/cart/my_cart', async (req, res) => {
     const data = {}
     result.forEach(element => {
         const {provider, name, imgs} = element
-        if (!data[provider]) data[provider] = {cover : null, items : []}
-        data[provider].cover = imgs[0]
-        data[provider].items.unshift(name)
+        if (!data[provider]) data[provider] = {cover : imgs[0], items : []}
+        data[provider].items.push(name)
     })
     // 用賣家帳號取得暱稱
     params = Object.keys(data).join("&account=")
@@ -524,7 +523,7 @@ app.get('/cart/my_storecart', async (req, res) => {
     result.forEach(element => {
         const {id, name, imgs, price, amount} = element
         const payload = {id, name, cover:imgs[0], price, amount}
-        data.unshift(payload) 
+        data.push(payload) 
     })
     res.json( {success : true, result : data} )
 })
