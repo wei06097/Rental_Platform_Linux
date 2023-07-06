@@ -2,20 +2,25 @@
 .option {
     display: flex; align-items: center;
 }
-.option > input,
-.option > label > input {
+.option > input {
     height: 35px; margin: 5px; padding: 10px;
     border: 1px solid #ddd; border-radius: 5px;
     outline: none; cursor: pointer;
 }
+.option > label > input {
+    width: 140px; height: 35px;
+    margin: 5px; padding: 10px;
+    border: 1px solid #ddd; border-radius: 5px;
+    outline: none; cursor: pointer; font-size: 15px;
+}
 
 /* ======================================== */
 .option > label,
-.option > label > input[type="text"] {
+.option > label > .position{
     display: flex; flex-grow: 1; overflow: scroll;
     word-break: keep-all; white-space: nowrap;
 }
 .option > label::-webkit-scrollbar,
-.option > label > input[type="text"]::-webkit-scrollbar {
+.option > label > .position::-webkit-scrollbar {
     width: 0; height: 0;
 }

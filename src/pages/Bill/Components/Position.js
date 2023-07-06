@@ -18,10 +18,8 @@ export default function Position({ index, length, setDates, deleteHandler, isLoa
     /* ==================== 分隔線 ==================== */
     return <>
         <div className={style.data}>
-            <input 
-                type="text" className={style.position} placeholder="填寫地點"
-                ref={inputRef} onChange={onChangeHandler}
-                disabled={isLoading}
+            <input type="text" placeholder="填寫地點" ref={inputRef}
+                onChange={onChangeHandler} disabled={isLoading}
             />
             <button className={style.icon}
                 style={{visibility:(length !== 1)? "visible":"hidden"}}

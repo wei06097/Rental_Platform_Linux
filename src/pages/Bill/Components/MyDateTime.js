@@ -3,11 +3,12 @@
 /* CSS */
 import style from "../Bill.module.css"
 /* Hooks */
-import { useRef } from "react"
+import { useState, useRef } from "react"
 
 /* ======================================== */
 export default function MyDateTime({ index, length, setDates, deleteHandler, isLoading }) {
     const datetimeRef = useRef()
+    const [datetime, setDatetime] = useState("選擇日期與時間")
     function getDateTime() {
         setDates(prev => {
             const newDates = [...prev]
@@ -18,10 +19,17 @@ export default function MyDateTime({ index, length, setDates, deleteHandler, isL
             }
             return newDates
         })
+        const newDateTime = new Date(datetimeRef.current.value).toLocaleString('zh-TW', {
+            timeZone: 'Asia/Taipei', hourCycle: 'h23',
+            day: '2-digit', month: '2-digit', year: 'numeric',
+            hour: '2-digit', minute: '2-digit'
+        })
+        setDatetime((newDateTime==="Invalid Date")? "選擇日期與時間": newDateTime)
     }
     /* ==================== 分隔線 ==================== */
     return <>
         <div className={style.data}>
+            <div>{datetime}</div>
             <input type="datetime-local" ref={datetimeRef} onChange={getDateTime} disabled={isLoading} />
             <button className={style.icon}
                 style={{visibility:(length !== 1)? "visible":"hidden"}}

@@ -8,7 +8,13 @@ import { useRef } from "react"
 export default function Option({ mode, value, setDecision, hideRadio, isHandling=false}) {
     const radioRef = useRef()
     const inputRef = useRef()
-    
+    const newDateTime = new Date(value).toLocaleString('zh-TW', {
+        timeZone: 'Asia/Taipei', hourCycle: 'h23',
+        day: '2-digit', month: '2-digit', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+    })
+    const datatime = (newDateTime !== "Invalid Date")? newDateTime: ""
+
     function radioClickHandler() {
         if (hideRadio || isHandling) return
         setDecision(prev => {
@@ -34,9 +40,9 @@ export default function Option({ mode, value, setDecision, hideRadio, isHandling
             }
             <label onClick={labelClickHandler}>
                 {
-                    (mode !== "position")
-                    ?<input type="datetime-local" disabled={true} value={value} ref={inputRef}/>
-                    :<input type="text" disabled={true} value={value} ref={inputRef}/>
+                    (mode === "position")
+                    ?<input type="text" className={style.position} disabled={true} value={value} ref={inputRef}/>
+                    :<input type="text" disabled={true} value={datatime} ref={inputRef}/>
                 }
             </label>
         </div>
