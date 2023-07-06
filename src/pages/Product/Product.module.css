@@ -39,6 +39,7 @@
 .info > div:nth-child(3) > div  {
     display: grid; grid-template-columns: 50px auto;
     color: #777; margin-top: 5px;
+    align-items: center;
 }
 
 /* ======================================== */
