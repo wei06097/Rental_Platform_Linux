@@ -3,9 +3,6 @@
     width: 750px; padding: 20px 10px; margin: 0 auto 5px;
     border: 1px solid #ddd; border-radius: 10px;
 }
-.title {
-    font-weight: bold;
-}
 @media(max-width: 800px) {
     .container {
         width: 100%;

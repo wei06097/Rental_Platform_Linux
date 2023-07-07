@@ -1,0 +1,28 @@
+.title {
+    font-size: large; padding: 0 20px;
+}
+.container {
+    width: calc(100% - 10px); margin: 10px auto 20px;
+    display: grid; gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+}
+
+.container > a,
+.container > button {
+    text-decoration: none; color: inherit;
+    display: flex; align-items: center; gap: 10px;
+    border: 2px solid #ddd; border-radius: 10px;
+    background-color: white; font-size: larger;
+    cursor: pointer; padding: 10px;
+}
+.container > a:hover,
+.container > button:hover {
+    box-shadow: 0 0 2px 2px #ddd;
+}
+
+.container > a > svg,
+.container > button > svg {
+    --size: 40px;
+    width: var(--size); height: var(--size);
+    color: gray;
+}

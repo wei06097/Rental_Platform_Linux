@@ -7,6 +7,7 @@ import "./global/css/component.css"
 import "./global/css/loading-ring.css"
 /* Pages */
 import NotFound from "./pages/NotFound"
+import User from "./pages/User/User"
 import SignUp from "./pages/Account/SignUp"
 import SignIn from "./pages/Account/SignIn"
 import Store from "./pages/Store/Store"
@@ -20,8 +21,8 @@ import ChatRoom from "./pages/ChatRoom/ChatRoom"
 import ShoppingCart from "./pages/ShoppingCart/ShoppingCart"
 import Bill from "./pages/Bill/Bill"
 import MyOrder from "./pages/MyOrder/MyOrder"
-import Profile from "./pages/Profile/Profile"
 import OrderDetail from "./pages/OrderDetail/OrderDetail"
+import Profile from "./pages/Profile/Profile"
 import MyCollect from "./pages/MyCollect/MyCollect"
 /* Hooks */
 import { Routes, Route } from "react-router-dom"
@@ -39,6 +40,7 @@ function App() {
       <SocketProvider>
         <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/User" element={<User />} />
             <Route path="/SignUp" element={<SignUp />} />
             <Route path="/SignIn" element={<SignIn />} />
             <Route path="/Store/:seller" element={<Store />} />

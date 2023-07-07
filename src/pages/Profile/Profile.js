@@ -7,7 +7,6 @@ import style from "./Profile.module.css"
 /* Components */
 import Back from "../../global/icon/Back"
 import Item from "./components/Item"
-import PasswordPage from "./components/PasswordPage"
 /* Hooks */
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
@@ -20,7 +19,6 @@ export default function Profile() {
     const {token, isLogin} = useSelector(state => state.account)
     const [profile, setProfile] = useState({})
     const [isHandling, setIsHandling] = useState(true)
-    const [isSettingPass, setIsSettingPass] = useState(false)
 
     useEffect( () => {
         document.title = "個人檔案"
@@ -35,7 +33,6 @@ export default function Profile() {
         }
     }, [token])
 
-    /* ======================================== */
     async function updateProfile(type, value, callback) {
         setIsHandling(true)
         const {success} = await API.put(API.PROFILE, token, {[type] : value})
@@ -49,13 +46,6 @@ export default function Profile() {
         callback()
         setIsHandling(false)
     }
-    async function changePassword(payload, callback) {
-        setIsHandling(true)
-        const {success, message} = await API.post(API.PASSWORD_CHANGE, token, payload)
-        if (success) callback()
-        setIsHandling(false)
-        alert(message)
-    }
 
     /* ==================== 分隔線 ==================== */
     return <>
@@ -65,33 +55,25 @@ export default function Profile() {
                 <span>個人檔案</span>
             </div>
         </header>
-        {
-            isSettingPass &&
-            <PasswordPage
-                isHandling={isHandling}
-                closePage={() => {setIsSettingPass(false)}}
-                changePassword={changePassword}
-            />
-        }
         <main className="main">
             {
                 isHandling &&
                 <div className="loading-ring" />
             }
             <div className={style.container}>
-                <div className={style.title}>帳號</div>
+                <div>帳號</div>
                 <Item
                     isEditable={false}
                     value={profile?.account || ""}
                 />
-                <div className={style.title}>名稱</div>
+                <div>名稱</div>
                 <Item
                     isHandling={isHandling}
                     value={profile?.nickname || ""}
                     type={"nickname"}
                     updateProfile={updateProfile}
                 />
-                <div className={style.title}>手機</div>
+                <div>手機</div>
                 <Item
                     isHandling={isHandling}
                     needVerify={false}
@@ -99,7 +81,7 @@ export default function Profile() {
                     type={"phone"}
                     updateProfile={updateProfile}
                 />
-                <div className={style.title}>信箱</div>
+                <div>信箱</div>
                 <Item
                     isHandling={isHandling}
                     needVerify={false}
@@ -107,10 +89,6 @@ export default function Profile() {
                     type={"mail"}
                     updateProfile={updateProfile}
                 />
-            </div>
-            <div className={style.container} style={{border:"0", margin:"0 auto", padding:"0"}}>
-                <button className="button" disabled={isHandling} 
-                    onClick={() => {setIsSettingPass(true)}}>變更密碼</button>
             </div>
         </main>
     </>

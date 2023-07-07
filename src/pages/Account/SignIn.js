@@ -78,7 +78,7 @@ export default function SignIn() {
 
                 <div style={{fontSize:"15px", textAlign:"center"}}>
                     <span style={{paddingRight: "5px"}}>沒有帳號?</span>
-                    <Link to="/SignUp" onClick={signupHandler}>註冊</Link>
+                    <Link replace to="/SignUp" onClick={signupHandler}>註冊</Link>
                 </div>
             </form>
         </main>
