@@ -24,7 +24,7 @@ export default function Result() {
     const dispatch = useDispatch()
     const {isLoading, history} = useSelector(state => state.result)
     const [queryParams, setQueryParams] = useState([])
-
+    const [showing, setShowing] = useState(false)
     const title = queryParams.join(" ")
     const queryString = encodeURLfromArr(queryParams)
     const haveData = Object.keys(history).includes(queryString)
@@ -34,32 +34,28 @@ export default function Result() {
         window.scroll(0, 0)
     }, [])
     useEffect(() => {
-        document.title = `搜尋結果 : ${title}`
-        if(!haveData) dispatch(queryProducts({queryString}))
+        document.title = `搜尋 : ${title}`
+        if (!queryString) {
+            setShowing(false)
+            return
+        }
+        if (!haveData) dispatch(queryProducts({queryString}))
+        setShowing(true)
     }, [dispatch, title, queryString, haveData])
-
+    
     function reloadHandler() {
         dispatch(queryProducts({queryString}))
     }
 
     /* ==================== 分隔線 ==================== */
     return <>
-        <header className="header3">
-            <div>
-                <div className="flex_center">
-                    <Back />
-                    <span>搜尋結果</span>
-                </div>
-                <div className="flex_center">
-                    <ShoppingCart />
-                    <Home />
-                </div>
-            </div>
+        <header>
+            <Back />
             <SearchBar
                 setQueryParams={setQueryParams}
-                forceQuery={queryProducts}
-                history={history}
             />
+            <ShoppingCart />
+            <Home />
         </header>
         <main className="main">
             <GotoTop />
@@ -67,8 +63,9 @@ export default function Result() {
             {
                 isLoading?
                 <div className="loading-ring" />:
-                !products[0]?
+                showing && !products[0]?
                 <div style={{textAlign: "center"}}>沒有符合的商品</div>:
+                showing?
                 <OverviewCards>
                     {
                         products
@@ -83,7 +80,8 @@ export default function Result() {
                                 />
                             )
                     }
-                </OverviewCards>
+                </OverviewCards>:
+                <></>
             }
         </main>
     </>
