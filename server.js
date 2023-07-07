@@ -32,7 +32,6 @@ io.on('connection', socket => {
     /* 加入線上列表 */
     if (!online[account]) online[account] = []
     online[account].push(socket.id)
-    // console.log("已登入", online)
     
     /* 前端登出後或是關閉分頁，會產生 socket 斷線的事件 */
     socket.on("disconnect", () => {
@@ -40,7 +39,6 @@ io.on('connection', socket => {
         const index = online[account].indexOf(socket.id)
         if (index !== -1) online[account].splice(index, 1)
         if (!online[account][0]) delete online[account]
-        // console.log("已登出", online)
     })
 
     socket.on("message", async ({provider, receiver, type, content, img}) => {
@@ -793,7 +791,6 @@ app.put('/orders/order', async (req, res) => {
         }
         for (let i=0; i<Object.keys(newProductInfo).length; i++) {
             const id = Object.keys(newProductInfo)[i]
-            console.log(newProductInfo[id])
             //更改商品數量
             await fetch(`${DB_URL}/products/${id}`, {
                 method : "PATCH",
@@ -809,6 +806,86 @@ app.put('/orders/order', async (req, res) => {
         body : JSON.stringify(payload)
     })
     res.json( {success : true} )
+})
+
+/* ======================================== *//* ======================================== */
+// 拿個人資料
+app.get('/profile',  async (req, res) => {
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    // 驗證帳號
+    if (!account) {
+        res.json( {success : false} )
+        return
+    }
+    const response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    const result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    const profile = {
+        account : result[0].account,
+        nickname : result[0].nickname,
+        phone : result[0].phone,
+        mail : result[0].mail,
+        intro : result[0].intro
+    }
+    res.json({success : true, profile : profile})
+})
+// 修改個人資料
+app.put('/profile',  async (req, res) => {
+    const payload = req.body
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    // 驗證帳號
+    const response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    const result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    // 驗證payload
+    let isLegal = true
+    Object.keys(payload)
+        .forEach(key => {
+            if (!isLegal) return
+            if (!Object.keys(result[0]).includes(key)) isLegal = false
+        })
+    if (!isLegal) {
+        res.json( {success : false} )
+        return
+    }
+    await fetch(`${DB_URL}/accounts/${result[0].id}`, {
+        method : "PATCH",
+        headers : {"Content-Type" : "application/json"},
+        body : JSON.stringify(payload)
+    })
+    res.json({success : true})
+})
+// 修改密碼
+app.post('/password_change',  async (req, res) => {
+    const {oldPassword, newPassword} = req.body
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    // 驗證帳號
+    const response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    const result = await response.json()
+    if (!result[0]) {
+        res.json( {success : false} )
+        return
+    }
+    const {password, id} = result[0]
+    if (password !== oldPassword) {
+        res.json({success : false, message : "密碼錯誤"})
+        return
+    }
+    await fetch(`${DB_URL}/accounts/${id}`, {
+        method : "PATCH",
+        headers : {"Content-Type" : "application/json"},
+        body : JSON.stringify({password : newPassword})
+    })
+    res.json({success : true, message : "更改成功"})
 })
 
 /* ======================================== *//* ======================================== */

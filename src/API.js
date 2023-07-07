@@ -6,6 +6,9 @@ const WS_URL = API_URL
 const SIGNUP = `${API_URL}/api/signup`
 const LOGIN = `${API_URL}/api/login`
 const JWT = `${API_URL}/api/token_verify`
+/* 個人檔案 */
+const PROFILE = `${API_URL}/profile`
+const PASSWORD_CHANGE = `${API_URL}/password_change`
 /* 賣場 */
 const STORE = `${API_URL}/store`
 const MY_PRODUCTS = `${API_URL}/api/commodity/my_commodity`
@@ -75,6 +78,7 @@ const API = {
     // URL
     WS_URL,
     SIGNUP, LOGIN, JWT,
+    PROFILE, PASSWORD_CHANGE,
     STORE, MY_PRODUCTS, CRUD_PRODUCT, LAUNCH_PRODUCT,
     HOMEPAGE, RESULT, PRODUCT,
     CHAT_LIST, CHAT_HISTORY,

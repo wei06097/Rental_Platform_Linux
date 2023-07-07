@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom"
 
-export default function Back() {
+export default function Back({ goLastPage=true, closeSubPage=null }) {
     const navigate = useNavigate()
     function onClick() {
-        navigate(-1)
+        if (goLastPage) navigate(-1)
+        else if (closeSubPage) closeSubPage()
     }
     return <>
         <button className="icon-button" onClick={onClick}>

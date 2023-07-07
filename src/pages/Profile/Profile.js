@@ -1,56 +1,116 @@
+/* import */
+/* ======================================== */
+/* API */
+import API from "../../API"
 /* CSS */
 import style from "./Profile.module.css"
-
-/* header 的按鈕 */
+/* Components */
 import Back from "../../global/icon/Back"
+import Item from "./components/Item"
+import PasswordPage from "./components/PasswordPage"
+/* Hooks */
+import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+/* Redux */
+import { useSelector } from "react-redux"
 
-/* React Hooks */
-import { useEffect } from "react"
-
-/* Functions */
-
-/* React Components */
+/* ======================================== */
 export default function Profile() {
+    const navigate = useNavigate()
+    const {token, isLogin} = useSelector(state => state.account)
+    const [profile, setProfile] = useState({})
+    const [isHandling, setIsHandling] = useState(true)
+    const [isSettingPass, setIsSettingPass] = useState(false)
+
     useEffect( () => {
         document.title = "個人檔案"
-    }, [])
+        if (!isLogin) navigate("/SignIn", {replace : true})
+    }, [navigate, isLogin])
+    useEffect( () => {
+        init()
+        async function init() {
+            const {success, profile} = await API.get(API.PROFILE, token)
+            if (success) setProfile(profile)
+            setIsHandling(false)
+        }
+    }, [token])
+
+    /* ======================================== */
+    async function updateProfile(type, value, callback) {
+        setIsHandling(true)
+        const {success} = await API.put(API.PROFILE, token, {[type] : value})
+        if (!success) return
+        setProfile(prev => {
+            return {
+                ...prev,
+                [type] : value
+            }
+        })
+        callback()
+        setIsHandling(false)
+    }
+    async function changePassword(payload, callback) {
+        setIsHandling(true)
+        const {success, message} = await API.post(API.PASSWORD_CHANGE, token, payload)
+        if (success) callback()
+        setIsHandling(false)
+        alert(message)
+    }
+
+    /* ==================== 分隔線 ==================== */
     return <>
         <header>
             <div className="flex_center">
                 <Back />
                 <span>個人檔案</span>
             </div>
-            <div className="flex_center">
-                <button className="icon-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-check-lg" viewBox="0 0 16 16">
-                        <path d="M12.736 3.97a.733.733 0 0 1 1.047 0c.286.289.29.756.01 1.05L7.88 12.01a.733.733 0 0 1-1.065.02L3.217 8.384a.757.757 0 0 1 0-1.06.733.733 0 0 1 1.047 0l3.052 3.093 5.4-6.425a.247.247 0 0 1 .02-.022Z"/>
-                    </svg>
-                </button>
-            </div>
         </header>
+        {
+            isSettingPass &&
+            <PasswordPage
+                isHandling={isHandling}
+                closePage={() => {setIsSettingPass(false)}}
+                changePassword={changePassword}
+            />
+        }
         <main className="main">
+            {
+                isHandling &&
+                <div className="loading-ring" />
+            }
             <div className={style.container}>
-                <div>
-                    <div>帳號</div>
-                    <div>kokoro12345</div>
-                </div>
-                <div>
-                    <div>名稱</div>
-                    <input type="text" />
-                </div>
-                <div>
-                    <div>賣場簡介</div>
-                    <textarea rows="10" wrap="soft"></textarea>
-                </div>
-                <div>
-                    <div>手機</div>
-                    <input type="number" />
-                </div>
-                <div>
-                    <div>信箱</div>
-                    <input type="text" />
-                </div>
-                <button className="button">更改密碼</button>
+                <div className={style.title}>帳號</div>
+                <Item
+                    isEditable={false}
+                    value={profile?.account || ""}
+                />
+                <div className={style.title}>名稱</div>
+                <Item
+                    isHandling={isHandling}
+                    value={profile?.nickname || ""}
+                    type={"nickname"}
+                    updateProfile={updateProfile}
+                />
+                <div className={style.title}>手機</div>
+                <Item
+                    isHandling={isHandling}
+                    needVerify={false}
+                    value={profile?.phone || ""}
+                    type={"phone"}
+                    updateProfile={updateProfile}
+                />
+                <div className={style.title}>信箱</div>
+                <Item
+                    isHandling={isHandling}
+                    needVerify={false}
+                    value={profile?.mail || ""}
+                    type={"mail"}
+                    updateProfile={updateProfile}
+                />
+            </div>
+            <div className={style.container} style={{border:"0", margin:"0 auto", padding:"0"}}>
+                <button className="button" disabled={isHandling} 
+                    onClick={() => {setIsSettingPass(true)}}>變更密碼</button>
             </div>
         </main>
     </>
