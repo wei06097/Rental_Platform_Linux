@@ -6,10 +6,12 @@ import style from "../Profile.module.css"
 import { useState } from "react"
 /* Components */
 import InputPage from "./InputPage"
+import TextAreaPage from "./TextAreaPage"
 
 /* ======================================== */
 export default function Item({ isHandling, isEditable=true, needVerify=false, value, type, updateProfile }) {
     const [showingPage, setShowingPage] = useState(false)
+    
     function onClickHandler() {
         if (!isEditable || isHandling || needVerify) return
         setShowingPage(true)
@@ -18,12 +20,23 @@ export default function Item({ isHandling, isEditable=true, needVerify=false, va
     /* ==================== 分隔線 ==================== */
     return <>
         {
-            showingPage &&
+            showingPage && type === "intro" &&
+            <TextAreaPage
+                isHandling={isHandling}
+                closePage={() => setShowingPage(false)}
+                type={type}
+                updateProfile={updateProfile}
+                defaultValue={value}
+            />
+        }
+        {
+            showingPage && type !== "intro" &&
             <InputPage 
                 isHandling={isHandling}
                 closePage={() => setShowingPage(false)}
                 type={type}
                 updateProfile={updateProfile}
+                defaultValue={value}
             />
         }
         <div className={style.item} >

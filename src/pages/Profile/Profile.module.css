@@ -11,17 +11,17 @@
 
 /* ======================================== */
 .item {
-    display: flex; gap: 10px;
-    align-items: center;
+    display: grid; gap: 10px; align-items: center;
+    grid-template-columns: auto 20px;
+    cursor: pointer; color: #777;
 }
 .item > div {
-    height: 35px; line-height: 35px; flex-grow: 1;
+    height: 35px; line-height: 35px;
     margin: 5px 0 10px; padding: 0 10px;
     border: 1px solid #ddd; border-radius: 5px;
-    font-size: 15px; color: #777; cursor: pointer;
-}
-.item > svg {
-    cursor: pointer;
+    font-size: 15px;
+    word-break: keep-all; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
 }
 
 /* ======================================== */
@@ -35,4 +35,16 @@
 }
 .container > input[type="password"] {
     letter-spacing: 2px;
+}
+
+/* ======================================== */
+.container > textarea {
+    width: 100%; padding: 10px;
+    font-size: 15px; line-height: 18px;
+    border: 1px solid #ddd; border-radius: 5px;
+    outline: none; resize: none; overflow: auto;
+}
+.container > textarea::-webkit-scrollbar {
+    margin: 0; padding: 0;
+    height: 6px; width: 6px;
 }

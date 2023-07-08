@@ -73,6 +73,13 @@ export default function Profile() {
                     type={"nickname"}
                     updateProfile={updateProfile}
                 />
+                <div>賣場簡介</div>
+                <Item
+                    isHandling={isHandling}
+                    value={profile?.intro || ""}
+                    type={"intro"}
+                    updateProfile={updateProfile}
+                />
                 <div>手機</div>
                 <Item
                     isHandling={isHandling}

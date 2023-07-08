@@ -4,24 +4,31 @@
 import style from "../Profile.module.css"
 import Back from "../../../global/icon/Back"
 /* Hooks */
-import { useEffect, useRef } from "react"
+import { useState, useEffect, useRef } from "react"
 /* Function */
 import InputChecker from "../../../global/functions/InputChecker"
 
 /* ======================================== */
-export default function InputPage({ isHandling, closePage, type, updateProfile, defaultValue }) {
+export default function TextAreaPage({ isHandling, closePage, type, updateProfile, defaultValue }) {
+    const MAXROWS = 25
     const inputRef = useRef()
-    const title = (type === "nickname")?"輸入名稱": (type === "phone")? "輸入手機": "輸入信箱"
-    
+    const [rows, setRows] = useState(1)
+
     useEffect(() => {
         inputRef.current.value = defaultValue
+        onChangeHandler()
     }, [defaultValue])
-    
+
     async function submitHandler() {
         const value = inputRef.current.value
         const noBlank = InputChecker.noBlank(value)
         if (!noBlank) return
         updateProfile(type, value, closePage)
+    }
+    function onChangeHandler() {
+        const value = inputRef.current.value
+        const number = Array.from(value).filter(element => element === "\n").length + 1
+        setRows((number > MAXROWS)? MAXROWS: number)
     }
 
     /* ==================== 分隔線 ==================== */
@@ -33,7 +40,7 @@ export default function InputPage({ isHandling, closePage, type, updateProfile, 
                         goLastPage={false}
                         closeSubPage={closePage}
                     />
-                    <span>{title}</span>
+                    <span>輸入簡介</span>
                 </div>
                 <button className="icon-button" onClick={submitHandler} disabled={isHandling} >
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-check-lg" viewBox="0 0 16 16">
@@ -43,7 +50,8 @@ export default function InputPage({ isHandling, closePage, type, updateProfile, 
             </header>
             <main className="main" >
                 <div className={style.container} style={{border:"0"}}>
-                    <input type="text" ref={inputRef} placeholder="在這裡輸入" />
+                    <textarea rows={rows} wrap="off" ref={inputRef}
+                        placeholder="在這裡輸入" onChange={onChangeHandler} />
                 </div>
             </main>
         </div>

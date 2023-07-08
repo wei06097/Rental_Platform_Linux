@@ -2,10 +2,16 @@
 .page {
     width: 100vw; height: 100vh; z-index: 20;
     position: fixed; top: 0; left: 0;
-    background-color: white;
+    background-color: white; overflow: auto;
     animation: page-in 400ms ease-in-out;
 }
 @keyframes page-in {
     0% { top: 100vh; }
     100% { top: 0; }
+}
+
+/* ======================================== */
+.hidepage {
+    height: 0;
+    overflow: hidden;
 }
