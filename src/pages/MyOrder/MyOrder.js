@@ -33,7 +33,7 @@ export default function MyOrder() {
     const {orderPage} = useSelector(state => state.global)
     const [orders, setOrders] = useState([])
     const [isLoading, setIsLoading] = useState(true)
-    const title = (status==="provider")? "我的訂單": (status==="consumer")? "購買清單": null
+    const title = (status==="provider")? "我的訂單": (status==="consumer")? "租借清單": null
     
     useEffect(() => {
         document.title = title

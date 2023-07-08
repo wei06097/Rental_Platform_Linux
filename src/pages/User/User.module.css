@@ -10,8 +10,8 @@
 .container > a,
 .container > button {
     text-decoration: none; color: inherit;
-    display: flex; align-items: center; gap: 10px;
-    border: 2px solid #ddd; border-radius: 10px;
+    display: flex; align-items: center; gap: 20px;
+    border: 1px solid #ddd; border-radius: 10px;
     background-color: white; font-size: larger;
     cursor: pointer; padding: 10px;
 }
@@ -22,7 +22,7 @@
 
 .container > a > svg,
 .container > button > svg {
-    --size: 40px;
+    --size: 35px;
     width: var(--size); height: var(--size);
-    color: gray;
+    color: #0d6efd;
 }

@@ -23,7 +23,7 @@ export default function ShoppingCart() {
     const [isLoading, setIsLoading] = useState(true)
 
     useEffect( () => {
-        document.title = "購物車"
+        document.title = "租借商品"
         if (!isLogin) navigate("/SignIn", {replace : true})
     }, [navigate, isLogin])
     useEffect(() => {
@@ -40,7 +40,7 @@ export default function ShoppingCart() {
         <header>
             <div className="flex_center">
                 <Back />
-                <span>購物車</span>
+                <span>租借商品</span>
             </div>
             <div className="flex_center">
                 <Message />
@@ -70,7 +70,7 @@ export default function ShoppingCart() {
                         })
                 }
             </main>:
-            <div style={{textAlign: "center", marginTop: "20px"}}>清單是空的</div>
+            <div style={{textAlign: "center", marginTop: "20px"}}>沒有商品</div>
         }
     </>
 }
