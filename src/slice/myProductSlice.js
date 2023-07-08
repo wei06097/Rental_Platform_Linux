@@ -45,15 +45,17 @@ export const launchProduct = createAsyncThunk(
 /* ============================================================ */
 const initialState = {
     on : true,
-    scrollY : 0,
+    scrollY : {
+        on : 0,
+        off : 0
+    },
     products : {
         product_on : [],
         product_off : []
     },
     isLoading : false, //當頁面第1次載入
     isHandling : false, //處理刪除/編輯
-    isChecked : false, //是否至少拿1次資料
-    isUpdatedProducts : false //是否有更新過資料(上/下架 新增 刪除 儲存)
+    isChecked : false //是否至少拿1次資料
 }
 
 const myProductSlice = createSlice({
@@ -63,14 +65,15 @@ const myProductSlice = createSlice({
         resetState : (state) => {
             return {...initialState}
         },
-        setIsUpdatedProducts : (state) => {
-            state.isUpdatedProducts = true
-        },
         changeOnOff : (state, action) => {
             state.on = action.payload
         },
         recordScrollY : (state, action) => {
-            state.scrollY = action.payload
+            const prev = current(state.scrollY)
+            state.scrollY = {
+                ...prev,
+                ...action.payload
+            }
         }
     },
     extraReducers : (builder) => {
@@ -114,7 +117,6 @@ const myProductSlice = createSlice({
                             .filter(element => Number(element.id) !== Number(id))
                         state.products.product_off = [...newArray]
                     }
-                    state.isUpdatedProducts = true
                 } else {
                     alert("刪除時發生錯誤")
                 }
@@ -150,7 +152,6 @@ const myProductSlice = createSlice({
                         state.products.product_on = [...newArray1]
                         state.products.product_off = [...newArray2]
                     }
-                    state.isUpdatedProducts = true
                 } else {
                     alert("操作時發生錯誤")
                 }
@@ -165,4 +166,4 @@ const myProductSlice = createSlice({
 
 /* ============================================================ */
 export default myProductSlice.reducer
-export const { resetState, setIsUpdatedProducts, changeOnOff, recordScrollY } = myProductSlice.actions
+export const { resetState, changeOnOff, recordScrollY } = myProductSlice.actions

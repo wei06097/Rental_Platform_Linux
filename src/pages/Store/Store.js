@@ -16,7 +16,6 @@ import { useParams, Link, useNavigate } from "react-router-dom"
 /* Redux */
 import { useSelector, useDispatch } from "react-redux"
 import { getStoreInfo, resetExistState } from "../../slice/storeSlice"
-import { resetState } from "../../slice/myProductSlice"
 
 /* ======================================== */
 /* React Components */
@@ -26,7 +25,6 @@ export default function Store() {
     const dispatch = useDispatch()
     const {account} = useSelector(state => state.account)
     const {store, isExist, isLoading} = useSelector(state => state.store)
-    const {isUpdatedProducts} = useSelector(state => state.myProduct)
 
     const PATHNAME = window.location.pathname
     const haveData = Object.keys(store).includes(PATHNAME)
@@ -36,22 +34,21 @@ export default function Store() {
 
     useEffect(() => {
         document.title = title
-    }, [title])
-    useEffect(() => {
-        dispatch(resetState())
-        if (isUpdatedProducts || !haveData) dispatch(getStoreInfo({seller}))
-    }, [dispatch, seller, haveData, isUpdatedProducts])
-    useEffect(() => {
-        if (!isExist) {
+        if (window.location.hash === "#refresh") {
+            dispatch(getStoreInfo({seller}))
+            navigate(window.location.pathname, {replace : true})
+        } else if (!isExist) {
             dispatch(resetExistState())
             navigate("/NotFound", {replace : true})
+        } else if (!haveData) {
+            dispatch(getStoreInfo({seller}))
         }
-    }, [navigate, dispatch, isExist])
+    }, [title, navigate, dispatch, seller, isExist, haveData])
 
     function reloadHandler() {
         dispatch(getStoreInfo({seller}))
     }
-    
+
     /* ==================== 分隔線 ==================== */
     return <>
         <header>
@@ -78,8 +75,18 @@ export default function Store() {
                     isLoading?
                     <div className="fill skeleton" style={{height:"30px", maxWidth:"500px"}} />:
                     <>
-                        <div>{isExist && `手機: ${phone}`}</div>
-                        <div>{isExist && `信箱: ${mail}`}</div>
+                        <div>
+                            <span>- 手機 </span>
+                            <span style={{paddingLeft:"10px"}}>
+                                {isExist && phone}
+                            </span>
+                        </div>
+                        <div>
+                            <span>- 信箱 </span>
+                            <span style={{paddingLeft:"10px"}}>
+                                {isExist && mail}
+                            </span>
+                        </div>
                     </>
                 }
             </div>
@@ -105,24 +112,16 @@ export default function Store() {
                 </OverviewCards>
             }
         </main>
-        <div className="base" />
-        <footer>
-            {
-                (seller === account)?
-                <>
-                    <Link className="link flex_center grow" to="/MyOrder/provider">
-                        <button className="button grow">我的訂單</button>
-                    </Link>
-                    <Link className="link flex_center grow" to="/MyProducts">
-                        <button className="button grow">我的商品</button>
-                    </Link>
-                </>:
-                <>
+        {
+           account && (seller !== account) && 
+            <>
+                <div className="base" />
+                <footer>
                     <Link className="link flex_center grow" to={`/ChatRoom/${seller}`}>
                         <button className="button grow" disabled={isLoading}>聊天</button>
                     </Link>
-                </>
-            }
-        </footer>
+                </footer>
+            </>
+        }
     </>
 }
