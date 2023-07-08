@@ -2,8 +2,9 @@
 /* ======================================== */
 /* Global CSS */
 import "./global/css/body.css"
+import "./global/css/page.css"
 import "./global/css/navbar.css"
-import "./global/css/component.css"
+import "./global/css/button.css"
 import "./global/css/loading-ring.css"
 /* Pages */
 import NotFound from "./pages/NotFound"

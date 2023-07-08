@@ -43,7 +43,7 @@ export default function PasswordPage({ closePage }) {
             isHandling &&
             <div className="loading-ring" />
         }
-        <div className={style.page}>
+        <div className="page">
             <header>
                 <div className="flex_center">
                     <Back 

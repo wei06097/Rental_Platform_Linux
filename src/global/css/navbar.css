@@ -28,14 +28,6 @@ footer {
 }
 
 /* ======================================== */
-.header3 {
-    width: var(--width); height: auto;
-    position: sticky; top: 0; z-index: 1;
-    background-color: var(--navBG);
-    box-shadow: 0 0 2px 2px #ddd;
-    display: grid; grid-template-columns: 100%;
-    grid-template-rows: var(--height) var(--lineHeight);
-}
 .header2 {
     --lineHeight: 40px;
     width: var(--width); height: calc(var(--height) + var(--lineHeight));
@@ -46,7 +38,6 @@ footer {
     grid-template-rows: var(--height) var(--lineHeight);
 }
 
-.header3 > div:nth-child(1),
 .header2 > div:nth-child(1) {
     display: flex;
     justify-content: space-between; align-items: center;

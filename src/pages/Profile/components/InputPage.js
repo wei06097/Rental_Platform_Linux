@@ -22,7 +22,7 @@ export default function InputPage({ isHandling, closePage, type, updateProfile }
 
     /* ==================== 分隔線 ==================== */
     return <>
-        <div className={style.page}>
+        <div className="page">
             <header>
                 <div className="flex_center">
                     <Back 
