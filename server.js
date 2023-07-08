@@ -41,22 +41,16 @@ io.on('connection', socket => {
         if (!online[account][0]) delete online[account]
     })
 
-    socket.on("message", async ({provider, receiver, type, content, img}) => {
-        // 檢查傳送者身分
-        if (!online[provider]) return
-        const correct = online[provider].some(myId => myId === socket.id)
-        if (!correct) return
+    socket.on("message", async ({provider, receiver, type, content}) => {
+        // 不能傳訊息給自己
+        if (provider === receiver) return
         // 處理訊息
-        const current = new Date().toLocaleString('zh-TW', {
-            timeZone: 'Asia/Taipei', hour12: false,
-            day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute: '2-digit'
-        })
-        const [date, time] = current.split(" ")
-        const src = (type == "img")? await saveImg(img, true): ""
-        const message = (type == "img")
-            ?{provider, receiver, type, src, date, time}
-            :{provider, receiver, type, content, date, time}
+        const datetime = getCurrentDateTime()
+        const data = (type === "img")? await saveImg(content, true): content
+        const message = {
+            provider, receiver, type,
+            content : data, datetime
+        }
         // 丟到資料庫
         await fetch(`${DB_URL}/chat_history`, {
             method : "POST",
@@ -68,7 +62,6 @@ io.on('connection', socket => {
             io.sockets.sockets.get(myId).emit("message", message)
         })
         // 傳給對方
-        if (provider === receiver) return
         if (!online[receiver]) return
         online[receiver].forEach(targetId => {
             io.sockets.sockets.get(targetId).emit("message", message)

@@ -119,7 +119,7 @@ export default function Product() {
                         <div>{product?.provider}</div>
                         <div>
                             <Link to={`/ChatRoom/${product?.provider}`} 
-                                style={{visibility: (account !== product?.provider)? "visible": "hidden"}}>
+                                style={{visibility: (account && account !== product?.provider)? "visible": "hidden"}}>
                                 <button className="button" style={{margin:"0"}}>聊天</button>
                             </Link>
                             <Link to={`/Store/${product?.provider}`}>

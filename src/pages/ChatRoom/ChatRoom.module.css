@@ -2,99 +2,43 @@
 .container {
     width: 100%; padding: 0 10px;
 }
-.date {
-    --size: 25px;
-    width: max-content; height: var(--size); 
-    line-height: var(--size); border-radius: var(--size);
-    margin: 0 auto; padding: 2px 8px;
-    color: #777; font-size: 15px;
-    background-color: #0001;
+.base {
+    height: 50px;
 }
-
-/* ======================================== */
-.img {
-    max-width: 450px; position: relative;
-    width: max-content; height: max-content;
-    cursor: pointer;
-}
-.img > img {
-    width: 100%; height: auto;
-    object-fit: contain; border-radius: 5px; 
-    box-shadow: 0 0 1px 1px #ddd;
-}
-
-/* ======================================== */
-.card {
-    max-width: 450px; position: relative;
-    width: max-content; height: max-content;
-    padding: 5px 10px; border-radius: 5px; 
-    background-color: #eee4;
-    box-shadow: 0 0 2px 2px #ddd;
-    word-break: break-all; word-wrap: break-word;
-    white-space: pre-line; line-height: 1.5rem;
-}
-@media(max-width: 600px) {
-    .img,
-    .card {
-        max-width: 75%;
-    }
-}
-
-/* ======================================== */
-.right { margin: 20px 0 20px auto; }
-.left { margin: 20px auto 20px 0; }
-
-.right::after {
-    content: attr(time); font-size: 15px;
-    position: absolute; color: #777;
-    bottom: 0; right: calc(100% + 5px);
-    word-break: keep-all;
-}
-.left::after {
-    content: attr(time); font-size: 15px;
-    position: absolute; color: #777;
-    bottom: 0; left: calc(100% + 5px);
-    word-break: keep-all;
-}
-
-/* ======================================== */
-.base { height: 70px; }
 .bottom {
-    width: var(--width); height: 70px;
+    width: var(--width); height: auto;
     position: fixed; z-index: 1; bottom: 0;
     left: calc(50% - var(--width) / 2);
     background-color: #fff;
     box-shadow: 0 0 2px 2px #ddd;
-    padding: 2px; gap: 2px;
-    display: flex; align-items: center;
+    display: flex; gap: 10px; 
+    align-items: center; padding: 0 5px;
 }
 
 /* ======================================== */
-.input {
-    flex-grow: 1;
-    padding: 2px 5px; margin: 4px 0;
-    border-radius: 5px; border-color: #ddd;
-    resize: none; outline: none; font-size: 16px;
+.test_box {
+    width: auto; flex-grow: 1;
+    font-size: 16px; line-height: 20px;
+    min-height: 20px; max-height: 100px;
+    margin: 5px auto; padding: 10px; outline: none;
+    border: 1px solid #ddd; border-radius: 10px;
+    word-wrap: break-word; overflow-x: hidden; overflow-y: auto;
 }
-.input:focus-within {
-    box-shadow: 0 0 1px 1px #0d6efd;
-}
+.test_box::-webkit-scrollbar { width: 6px; }
+.test_box:focus-within { box-shadow: 0 0 1px 1px #0d6efd; }
 
 /* ======================================== */
 .button {
     --size: 35px; --color: #0d6efd; --bgColor: white;
     width: var(--size); height: var(--size);
-    border-radius: var(--size); border: 0; outline: none;
-    text-align: center; line-height: var(--size);
+    outline: none; border: 0; border-radius: var(--size); 
     color: var(--color); background-color: var(--bgColor);
+    display: grid; place-items: center; cursor: pointer;
 }
 .button:hover {
     color: var(--bgColor); background-color: var(--color);
 }
 .button > svg {
-    --size: 18px;
-    -webkit-user-drag: none; pointer-events: none;
+    --size: 20px; -webkit-user-drag: none; 
     width: var(--size); height: var(--size);
 }
-
-/* ======================================== */

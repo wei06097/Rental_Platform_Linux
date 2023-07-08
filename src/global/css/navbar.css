@@ -25,6 +25,11 @@ footer {
 }
 .flex_center {
     display: flex; align-items: center;
+    overflow: hidden;
+}
+.flex_center > span {
+    word-break: keep-all; white-space: nowrap;
+    overflow: hidden; text-overflow: ellipsis;
 }
 
 /* ======================================== */
