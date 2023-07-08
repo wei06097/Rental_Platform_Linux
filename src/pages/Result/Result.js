@@ -50,12 +50,16 @@ export default function Result() {
     /* ==================== 分隔線 ==================== */
     return <>
         <header>
-            <Back />
+            <div className="flex_center">
+                <Back />
+            </div>
             <SearchBar
                 setQueryParams={setQueryParams}
             />
-            <ShoppingCart />
-            <Home />
+            <div className="flex_center">
+                <ShoppingCart />
+                <Home />
+            </div>
         </header>
         <main className="main">
             <GotoTop />
