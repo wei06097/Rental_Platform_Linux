@@ -71,7 +71,8 @@ export default function ChatRoom() {
         const content = textareaRef.current.innerText
         textareaRef.current.innerText = ""
         if (content.replaceAll('\n', '') === "") return
-        if (socket) socket.emit("message", {provider: account, receiver, type, content})
+        const paylaod = {receiver, type, content}
+        if (socket) socket.emit("message", paylaod)
     }
     function onKeyDown(e) {
         const keyCode = e.which || e.keyCode
@@ -90,9 +91,11 @@ export default function ChatRoom() {
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
                 const content = reader.result //base64Pic
-                if (socket) socket.emit("message", {provider: account, receiver, type, content})
+                const payload = {receiver, type, content}
+                if (socket) socket.emit("message", payload)
             }, false)
         }
+        e.target.value = ""
     }
 
     /* ==================== 分隔線 ==================== */
@@ -125,11 +128,12 @@ export default function ChatRoom() {
         <div className={style.base} />
         <div className={style.bottom}>
             <label className={style.button}>
-                <input style={{display: "none"}} type="file" accept=".png,.jpg,.jpeg,.gif" multiple 
+                <input style={{display: "none"}} type="file" accept="image/*" multiple 
                     onChange={onInputImgChange} disabled={isLoading} />
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-plus-lg" viewBox="0 0 16 16">
-                    <path fillRule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-                </svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-images" viewBox="0 0 16 16">
+                        <path d="M4.502 9a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/>
+                        <path d="M14.002 13a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2V5A2 2 0 0 1 2 3a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8a2 2 0 0 1-1.998 2zM14 2H4a1 1 0 0 0-1 1h9.002a2 2 0 0 1 2 2v7A1 1 0 0 0 15 11V3a1 1 0 0 0-1-1zM2.002 4a1 1 0 0 0-1 1v8l2.646-2.354a.5.5 0 0 1 .63-.062l2.66 1.773 3.71-3.71a.5.5 0 0 1 .577-.094l1.777 1.947V5a1 1 0 0 0-1-1h-10z"/>
+                    </svg>
             </label>
             <div className={style.test_box} suppressContentEditableWarning={true}
                 contentEditable={!isLoading} onKeyDown={onKeyDown} ref={textareaRef} />

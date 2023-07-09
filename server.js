@@ -15,9 +15,12 @@ const DB_URL = "http://127.0.0.1:5000"
 
 const app = express()
 app.use(cors())
-app.use(express.json({limit: '50mb'}))
+app.use(express.json({limit: '100mb'}))
 const server = require('http').Server(app)
-const io = require('socket.io')(server, {cors: {origin: "*"}})
+const io = require('socket.io')(server, {
+    cors: { origin: "*" },
+    maxHttpBufferSize: 10e7 //10MB
+})
 
 /* ======================================== *//* ======================================== */
 let online = {}
@@ -41,31 +44,37 @@ io.on('connection', socket => {
         if (!online[account][0]) delete online[account]
     })
 
-    socket.on("message", async ({provider, receiver, type, content}) => {
+    /* 傳送訊息 */
+    socket.on("message", async ({receiver, type, content}) => {
         // 不能傳訊息給自己
-        if (provider === receiver) return
+        if (account === receiver) return
         // 處理訊息
         const datetime = getCurrentDateTime()
-        const data = (type === "img")? await saveImg(content, true): content
+        const data = (type === "img")? "img/NotFound.png": content
+        // const data = (type === "img")? await saveImg(content, true): content
         const message = {
-            provider, receiver, type,
-            content : data, datetime
+            provider : account,
+            receiver,
+            type,
+            content : data,
+            datetime
         }
         // 丟到資料庫
-        await fetch(`${DB_URL}/chat_history`, {
-            method : "POST",
-            headers : { "Content-Type" : "application/json" },
-            body : JSON.stringify(message)
-        })
+        // await fetch(`${DB_URL}/chat_history`, {
+        //     method : "POST",
+        //     headers : { "Content-Type" : "application/json" },
+        //     body : JSON.stringify(message)
+        // })
         // 傳給自己
-        online[provider].forEach(myId => {
-            io.sockets.sockets.get(myId).emit("message", message)
-        })
+        if (online[account]) online[account]
+            .forEach(myId => {
+                io.sockets.sockets.get(myId).emit("message", message)
+            })
         // 傳給對方
-        if (!online[receiver]) return
-        online[receiver].forEach(targetId => {
-            io.sockets.sockets.get(targetId).emit("message", message)
-        })
+        if (online[receiver]) online[receiver]
+            .forEach(targetId => {
+                io.sockets.sockets.get(targetId).emit("message", message)
+            })
     })
 })
 

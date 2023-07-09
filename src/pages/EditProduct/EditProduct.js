@@ -82,6 +82,7 @@ export default function EditProduct() {
                 dispatch(addImg(base64Pic))
             }, false)
         }
+        e.target.value = ""
     }
     function submitHandler(mode, launched=false) {
         // 取得 inputs
@@ -136,7 +137,7 @@ export default function EditProduct() {
                             <label>
                                 <span>+加入</span>
                                 <input type="file" style={{display: "none"}}
-                                    accept=".png,.jpg,.jpeg,.gif" multiple 
+                                    accept="image/*" multiple 
                                     onChange={onInputImgChange}
                                     disabled={isDisabled}
                                 />
