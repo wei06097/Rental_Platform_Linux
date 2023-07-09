@@ -6,6 +6,7 @@ import API from "../../API"
 import style from "./Profile.module.css"
 /* Components */
 import Back from "../../global/icon/Back"
+import Home from "../../global/icon/Home"
 import Item from "./components/Item"
 /* Hooks */
 import { useState, useEffect } from "react"
@@ -53,6 +54,9 @@ export default function Profile() {
             <div className="flex_center">
                 <Back />
                 <span>個人檔案</span>
+            </div>
+            <div className="flex_center">
+                <Home />
             </div>
         </header>
         <main className="main">

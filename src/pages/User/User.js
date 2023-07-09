@@ -25,6 +25,8 @@ export default function User() {
     }, [navigate, isLogin])
 
     function logoutHandler() {
+        const check = window.confirm("確定要登出") || false
+        if (!check) return
         dispatch(doLogout())
         navigate("/", {replace : true})
     }

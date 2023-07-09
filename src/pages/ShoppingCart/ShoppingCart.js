@@ -6,7 +6,6 @@ import style from "./ShoppingCart.module.css"
 import API from "../../API"
 /* Components */
 import Back from "../../global/icon/Back"
-import Message from "../../global/icon/Message"
 import Home from "../../global/icon/Home"
 import Card, { LoadingCard } from "./components/Card"
 /* Hooks */
@@ -43,7 +42,6 @@ export default function ShoppingCart() {
                 <span>租借商品</span>
             </div>
             <div className="flex_center">
-                <Message />
                 <Home />
             </div>
         </header>
