@@ -83,7 +83,7 @@ export default function MyOrder() {
                     <LoadingCard />
                     <LoadingCard />
                 </>:
-                orders
+                orders.slice().reverse()
                     .map(element => {
                         return <Card 
                             key={element.order_id}
