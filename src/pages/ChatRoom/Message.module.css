@@ -3,7 +3,7 @@
     --size: 25px; cursor: default; user-select: none;
     width: max-content; height: var(--size); 
     line-height: var(--size); border-radius: var(--size);
-    margin: 0 auto; padding: 0 10px; font-size: 15px;
+    margin: 30px auto 0; padding: 0 10px; font-size: 15px;
     color: #777; background-color: #0001;
 }
 

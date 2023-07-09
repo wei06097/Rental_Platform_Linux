@@ -38,9 +38,13 @@ export default function ChatRoom() {
         async function init() {
             const {success, history, nickname} = await API.get(`${API.CHAT_HISTORY}/?receiver=${receiver}`, token)
             if (!success) navigate("/NotFound", {replace : true})
+            let lastdate = ""
             const newHistory = history
                 .map(element => {
-                    return {...element, key : uuidv4()}
+                    const date = element.datetime.split("T")[0]
+                    const showString = (date !== lastdate)
+                    lastdate = date
+                    return {...element, showString, key : uuidv4()}
                 })
             setMessages(newHistory)
             setNickname(nickname)
@@ -116,7 +120,6 @@ export default function ChatRoom() {
                             .map((message, i) => 
                                 <Message
                                     key={message.key}
-                                    lastDateTime={i!==0? messages[i-1].datetime: 0}
                                     message={message}
                                     fromMe={message.provider === account}
                                 />

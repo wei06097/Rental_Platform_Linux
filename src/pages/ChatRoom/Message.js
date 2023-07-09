@@ -10,15 +10,16 @@ import ViewPage from "./ViewPage"
 import { useState, useEffect, useRef } from "react"
 
 /* ======================================== */
-export default function Message({ lastDateTime, message, fromMe }) {
+export default function Message({ message, fromMe }) {
     const imgRef = useRef()
     const [loaded, setLoaded] = useState(false)
     const [opening, setOpening] = useState(false)
     const [date, time] = message.datetime.slice().split("T")
-    const days = (new Date(Date.now()) - new Date(message.datetime)) / (24 * 3600 * 1000)
-    const string = (days > 2)? date: (days > 1)? "昨天": "今天"
-    const dayDiff = (new Date(message.datetime) - new Date(lastDateTime)) / (24 * 3600 * 1000)
-
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const days = (new Date(message.datetime) - new Date(today)) / (24 * 3600 * 1000)
+    const string = (days > 0)? "今天": (days > -1)? "昨天": date
+    
     useEffect(() => {
         autoScroll()
         if (message.type === "text") return
@@ -46,7 +47,7 @@ export default function Message({ lastDateTime, message, fromMe }) {
     /* ==================== 分隔線 ==================== */
     return <>
         {
-            dayDiff > 1 &&
+            message.showString &&
             <div className={style.date}>{string}</div>
         }
         {
