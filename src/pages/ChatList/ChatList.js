@@ -46,16 +46,16 @@ export default function ChatList() {
             {
                 isLoading?
                 <div className="loading-ring" />:
-                users
+                users && users
                     .map( (user, i) => 
                         <Link
                             key={i}
                             className={style.card}
-                            to={`/ChatRoom/${user?.account}`}
+                            to={`/ChatRoom/${user.account}`}
                         >
                             <div className={style.img}></div>
                             <div className={style.content} time={"04:44"}>
-                                <div>{user?.account}</div>
+                                <div>{user.nickname}</div>
                                 <div>{`暫時不顯示內容\n暫時不顯示內容\n暫時不顯示內容`}</div>
                             </div>
                         </Link>

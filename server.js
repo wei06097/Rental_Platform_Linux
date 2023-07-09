@@ -150,40 +150,41 @@ app.get('/api/token_verify', async (req, res) => {
 // 回傳聊天歷史紀錄
 app.get('/chat_history', async (req, res) => {
     const receiver = req.query?.receiver || undefined
-    const token = req.headers?.authorization || undefined
     // 驗證身分
+    const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
-    const provider = account
-    let response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
-    let result = await response.json()
-    if (!result[0] || !provider || !receiver || provider === receiver) {
-        res.json({success : false, history : null})
+    const response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
+    const result = await response.json()
+    if (!result[0] || !account || account === receiver) {
+        res.json({success : false, history : []})
         return
     }
     // 取得聊天紀錄
-    const query = `provider=${provider}&receiver=${receiver}&provider=${receiver}&receiver=${provider}`
-    response = await fetch(`${DB_URL}/chat_history?${query}`)
-    result = await response.json()
-    res.json( {success : true, history : result} )
+    const nickname = result[0].nickname 
+    const params = `provider=${account}&receiver=${receiver}&provider=${receiver}&receiver=${account}`
+    const response2 = await fetch(`${DB_URL}/chat_history?${params}`)
+    const result2 = await response2.json()
+    res.json( {success : true, history : result2, nickname : nickname} )
 })
-// 回傳所有帳號
+// 回傳所有帳號 (測試聊天用)
 app.get('/chat_list', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
-    let response = await fetch(`${DB_URL}/accounts?account=${account}`)
-    let result = await response.json()
+    const response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    const result = await response.json()
     if (!result[0]) {
         res.json({success : false, list : null})
         return
     }
     // 取得除了自己外的所有帳號
-    response = await fetch(`${DB_URL}/accounts?account_ne=${account}`)
-    result = await response.json()
-    result = result.map( user => {
-        return {account : user?.account}
+    const response2 = await fetch(`${DB_URL}/accounts?account_ne=${account}`)
+    const result2 = await response2.json()
+    const list = result2.map(user => {
+        const {account, nickname} = user
+        return {account, nickname}
     })
-    res.json( {success : true, list : result} )
+    res.json( {success : true, list : list} )
 })
 // 顯示圖片
 app.get('/img/:name', async (req, res) => {

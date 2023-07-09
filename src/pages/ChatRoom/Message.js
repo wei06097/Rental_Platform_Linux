@@ -4,6 +4,8 @@
 import API from "../../API"
 /* CSS */
 import style from "./Message.module.css"
+/* Components */
+import ViewPage from "./ViewPage"
 /* Hooks */
 import { useState, useEffect, useRef } from "react"
 
@@ -11,6 +13,7 @@ import { useState, useEffect, useRef } from "react"
 export default function Message({ lastDateTime, message, fromMe }) {
     const imgRef = useRef()
     const [loaded, setLoaded] = useState(false)
+    const [opening, setOpening] = useState(false)
     const [date, time] = message.datetime.slice().split("T")
     const days = (new Date(Date.now()) - new Date(message.datetime)) / (24 * 3600 * 1000)
     const string = (days > 2)? date: (days > 1)? "昨天": "今天"
@@ -55,12 +58,19 @@ export default function Message({ lastDateTime, message, fromMe }) {
             <div className={`${style.img} ${fromMe? style.right: style.left}`}
                 time={time}>
                 {!loaded && <div className={`fill skeleton ${style.skeleton}`} />}
-                <img
+                <img onClick={() => {setOpening(true)}}
                     ref={imgRef}
                     style={{opacity:loaded?1:0}} loading="eager" alt=""
                     src={`${API.WS_URL}/${message.content}`}
                 />
             </div>
+        }
+        {
+            opening &&
+            <ViewPage
+                closePage={() => {setOpening(false)}}
+                src={`${API.WS_URL}/${message.content}`}
+            />
         }
     </>
 }
