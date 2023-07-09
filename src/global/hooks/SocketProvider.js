@@ -21,14 +21,10 @@ export default function SocketProvider({ children }) {
         if (!("Notification" in window)) {
             console.log('This browser does not support notification')
         } else {
+            // permission: 1. granted 2.denied 3.default
             Notification.requestPermission()
                 .then(permission => {
-                    // permission: 1. granted 2.denied 3.default
-                    // const config = {
-                    //     body: `Notification is ${permission}`,
-                    //     tag: "permission"
-                    // }
-                    // new Notification("Notification", config)
+                    console.log(`notification permission ${permission}`)
                 })
         }
     }, [])
@@ -51,7 +47,7 @@ export default function SocketProvider({ children }) {
         if (!token && socket) setSocket(null)
     }, [token, socket])
 
-    /* 簡單測試socket */
+    /* 訂單或是訊息事件監聽 */
     useEffect(() => {
         if (!socket) return
         function messageNotify(message) {
@@ -59,7 +55,7 @@ export default function SocketProvider({ children }) {
             if (provider === account || receiver !== account) return
             const notify = new Notification(nickname, {
                 body: (type === "img")? "傳送了一張圖片": content,
-                tag: `${message}-${provider}`
+                tag: `message-${provider}`
             })
             notify.onclick = () => {
                 const myWindow = window.open(`/ChatRoom/${provider}`," _blank")
@@ -67,8 +63,17 @@ export default function SocketProvider({ children }) {
                 notify.close()
             }
         }
-        function orderNotify(data) {
-            
+        function orderNotify(order) {
+            const {id, message} = order
+            const notify = new Notification("訂單通知", {
+                body: message,
+                tag: `order-${id}`
+            })
+            notify.onclick = () => {
+                const myWindow = window.open(`/OrderDetail/${id}`," _blank")
+                myWindow.focus()
+                notify.close()
+            }
         }
         socket.on("order", orderNotify)
         socket.on("message", messageNotify)

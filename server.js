@@ -68,17 +68,21 @@ io.on('connection', socket => {
             body : JSON.stringify(message)
         })
         // 傳給自己
-        if (online[account]) online[account]
-            .forEach(myId => {
-                io.sockets.sockets.get(myId).emit("message", {...message, nickname})
-            })
+        sendSocketMessage(account, "message", {...message, nickname})
         // 傳給對方
-        if (online[receiver]) online[receiver]
-            .forEach(targetId => {
-                io.sockets.sockets.get(targetId).emit("message", {...message, nickname})
-            })
+        sendSocketMessage(receiver, "message", {...message, nickname})
     })
 })
+
+// 根據帳號送出訊息
+function sendSocketMessage(account, event, payload) {
+    if (!online[account]) return
+    online[account]
+        .forEach(socketId => {
+            const socket = io.sockets.sockets.get(socketId)
+            socket.emit(event, payload)
+        })
+}
 
 /* Functions */
 /* ======================================== */
@@ -651,17 +655,10 @@ app.post('/orders/order', async (req, res) => {
         body : JSON.stringify(payload)
     })
     res.json({success : true})
-    // 發送及時通知 provider account
-    if (online[account]) online[account]
-        .forEach(consumerId => {
-            const socket = io.sockets.sockets.get(consumerId)
-            socket.emit("notify", "訂單處理中")
-        })
-    if (online[provider]) online[provider]
-        .forEach(providerId => {
-            const socket = io.sockets.sockets.get(providerId)
-            socket.emit("notify", "有一筆新的訂單")
-        })
+    // 發送及時通知 給買家
+    sendSocketMessage(account, "order", {id: order_id, message: "已提交租借申請"})
+    // 發送及時通知 給賣家
+    sendSocketMessage(provider, "order", {id: order_id, message: "您有一筆新訂單"})
 })
 // R 透過訂單id(自定義的) 取得訂單資訊
 app.get('/orders/order', async (req, res) => {
@@ -809,6 +806,10 @@ app.put('/orders/order', async (req, res) => {
         body : JSON.stringify(payload)
     })
     res.json( {success : true} )
+    // 發送及時通知 給買家
+    sendSocketMessage(consumer, "order", {id: order_id, message: "訂單狀態已更新"})
+    // 發送及時通知 給賣家
+    sendSocketMessage(provider, "order", {id: order_id, message: "訂單狀態已更新"})
 })
 
 /* ======================================== *//* ======================================== */
