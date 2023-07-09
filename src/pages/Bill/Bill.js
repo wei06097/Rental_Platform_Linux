@@ -49,7 +49,7 @@ export default function Bill() {
             setIsLoading(true)
             const {success, result} = await API.get(`${API.MY_STORECART}?seller=${seller}`, token)
             if (success) setData(result)
-            if (!result[0]) navigate(-1, {replace : true})
+            if (!result[0]) navigate("/NotFound", {replace : true})
             setIsLoading(false)
         }
     }, [navigate, seller, token])

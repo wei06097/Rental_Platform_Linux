@@ -44,8 +44,10 @@ export default function EditProduct() {
         }
     }, [title])
     useEffect(() => {
-        if (!isLogin || !isAccessible) {
-            // 權限不符合
+        if (!isLogin) {
+            dispatch(resetState())
+            navigate("/SignIn", {replace: true})
+        } else if (!isAccessible) {
             dispatch(resetState())
             navigate("/NotFound", {replace: true})
         } else if (isCompleted) {
