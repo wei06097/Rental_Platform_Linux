@@ -47,7 +47,7 @@ export default function EditProduct() {
         if (!isLogin || !isAccessible) {
             // 權限不符合
             dispatch(resetState())
-            navigate("/", {replace: true})
+            navigate("/NotFound", {replace: true})
         } else if (isCompleted) {
             // 完成繳交退出
             dispatch(resetState())

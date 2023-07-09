@@ -41,7 +41,7 @@ export default function Bill() {
     useEffect(() => {
         document.title = "填寫資料"
         if (!isLogin) navigate("/SignIn", {replace : true})
-        if (seller === account) navigate(-1, {replace : true})
+        if (seller === account) navigate("/NotFound", {replace : true})
     }, [navigate, isLogin, seller, account])
     useEffect(() => {
         init()

@@ -61,9 +61,10 @@ export default function OrderDetail() {
         async function init() {
             const {success, order} = await API.get(`${API.ORDER}?id=${id}`, token)
             if (success) setResult(order)
+            else navigate("/NotFound", {replace : true})
             setIsLoading(false)
         }
-    }, [token, id])
+    }, [navigate, token, id])
 
     /* ======================================== */
     async function submitHandler(mode) {

@@ -37,7 +37,7 @@ export default function ChatRoom() {
         init()
         async function init() {
             const {success, history, nickname} = await API.get(`${API.CHAT_HISTORY}/?receiver=${receiver}`, token)
-            if (!success) return
+            if (!success) navigate("/NotFound", {replace : true})
             const newHistory = history
                 .map(element => {
                     return {...element, key : uuidv4()}

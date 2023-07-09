@@ -38,7 +38,7 @@ export default function MyOrder() {
     useEffect(() => {
         document.title = title
         if (!isLogin) navigate("/SignIn", {replace : true})
-        if (!title) navigate("/", {replace : true})
+        if (!title) navigate("/NotFound", {replace : true})
     }, [navigate, isLogin, title])
     useEffect(() => {
         getRemoteOrders(orderPage, status, token, setOrders, setIsLoading)
