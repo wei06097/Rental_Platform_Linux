@@ -2,40 +2,34 @@
 /* ======================================== */
 /* API */
 import API from "../../API"
+/* Redux */
+import { useSelector } from "react-redux"
 /* socket */
 import React, { useState, useEffect, useContext } from "react"
 import webSocket from "socket.io-client"
-/* Redux */
-import { useSelector } from "react-redux"
 
 const SocketContext = React.createContext()
 export const useSocket = () => useContext(SocketContext)
+
 /* ======================================== */
 export default function SocketProvider({ children }) {
     const [socket, setSocket] = useState(null)
-    const {token} = useSelector(state => state.account)
+    const {token, account} = useSelector(state => state.account)
     
     /* 獲取瀏覽器通知權限 */
     useEffect(() => {
-        function requestNotifyPermission() {
-            window.removeEventListener("mousemove", requestNotifyPermission)
-            if (!("Notification" in window)) {
-                console.log('This browser does not support notification')
-            } else {
-                Notification.requestPermission()
-                    .then((permission) => {
-                        // permission: 1. granted 2.denied 3.default
-                        const config = {
-                            body: `Notification is ${permission}`,
-                            tag: "permission"
-                        }
-                        new Notification("Notification", config)
-                    })
-            }
-        }
-        window.addEventListener("mousemove", requestNotifyPermission)
-        return () => {
-            window.removeEventListener("mousemove", requestNotifyPermission)
+        if (!("Notification" in window)) {
+            console.log('This browser does not support notification')
+        } else {
+            Notification.requestPermission()
+                .then(permission => {
+                    // permission: 1. granted 2.denied 3.default
+                    // const config = {
+                    //     body: `Notification is ${permission}`,
+                    //     tag: "permission"
+                    // }
+                    // new Notification("Notification", config)
+                })
         }
     }, [])
 
@@ -60,15 +54,29 @@ export default function SocketProvider({ children }) {
     /* 簡單測試socket */
     useEffect(() => {
         if (!socket) return
-        socket.on("connect", () => {
-            console.log("socket 已連線", socket)
-            // console.log("token:", socket._opts.extraHeaders.Authorization)
-        })
-        return () => {
-            socket.off("connect")
-            console.log("socket 已斷線")
+        function messageNotify(message) {
+            const {provider, receiver, type, content, nickname} = message
+            if (provider === account || receiver !== account) return
+            const notify = new Notification(nickname, {
+                body: (type === "img")? "傳送了一張圖片": content,
+                tag: `${message}-${provider}`
+            })
+            notify.onclick = () => {
+                const myWindow = window.open(`/ChatRoom/${provider}`," _blank")
+                myWindow.focus()
+                notify.close()
+            }
         }
-    }, [socket])
+        function orderNotify(data) {
+            
+        }
+        socket.on("order", orderNotify)
+        socket.on("message", messageNotify)
+        return () => {
+            socket.off("order", orderNotify)
+            socket.off("message", messageNotify)
+        }
+    }, [socket, account])
 
     /* ==================== 分隔線 ==================== */
     return <>

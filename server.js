@@ -29,7 +29,7 @@ let online = {}
 io.on('connection', socket => {
     /* 此時可以從 headers 拿 token */
     const token = socket?.handshake?.headers?.authorization || null
-    const {account} = decodeToken(token)
+    const {account, nickname} = decodeToken(token)
     /* 如果 token 解析錯誤，就離開函式 */
     if (!token || !account) return
     /* 加入線上列表 */
@@ -46,12 +46,14 @@ io.on('connection', socket => {
 
     /* 傳送訊息 */
     socket.on("message", async ({receiver, type, content}) => {
+        // 驗證對方是否存在
+        const response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
+        const result = await response.json()
         // 不能傳訊息給自己
-        if (account === receiver) return
+        if (!result[0] || account === receiver) return
         // 處理訊息
         const datetime = getCurrentDateTime()
-        const data = (type === "img")? "img/NotFound.png": content
-        // const data = (type === "img")? await saveImg(content, true): content
+        const data = (type === "img")? await saveImg(content, true): content
         const message = {
             provider : account,
             receiver,
@@ -60,20 +62,20 @@ io.on('connection', socket => {
             datetime
         }
         // 丟到資料庫
-        // await fetch(`${DB_URL}/chat_history`, {
-        //     method : "POST",
-        //     headers : { "Content-Type" : "application/json" },
-        //     body : JSON.stringify(message)
-        // })
+        await fetch(`${DB_URL}/chat_history`, {
+            method : "POST",
+            headers : { "Content-Type" : "application/json" },
+            body : JSON.stringify(message)
+        })
         // 傳給自己
         if (online[account]) online[account]
             .forEach(myId => {
-                io.sockets.sockets.get(myId).emit("message", message)
+                io.sockets.sockets.get(myId).emit("message", {...message, nickname})
             })
         // 傳給對方
         if (online[receiver]) online[receiver]
             .forEach(targetId => {
-                io.sockets.sockets.get(targetId).emit("message", message)
+                io.sockets.sockets.get(targetId).emit("message", {...message, nickname})
             })
     })
 })
@@ -650,18 +652,16 @@ app.post('/orders/order', async (req, res) => {
     })
     res.json({success : true})
     // 發送及時通知 provider account
-    if (online[account]) {
-        online[account].forEach(consumerId => {
+    if (online[account]) online[account]
+        .forEach(consumerId => {
             const socket = io.sockets.sockets.get(consumerId)
             socket.emit("notify", "訂單處理中")
         })
-    }
-    if (online[provider]) {
-        online[provider].forEach(providerId => {
+    if (online[provider]) online[provider]
+        .forEach(providerId => {
             const socket = io.sockets.sockets.get(providerId)
             socket.emit("notify", "有一筆新的訂單")
         })
-    }
 })
 // R 透過訂單id(自定義的) 取得訂單資訊
 app.get('/orders/order', async (req, res) => {
