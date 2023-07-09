@@ -162,8 +162,44 @@ app.get('/api/token_verify', async (req, res) => {
 })
 
 /* ======================================== */
-// 回傳聊天歷史紀錄
-app.get('/chat_history', async (req, res) => {
+// 回傳有聊天過的對象以及最後的對話內容 (照時間排，最新的在前面)
+app.get('/chat/overview', async (req, res) => {
+    // 驗證身分
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    if (!account) {
+        res.json({success : false})
+        return
+    }
+    const response = await fetch(`${DB_URL}/chat_history?provider=${account}`)
+    const result = await response.json()
+    const response2 = await fetch(`${DB_URL}/chat_history?receiver=${account}`)
+    const result2 = await response2.json()
+    const history = result.concat(result2)
+    history.sort((a, b) => a.id - b.id)
+    // 拿最後一則訊息
+    const lastMessage = {}
+    history
+        .forEach(element => {
+            const {provider, receiver, type, content, datetime, id} = element
+            const user = (provider === account)? receiver: provider
+            const string = (type === "img")? "傳送了一張圖片": content
+            lastMessage[user] =  {account: user, content: string, datetime, id}
+        })
+    for (let i=0; i<Object.keys(lastMessage).length; i++) {
+        const user = Object.keys(lastMessage)[i]
+        const response = await fetch(`${DB_URL}/accounts/?account=${user}`)
+        const result = await response.json()
+        const {nickname} = result[0]
+        lastMessage[user] = {...lastMessage[user], nickname}
+    }
+    const newArray = Object.keys(lastMessage)
+        .map(key => lastMessage[key])
+        .sort((a, b) => b.id - a.id)
+    res.json({success : true, list : newArray})
+})
+// 回傳聊天歷史紀錄 receiver為對方的帳號
+app.get('/chat/history', async (req, res) => {
     const receiver = req.query?.receiver || undefined
     // 驗證身分
     const token = req.headers?.authorization || undefined
@@ -182,7 +218,7 @@ app.get('/chat_history', async (req, res) => {
     res.json( {success : true, history : result2, nickname : nickname} )
 })
 // 回傳所有帳號 (測試聊天用)
-app.get('/chat_list', async (req, res) => {
+app.get('/chat/list', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)

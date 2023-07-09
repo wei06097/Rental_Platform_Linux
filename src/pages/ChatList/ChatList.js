@@ -28,7 +28,7 @@ export default function ChatList() {
         setIsLoading(true)
         init()
         async function init() {
-            const {success, list} = await API.get(API.CHAT_LIST, token)
+            const {success, list} = await API.get(API.CHAT_OVERVIEW, token)
             if (success) setUsers(list)
             setIsLoading(false)
         }
@@ -47,16 +47,12 @@ export default function ChatList() {
                 isLoading?
                 <div className="loading-ring" />:
                 users && users
-                    .map( (user, i) => 
-                        <Link
-                            key={i}
-                            className={style.card}
-                            to={`/ChatRoom/${user.account}`}
-                        >
-                            <div className={style.img}></div>
-                            <div className={style.content} time={"04:44"}>
+                    .map(user => 
+                        <Link key={user.id} className={`link ${style.card}`} to={`/ChatRoom/${user.account}`}>
+                            <div className={style.img} />
+                            <div className={style.content} time={user.datetime.slice().split("T")[1]}>
                                 <div>{user.nickname}</div>
-                                <div>{`暫時不顯示內容\n暫時不顯示內容\n暫時不顯示內容`}</div>
+                                <div>{user.content}</div>
                             </div>
                         </Link>
                     )

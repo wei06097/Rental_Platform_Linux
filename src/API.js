@@ -19,8 +19,9 @@ const HOMEPAGE = `${API_URL}/homepage`
 const RESULT = `${API_URL}/result`
 const PRODUCT = `${API_URL}/product`
 /* 聊天 */
-const CHAT_LIST = `${API_URL}/chat_list`
-const CHAT_HISTORY = `${API_URL}/chat_history`
+const CHAT_LIST = `${API_URL}/chat/list`
+const CHAT_HISTORY = `${API_URL}/chat/history`
+const CHAT_OVERVIEW = `${API_URL}/chat/overview`
 /* 購物車 */
 const CRUD_CART = `${API_URL}/cart/cart_CRUD`
 const MY_CART = `${API_URL}/cart/my_cart`
@@ -81,7 +82,7 @@ const API = {
     PROFILE, PASSWORD_CHANGE,
     STORE, MY_PRODUCTS, CRUD_PRODUCT, LAUNCH_PRODUCT,
     HOMEPAGE, RESULT, PRODUCT,
-    CHAT_LIST, CHAT_HISTORY,
+    CHAT_LIST, CHAT_HISTORY, CHAT_OVERVIEW,
     CRUD_CART, MY_CART, MY_STORECART,
     ORDER, OVERVIEW_ORDERS
 }
