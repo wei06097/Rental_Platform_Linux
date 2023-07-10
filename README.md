@@ -386,6 +386,241 @@
         ```
 </details>
 
+## 個人檔案
+###  `/profile`
+<details>
+
+- 用途
+    - 拿個人資料
+    - 更新個人資料
+    - 手機跟信箱還有驗證問題，這邊沒有處理
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+- method
+    - `get`
+        - response
+        ```JavaScript
+        {
+            success: true, //身分驗證成功
+            profile: {  // 個人檔案
+                account: 'kokoro123',
+                nickname: '弦巻こころ',
+                phone: '0910156987',
+                mail: 'kokoro123@gmail.com',
+                intro: 'こころと申します'
+            }
+        }
+        ```
+    - `put`
+        - body
+        ```JavaScript
+        {   //暱稱
+            nickname: '弦巻こころ'
+        } 
+        or
+        {   //賣場簡介
+            intro: '你好'
+        } 
+        or
+        {   //手機
+            phone: '0912345678'
+        } 
+        or
+        {   //信箱
+            mail: '123@gmail.com'
+        } 
+        ```
+        - response
+        ```JavaScript
+        {
+            success : true //修改是否成功
+        }
+        ```
+        - 注意
+            - 暱稱和簡介確定是這樣
+            - 手機和信箱尚未處理驗證
+</details>
+
+###  `/password_change`
+<details>
+
+- 用途
+    - 更改密碼
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+- method
+    - `post`
+        - body
+        ``` JavaScript
+        {
+            oldPassword : "kokoro123", //舊密碼
+            newPassword : "kokoro12345" //新密碼
+        }
+        ```
+        - response
+        ``` JavaScript
+        {
+            success : true, //更改是否成功
+            message : "更改成功" or "密碼錯誤" or 其他
+        }
+        ```
+</details>
+
+## 聊天
+### `/chat/overview`
+<details>
+
+- 用途
+    - 取得對話過的對象及其最後一筆訊息
+    - 要按照時間在陣列排序
+    - 最新的紀錄要放在陣列的前面
+    - 時間規則與之前一樣 YYYY-MM-DDThh:mm (ex. 2023-07-10T00:28)
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+- method
+    - `get`
+        - response
+        ```JavaScript
+        {
+            success: true, //取得是否成功
+            list: [
+                {
+                    account: 'kokoro123', //對方的帳號
+                    content:'你好阿\n請多指教', //最後一則訊息
+                    datetime: '2023-07-10T00:28', //時間
+                    id: 24, //在資料庫的id
+                    nickname: '弦巻こころ' //對方的暱稱
+                },
+                {
+                    account: '1',
+                    content: '傳送了一張圖片', //如果是圖片要改成這樣
+                    datetime: '2023-07-10T00:21',
+                    id: 23,
+                    nickname: '1'
+                }
+            ]
+        }
+        ```
+</details>
+
+### `/chat/history`
+<details>
+
+- 用途
+    - 取得與某人的對話紀錄
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+    - `?receiver=`
+        - 要加上對方的帳號
+- method
+    - `get`
+        - response
+        ```JavaScript
+        {
+            success: true, //取得是否成功
+            history: [ //訊息紀錄
+                {
+                    provider: 'kokoro123', //發送訊息的人
+                    receiver: '2', //接收訊息的人
+                    type: 'text', //訊息類型
+                    content: '你好阿', //內容
+                    datetime: '2023-07-09T23:30', //時間
+                    id: 18  //在資料庫的id
+                },
+                {
+                    provider: 'kokoro123',
+                    receiver: '2',
+                    type: 'img',
+                    content: 'img/a9686976-cd2f-4cd4-ad91-075a10617521.png',
+                    datetime: '2023-07-09T23:58',
+                    id: 20
+                }
+            ],
+            nickname: '2' //對方的暱稱
+        }
+        ```
+</details>
+
+## Socket 事件
+- 登入會有 connect 事件觸發
+- 登出或離線會有 disconnect 事件觸發
+- token 會在 headers 的 authorization
+
+### `socket.on("message", payload)`
+<details>
+
+- 用途
+    - 接收訊息
+- payload
+    ```JavaScript
+    {
+        receiver : "kokoro123", //接收者
+        type : "text" or "img", //類型
+        content : "你好" or 圖片 //內容
+    }
+    ```
+- 存入資料庫(參考用)
+    ```JavaScript
+    {provider, receiver, type, content, datetime}
+    ```
+</details>
+
+### `socket.emit("message", body)`
+<details>
+
+- 用途
+    - `socket.on("message", payload)`
+    - 收到上面事件後傳送訊息給雙方
+- body
+    ```JavaScript
+    {   // 跟存入資料庫的很像，但要多加暱稱
+        provider,
+        receiver,
+        type,
+        content,
+        datetime,
+        nickname
+    }
+    ```
+</details>
+
+### `socket.emit("order", body)`
+<details>
+
+- 用途
+    - `post` `/orders/order`
+    - `put` `/orders/order`
+    - 上面兩個 api 處理完成後，傳送給買家和賣家及時通知
+- body
+    ```JavaScript
+    {   // 跟存入資料庫的很像，但要多加暱稱
+        id : "訂單自定義 id",
+        message : "已提交租借申請" or "您有一筆新訂單" or "訂單狀態已更新"
+    }
+    ```
+</details>
+
+## 其他
 ### `<== to be continued`
 <!-- <details>
 </details> -->
