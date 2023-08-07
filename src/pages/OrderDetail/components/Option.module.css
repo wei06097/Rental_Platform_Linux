@@ -24,3 +24,12 @@
 .option > label > .position::-webkit-scrollbar {
     width: 0; height: 0;
 }
+
+/* ======================================== */
+.icon {
+    user-select: none; cursor: pointer;
+    width: 40px; height: 40px;
+    border: none; border-radius: 50%;
+    color: #0d6efd; background-color: white;
+    display: grid; place-items: center;
+}

@@ -29,7 +29,7 @@ export default function MyDateTime({ index, length, setDates, deleteHandler, isL
     /* ==================== 分隔線 ==================== */
     return <>
         <div className={style.data}>
-            <div>{datetime}</div>
+            <div className={style.datatime}>{datetime}</div>
             <input type="datetime-local" ref={datetimeRef} onChange={getDateTime} disabled={isLoading} />
             <button className={style.icon}
                 style={{visibility:(length !== 1)? "visible":"hidden"}}

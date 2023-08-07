@@ -1,0 +1,70 @@
+.map {
+    width: var(--width); height: calc(100vh - var(--height));
+    position: absolute; margin: 0 auto;
+}
+.container {
+    width: max-content;
+    position: relative; z-index: 5;
+    top: 10px; left: 10px;
+}
+
+/* ======================================== */
+.mask {
+    position: fixed; z-index: 10;
+    width: 100vw; height: 100vh;
+    background-color: #0005;
+    display: grid; place-items: center;
+}
+.mask > div {
+    width: max-content; border-radius: 5px;
+    background-color: #fff;
+    box-shadow: 0 0 1px 1px #fff;
+    display: flex; flex-direction: column;
+    gap: 10px; padding: 15px 10px;
+}
+.mask > div > input,
+.mask > div > div > button {
+    width: 300px; height: 30px; border-radius: 5px;
+    outline: none; border: 0; padding: 5px;
+    box-shadow: 0 0 1px 1px #0002;
+    background-color: #fff;
+}
+.mask > div > div > button {
+    width: 150px;
+}
+.mask > div > div > button:hover {
+    cursor: pointer; background-color: #eee;
+}
+
+/* ======================================== */
+.container > form {
+    display: flex; gap: 5px;
+}
+.container > form > input {
+    height: 30px; border-radius: 5px;
+    outline: none; border: 0;
+    box-shadow: 0 0 2px 2px #0002;
+    background-color: #fff;
+}
+.container > form > input[type="text"] {
+    width: 250px; padding: 5px; font-size: 15px;
+}
+.container > form > input[type="submit"],
+.container > form > input[type="button"] {
+   cursor: pointer;
+}
+.container > form > input[type="submit"]:hover,
+.container > form > input[type="button"]:hover {
+    background-color: #eee;
+}
+
+/* ======================================== */
+.container > div {
+    width: 250px; font-size: 15px;
+    border-radius: 5px; cursor: pointer;
+    box-shadow: 0 0 2px 2px #0002;
+    background-color: #fff; color: #777;
+}
+.container > div > div {
+    padding: 5px; border-top: 1px solid #ddd;
+}

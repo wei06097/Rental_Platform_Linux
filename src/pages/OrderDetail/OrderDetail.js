@@ -28,7 +28,7 @@ export default function OrderDetail() {
     const dispatch = useDispatch()
     const {token, account, isLogin} = useSelector(state => state.account)
     const [result, setResult] = useState({})
-    const [decision, setDecision] = useState({start:"", end:"", position:""})
+    const [decision, setDecision] = useState({start:"", end:"", position:{center:[0, 0], name:""}})
     const [showingOpts, setShowingOpts] = useState(true)
     const [isLoading, setIsLoading] = useState(true)
     const [isHandling, setIsHandling] = useState(false)
@@ -70,7 +70,7 @@ export default function OrderDetail() {
     async function submitHandler(mode) {
         //mode為操作模式 1確認 2取消 3已收貨 4已歸還
         const blank1 = Object.keys(decision)
-            .filter(key => !decision[key])
+            .filter(key => (key==="position")? !decision[key].name: !decision[key])
             .length !== 0
         if (mode === 1 && showingOpts && blank1) {
             alert("請檢查選項皆已勾選")
@@ -140,7 +140,7 @@ export default function OrderDetail() {
                                 disabled={isHandling}
                                 onChange={(e) => {
                                     setShowingOpts(!e.target.checked)
-                                    setDecision({start:"", end:"", position:""})
+                                    setDecision({start:"", end:"", position:{center:[0, 0], name:""}})
                                 }}
                             />
                             <span className="control" />

@@ -2,25 +2,37 @@
 /* ======================================== */
 /* CSS */
 import style from "../Bill.module.css"
+/* Components */
+import Map from "./Map"
 /* Hooks */
-import { useRef } from "react"
+import { useState } from "react"
 
 /* ======================================== */
 export default function Position({ index, length, setDates, deleteHandler, isLoading }) {
-    const inputRef = useRef()
-    function onChangeHandler() {
+    const [showingMap, setShowingMap] = useState(false)
+    const [location, setLocation] = useState({center:[0, 0], name:""})
+    function onChangeHandler(location) {
+        setLocation(location)
         setDates(prev => {
             const newPosions = [...prev]
-            newPosions[index].position = inputRef.current.value
+            newPosions[index].position = {...location}
             return newPosions
         })
     }
     /* ==================== 分隔線 ==================== */
     return <>
-        <div className={style.data}>
-            <input type="text" placeholder="填寫地點" ref={inputRef}
-                onChange={onChangeHandler} disabled={isLoading}
+        {
+            showingMap &&
+            <Map 
+                closePage = {() => {setShowingMap(false)}}
+                setLocation = {onChangeHandler}
+                location = {location}
             />
+        }
+        <div className={style.data}>
+            <div className={style.position} onClick={() => {setShowingMap(true)}}>
+                {location?.name || "選擇地點"}
+            </div>
             <button className={style.icon}
                 style={{visibility:(length !== 1)? "visible":"hidden"}}
                 onClick={deleteHandler}

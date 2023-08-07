@@ -36,7 +36,7 @@ export default function Bill() {
     const [myRentDates, setMyRentDates] = useState([{key:uuidv4(), datetime:""}]) 
     const [myReturnDates, setMyReturnDates] = useState([{key:uuidv4(), datetime:""}])
     //期望交貨地點
-    const [positions, setPositions] = useState([{key:uuidv4(), position:""}])
+    const [positions, setPositions] = useState([{key:uuidv4(), position:{center:[0, 0], name:""}}])
 
     useEffect(() => {
         document.title = "填寫資料"
@@ -83,7 +83,7 @@ export default function Bill() {
         })
     }
     function addPositions() {
-        setPositions(prev => [...prev, {key:uuidv4(), position:""}])
+        setPositions(prev => [...prev, {key:uuidv4(), position:{center:[0, 0], name:""}}])
     }
     function deletePositions(index) {
         setPositions(prev => {
@@ -97,7 +97,7 @@ export default function Bill() {
             .filter(element => !element.datetime)
             .length !== 0
         const blank2 = positions
-            .filter(content => !content.position)
+            .filter(content => !content.position.name)
             .length !== 0
         if (blank1 || blank2) {
             alert("請檢查是否填寫完成")
