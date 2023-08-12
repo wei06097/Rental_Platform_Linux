@@ -20,7 +20,7 @@ import { setOrderPage } from "../../slice/globalSlice"
 /* ======================================== */
 async function getRemoteOrders(progress, status, token, setOrders, setIsLoading) {
     setIsLoading(true)
-    const {success, orders} = await API.get(`${API.OVERVIEW_ORDERS}/?progress=${progress}&status=${status}`, token)
+    const {success, orders} = await API.get(`${API.OVERVIEW_ORDERS}?progress=${progress}&status=${status}`, token)
     if (success) setOrders(orders)
     setIsLoading(false)
 }

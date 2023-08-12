@@ -7,7 +7,7 @@ export const getStoreInfo = createAsyncThunk(
     async ({seller}, thunkAPI) => {
         try {
             const token = thunkAPI.getState().account.token
-            return await API.get(`${API.STORE}/?seller=${seller}`, token)
+            return await API.get(`${API.STORE}?account=${seller}`, token)
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
         }
@@ -35,12 +35,12 @@ const storeSlice = createSlice({
                 state.isLoading = true
             })
             .addCase(getStoreInfo.fulfilled, (state, action) => {
-                const {success, provider, products} = action.payload
+                const {success, provider, commodity} = action.payload
                 if (success) {
                     const data = {
                         [window.location.pathname] : {
                             provider : provider,
-                            products : products
+                            products : commodity
                         }
                     }
                     const history = current(state.store)

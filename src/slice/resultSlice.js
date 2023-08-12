@@ -8,7 +8,7 @@ export const queryProducts = createAsyncThunk(
         try {
             return  {
                 key : queryString,
-                data : await API.get(`${API.RESULT}/?queryString=${queryString}`, null)
+                data : await API.get(`${API.RESULT}?keyword=${queryString}`, null)
             }
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
@@ -36,7 +36,7 @@ const resultSlice = createSlice({
                 let history = current(state.history)
                 history = {
                     ...history,
-                    [key] : data.result
+                    [key] : data
                 }
                 state.history = history
                 state.isLoading = false

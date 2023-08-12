@@ -34,11 +34,11 @@ export default function Product() {
         init()
         window.scroll(0, 0)
         async function init() {
-            const {success, product} = await API.get(`${API.PRODUCT}/?id=${id}`, null)
-            if (success) setProduct(product)
+            const {success, commodity} = await API.get(`${API.PRODUCT}?id=${id}`, null)
+            if (success) setProduct(commodity)
             else navigate("/NotFound", {replace : true})
             if (token) {
-                const {success, isAdded} = await API.get(`${API.CRUD_CART}/?id=${id}`, token)
+                const {success, isAdded} = await API.get(`${API.CRUD_CART}?id=${id}`, token)
                 if (success) setIsAdded(isAdded)
             }
             setIsloading(false)
@@ -49,8 +49,8 @@ export default function Product() {
         if (!account) navigate("/SignIn")
         setIsHandling(true)
         const {success} = isAdded
-            ? await API.del(`${API.CRUD_CART}/?id=${id}`, token)
-            : await API.post(`${API.CRUD_CART}/?id=${id}`, token)
+            ? await API.del(`${API.CRUD_CART}?id=${id}`, token)
+            : await API.post(`${API.CRUD_CART}?id=${id}`, token)
         if (success) setIsAdded(prev => !prev)
         setIsHandling(false)
     }
@@ -59,7 +59,7 @@ export default function Product() {
         setIsHandling(true)
         const {success} = isAdded
             ? {success : true}
-            : await API.post(`${API.CRUD_CART}/?id=${id}`, token)
+            : await API.post(`${API.CRUD_CART}?id=${id}`, token)
         if (success) navigate(`/Bill/${product?.provider}`)
         setIsHandling(false)
     }

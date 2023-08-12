@@ -119,7 +119,7 @@ function getCurrentDateTime() {
 }
 
 /* ======================================== *//* ======================================== */
-app.post("/api/signup", async (req, res) => {
+app.post("/api/userfile/signup/", async (req, res) => {
     const {account} = req.body
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
     let result = await response.json()
@@ -140,7 +140,7 @@ app.post("/api/signup", async (req, res) => {
     }
     res.json( {success, message} )
 })
-app.post("/api/login", async (req, res) => {
+app.post("/api/userfile/login/", async (req, res) => {
     const {account, password} = req.body
     const response = await fetch(`${DB_URL}/accounts?account=${account}`)
     const result = await response.json()
@@ -154,7 +154,7 @@ app.post("/api/login", async (req, res) => {
     }, JWT_SECRET)
     res.json( {success, message, account} )
 })
-app.get('/api/token_verify', async (req, res) => {
+app.get('/api/userfile/verify_token/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
     const success = account? true: false
@@ -163,7 +163,7 @@ app.get('/api/token_verify', async (req, res) => {
 
 /* ======================================== */
 // 回傳有聊天過的對象以及最後的對話內容 (照時間排，最新的在前面)
-app.get('/chat/overview', async (req, res) => {
+app.get('/api/chat/overview/', async (req, res) => {
     // 驗證身分
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -199,7 +199,7 @@ app.get('/chat/overview', async (req, res) => {
     res.json({success : true, list : newArray})
 })
 // 回傳聊天歷史紀錄 receiver為對方的帳號
-app.get('/chat/history', async (req, res) => {
+app.get('/api/chat/history/', async (req, res) => {
     const receiver = req.query?.receiver || undefined
     // 驗證身分
     const token = req.headers?.authorization || undefined
@@ -218,7 +218,7 @@ app.get('/chat/history', async (req, res) => {
     res.json( {success : true, history : result2, nickname : nickname} )
 })
 // 回傳所有帳號 (測試聊天用)
-app.get('/chat/list', async (req, res) => {
+app.get('/api/chat/list/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
@@ -248,7 +248,7 @@ app.get('/img/:name', async (req, res) => {
 
 /* ======================================== */
 // C 新增商品
-app.post('/api/commodity/commodity_CRUD', async (req, res) => {
+app.post('/api/commodity/commodity_CRUD/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     const {launched, imgs, name, description, price, amount, position} = req.body
     // 驗證身分
@@ -286,7 +286,7 @@ app.post('/api/commodity/commodity_CRUD', async (req, res) => {
     res.json( {success : true} )
 })
 // R 取得商品
-app.get('/api/commodity/commodity_CRUD', async (req, res) => {
+app.get('/api/commodity/commodity_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     // 驗證身分
@@ -294,14 +294,14 @@ app.get('/api/commodity/commodity_CRUD', async (req, res) => {
     const response = await fetch(`${DB_URL}/products?id=${id}&provider=${account}`)
     const result = await response.json()
     if (!result[0]) {
-        res.json( {success : false, info : null} )
+        res.json( {success : false, data : null} )
         return
     }
     // 回傳
-    res.json( {success : true, info : result[0]} )
+    res.json( {success : true, data : result[0]} )
 })
 // U 儲存商品
-app.put('/api/commodity/commodity_CRUD', async (req, res) => {
+app.put('/api/commodity/commodity_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     const {remain_imgs, imgs, name, description, price, amount, position} = req.body
@@ -341,7 +341,7 @@ app.put('/api/commodity/commodity_CRUD', async (req, res) => {
     res.json( {success : true} )
 })
 // D 刪除商品
-app.delete('/api/commodity/commodity_CRUD', async (req, res) => {
+app.delete('/api/commodity/commodity_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     // 驗證身分
@@ -359,27 +359,27 @@ app.delete('/api/commodity/commodity_CRUD', async (req, res) => {
     res.json( {success : true} )
 })
 // 取得我的所有商品
-app.get('/api/commodity/my_commodity', async (req, res) => {
+app.get('/api/commodity/my_commodity/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
     let response = await fetch(`${DB_URL}/accounts?account=${account}`)
     let result = await response.json()
     if (!result[0]) {
-        res.json( {success : false, avl_products : null, na_products : null} )
+        res.json( {success : false, launched : null, unlaunched : null} )
         return
     }
     // 取得商品
     response = await fetch(`${DB_URL}/products?provider=${account}&launched=true`)
     result = await response.json()
-    const avl_products = [...result]
+    const launched = [...result]
     response = await fetch(`${DB_URL}/products?provider=${account}&launched=false`)
     result = await response.json()
-    const na_products = [...result]
-    res.json({success : true, avl_products, na_products})
+    const unlaunched = [...result]
+    res.json({success : true, launched, unlaunched})
 })
 // 上架/下架我的商品
-app.put('/launch_product', async (req, res) => {
+app.post('/api/commodity/launch/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     const {launched} = req.body
@@ -403,8 +403,8 @@ app.put('/launch_product', async (req, res) => {
 
 /* ======================================== */
 // 查看賣場
-app.get('/store', async (req, res) => {
-    const seller = req.query?.seller || undefined
+app.get('/api/userfile/browse_store/', async (req, res) => {
+    const seller = req.query?.account || undefined
     // 確認賣場存在
     let response = await fetch(`${DB_URL}/accounts?account=${seller}`)
     let result = await response.json()
@@ -418,38 +418,38 @@ app.get('/store', async (req, res) => {
     //　取得賣場商品
     response = await fetch(`${DB_URL}/products?provider=${seller}&launched=true`)
     result = await response.json()
-    res.json( {success : true, provider : provider, products : result} )
+    res.json( {success : true, provider : provider, commodity : result} )
 })
 // 商品頁面
-app.get('/product', async (req, res) => {
+app.get('/api/commodity/get_commodity/', async (req, res) => {
     const id = req.query?.id || undefined
     const response = await fetch(`${DB_URL}/products?id=${id}&launched=true`)
     const result = await response.json()
     const success = result[0]? true: false
     const product = result[0] || []
-    res.json( {success, product} )
+    res.json( {success, commodity : product} )
 })
 // 首頁給商品
-app.get('/homepage', async (req, res) => {
+app.get('/api/commodity/get_launched_commodity/', async (req, res) => {
     const response = await fetch(`${DB_URL}/products?launched=true`)
     const result = await response.json()
-    res.json( {result} )
+    res.json(result)
 })
 // 搜尋商品
-app.get('/result', async (req, res) => {
-    const {queryString} = req?.query || []
-    const params = queryString
+app.get('/api/commodity/get_searched_commodity/', async (req, res) => {
+    const {keyword} = req?.query || []
+    const params = keyword
         .split(" ")
         .map(element => `&name_like=${element}`)
         .join("")
     const response = await fetch(`${DB_URL}/products?launched=true${params}`)
     const result = await response.json()
-    res.json( {result} )
+    res.json(result)
 })
 
 /* ======================================== *//* ======================================== */
 // C 加入商品到購物清單 id為商品的id (注意:不能將自己的商品加入購物清單)
-app.post('/cart/cart_CRUD', async (req, res) => {
+app.post('/api/cart/cart_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     // 驗證身分
@@ -476,7 +476,7 @@ app.post('/cart/cart_CRUD', async (req, res) => {
     res.json( {success : true} )
 })
 // R 讀取商品是否在購物清單 id為商品的id
-app.get('/cart/cart_CRUD', async (req, res) => {
+app.get('/api/cart/cart_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     // 驗證身分
@@ -491,7 +491,7 @@ app.get('/cart/cart_CRUD', async (req, res) => {
     res.json( {success : true, isAdded : result.length!==0} )
 })
 // D 從購物清單刪除商品 id為商品的id
-app.del('/cart/cart_CRUD', async (req, res) => {
+app.del('/api/cart/cart_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -508,7 +508,7 @@ app.del('/cart/cart_CRUD', async (req, res) => {
 
 /* ======================================== */
 // 取得購物車的所有商品
-app.get('/cart/my_cart', async (req, res) => {
+app.get('/api/cart/my_cart/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
@@ -545,7 +545,7 @@ app.get('/cart/my_cart', async (req, res) => {
     res.json( {success : true, result: data} )
 })
 // 取得購物車在特定賣場的商品
-app.get('/cart/my_storecart', async (req, res) => {
+app.get('/api/cart/my_storecart/', async (req, res) => {
     const seller = req.query?.seller || undefined
     const token = req.headers?.authorization || undefined
     // 驗證身分
@@ -573,7 +573,7 @@ app.get('/cart/my_storecart', async (req, res) => {
 
 /* ======================================== */
 // 取得數個訂單/購買清單 progress為訂單的進度，status為provider(賣家)或是consumer(買家)
-app.get('/orders/overview', async (req, res) => {
+app.get('/api/order/overview/', async (req, res) => {
     const status = req.query?.status || undefined
     const progress = req.query?.progress || undefined
     const token = req.headers?.authorization || undefined
@@ -605,7 +605,7 @@ app.get('/orders/overview', async (req, res) => {
     res.json( {success : true, orders : orders} )
 })
 // C 下訂單
-app.post('/orders/order', async (req, res) => {
+app.post('/api/order/order_CRUD/', async (req, res) => {
     const {options, comment, order} = req.body
     // 驗證帳號
     const token = req.headers?.authorization || undefined
@@ -697,7 +697,7 @@ app.post('/orders/order', async (req, res) => {
     sendSocketMessage(provider, "order", {id: order_id, message: "您有一筆新訂單"})
 })
 // R 透過訂單id(自定義的) 取得訂單資訊
-app.get('/orders/order', async (req, res) => {
+app.get('/api/order/order_CRUD/', async (req, res) => {
     const id = req.query?.id || undefined
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -744,7 +744,7 @@ app.get('/orders/order', async (req, res) => {
     res.json( {success : true, order : payload} )
 })
 // U 透過訂單id(自定義的) 更新訂單狀態，mode為操作模式 1確認 2取消 3已收貨 4已歸還
-app.put('/orders/order', async (req, res) => {
+app.put('/api/order/order_CRUD/', async (req, res) => {
     const {usingMessage, selectedOption} = req.body
     const order_id = req.query?.id || undefined
     const mode = Number(req.query?.mode) || -1
@@ -850,7 +850,7 @@ app.put('/orders/order', async (req, res) => {
 
 /* ======================================== *//* ======================================== */
 // 拿個人資料
-app.get('/profile',  async (req, res) => {
+app.get('/api/userfile/profile/',  async (req, res) => {
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
     // 驗證帳號
@@ -871,10 +871,10 @@ app.get('/profile',  async (req, res) => {
         mail : result[0].mail,
         intro : result[0].intro
     }
-    res.json({success : true, profile : profile})
+    res.json({success : true, data : profile})
 })
 // 修改個人資料
-app.put('/profile',  async (req, res) => {
+app.put('/api/userfile/profile/',  async (req, res) => {
     const payload = req.body
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -904,7 +904,7 @@ app.put('/profile',  async (req, res) => {
     res.json({success : true})
 })
 // 修改密碼
-app.post('/password_change',  async (req, res) => {
+app.post('/api/userfile/password_change/',  async (req, res) => {
     const {oldPassword, newPassword} = req.body
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)

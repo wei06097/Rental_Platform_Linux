@@ -7,7 +7,7 @@ export const getProductInfo = createAsyncThunk(
     async ({id}, thunkAPI) => {
         try {
             const token = thunkAPI.getState().account.token
-            return await API.get(`${API.CRUD_PRODUCT}/?id=${id}`, token)
+            return await API.get(`${API.CRUD_PRODUCT}?id=${id}`, token)
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
         }
@@ -26,7 +26,7 @@ export const submit = createAsyncThunk(
             }
             return (mode === "add")
                 ? await API.post(API.CRUD_PRODUCT, token, payload)
-                : await API.put(`${API.CRUD_PRODUCT}/?id=${id}`, token, payload)
+                : await API.put(`${API.CRUD_PRODUCT}?id=${id}`, token, payload)
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
         }
@@ -78,19 +78,19 @@ const editProductSlice = createSlice({
                 state.isLoading = true
             })
             .addCase(getProductInfo.fulfilled, (state, action) => {
-                const {success, info} = action.payload
+                const {success, data} = action.payload
                 if (!success) {
                     state.isAccessible = false
                 } else {
                     state.data = {
-                        id : info.id,
-                        remain_imgs : [...info.imgs],
+                        id : data.id,
+                        remain_imgs : [...data.imgs],
                         imgs : [],
-                        name : info.name,
-                        description : info.description,
-                        price : Number(info.price),
-                        amount : Number(info.amount),
-                        position : info.position
+                        name : data.name,
+                        description : data.description,
+                        price : Number(data.price),
+                        amount : Number(data.amount),
+                        position : data.position
                     }
                 }
                 state.isLoading = false

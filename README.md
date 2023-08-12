@@ -2,15 +2,15 @@
 ### BorrowedAmount
 <details>
 
-- `/api/commodity/commodity_CRUD` 在新增/編輯商品時，傳到伺服器的 payload 不變，但要記得在資料庫多增加 BorrowedAmount 的欄位，用來記錄借出去的商品數量。
-- `/api/commodity/my_commodity` 取得我的賣場所有商品時，回傳資料要多一項 BorrowedAmount。
+- `/api/commodity/commodity_CRUD/` 在新增/編輯商品時，傳到伺服器的 payload 不變，但要記得在資料庫多增加 BorrowedAmount 的欄位，用來記錄借出去的商品數量。
+- `/api/commodity/my_commodity/` 取得我的賣場所有商品時，回傳資料要多一項 BorrowedAmount。
 </details>
 
 
 # API 文件
 
 ## 購物車
-### `/cart/cart_CRUD`
+### `/api/cart/cart_CRUD/`
 <details>
 
 - 用途
@@ -58,7 +58,7 @@
 
 </details>
 
-### `/cart/my_cart`
+### `/api/cart/my_cart/`
 <details>
 
 - 用途
@@ -105,7 +105,7 @@
         ```
 </details>
 
-### `/cart/my_storecart`
+### `/api/cart/my_storecart/`
 <details>
 
 - 用途
@@ -149,7 +149,7 @@
 </details>
 
 ## 訂單
-### `/orders/order`
+### `/api/order/order_CRUD/`
 <details>
 
 - 用途
@@ -389,7 +389,7 @@
             - 取消訂單(2)和歸還商品(4)時，記得更新資料庫的商品剩餘數量與借出數量
 </details>
 
-### `/orders/overview`
+### `/api/order/overview/`
 <details>
 
 - 用途
@@ -435,7 +435,7 @@
 </details>
 
 ## 個人檔案
-###  `/profile`
+###  `/api/userfile/profile/`
 <details>
 
 - 用途
@@ -494,7 +494,7 @@
             - 手機和信箱尚未處理驗證
 </details>
 
-###  `/password_change`
+###  `/api/userfile/password_change/`
 <details>
 
 - 用途
@@ -525,7 +525,7 @@
 </details>
 
 ## 聊天
-### `/chat/overview`
+### `/api/chat/overview/`
 <details>
 
 - 用途
@@ -566,7 +566,7 @@
         ```
 </details>
 
-### `/chat/history`
+### `/api/chat/history/`
 <details>
 
 - 用途
@@ -656,8 +656,8 @@
 <details>
 
 - 用途
-    - `post` `/orders/order`
-    - `put` `/orders/order`
+    - `post` `/order/order_CRUD/`
+    - `put` `/order/order_CRUD/`
     - 上面兩個 api 處理完成後，傳送給買家和賣家及時通知
 - body
     ```JavaScript

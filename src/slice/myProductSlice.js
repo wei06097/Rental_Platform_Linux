@@ -20,7 +20,7 @@ export const deleteProduct = createAsyncThunk(
             const token = thunkAPI.getState().account.token
             return {
                 id : id, 
-                data : await API.del(`${API.CRUD_PRODUCT}/?id=${id}`, token)
+                data : await API.del(`${API.CRUD_PRODUCT}?id=${id}`, token)
             }
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
@@ -34,7 +34,7 @@ export const launchProduct = createAsyncThunk(
             const token = thunkAPI.getState().account.token
             return {
                 id : id, 
-                data : await API.put(`${API.LAUNCH_PRODUCT}/?id=${id}`, token, {launched})
+                data : await API.post(`${API.LAUNCH_PRODUCT}?id=${id}`, token, {launched})
             }
         } catch (error) {
             return thunkAPI.rejectWithValue(error.message)
@@ -83,11 +83,11 @@ const myProductSlice = createSlice({
                 state.isLoading = true
             })
             .addCase(getMyProducts.fulfilled, (state, action) => {
-                const { success, avl_products, na_products } = action.payload
+                const { success, launched, unlaunched } = action.payload
                 if (success) {
                     state.products = {
-                        product_on : [...avl_products],
-                        product_off : [...na_products]
+                        product_on : [...launched],
+                        product_off : [...unlaunched]
                     }
                     state.isChecked = true
                     state.isLoading = false

@@ -35,8 +35,7 @@ const homepage = createSlice({
                 state.isLoading = true
             })
             .addCase(getRecommend.fulfilled, (state, action) => {
-                const {result} = action.payload
-                state.products = [...result]
+                state.products = [...action.payload]
                 state.isChecked = true
                 state.isLoading = false
             })

@@ -40,7 +40,7 @@ const initialState = {
     account : "",
     isLogin : false,
     isHandling : false,
-    resState : false //清除input用
+    isOldInputs : false //清除input用
 }
 
 const accountSlice = createSlice({
@@ -94,11 +94,10 @@ const accountSlice = createSlice({
                 state.isHandling = true
             })
             .addCase(doSignup.fulfilled, (state, action) => {
-                const {success, message} = action.payload
-                if (success) window.location.replace("/SignIn")
-                alert(message)
+                const {message} = action.payload
                 state.isOldInputs = true
                 state.isHandling = false
+                alert(message)
             })
             .addCase(doSignup.rejected, (state, action) => {
                 alert(action.payload)

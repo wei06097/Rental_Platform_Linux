@@ -36,7 +36,7 @@ export default function ChatRoom() {
         if (!isLogin) navigate("/SignIn", {replace : true})
         init()
         async function init() {
-            const {success, history, nickname} = await API.get(`${API.CHAT_HISTORY}/?receiver=${receiver}`, token)
+            const {success, history, nickname} = await API.get(`${API.CHAT_HISTORY}?receiver=${receiver}`, token)
             if (!success) navigate("/NotFound", {replace : true})
             let lastdate = ""
             const newHistory = history

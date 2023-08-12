@@ -28,8 +28,8 @@ export default function Profile() {
     useEffect( () => {
         init()
         async function init() {
-            const {success, profile} = await API.get(API.PROFILE, token)
-            if (success) setProfile(profile)
+            const {success, data} = await API.get(API.PROFILE, token)
+            if (success) setProfile(data)
             setIsHandling(false)
         }
     }, [token])
