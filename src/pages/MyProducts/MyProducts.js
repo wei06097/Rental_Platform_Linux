@@ -23,9 +23,9 @@ export default function MyProducts() {
 
     useEffect(() => {
         document.title = "我的商品"
-        if (window.location.hash === "#refresh") {
+        if (window.location.hash === "#/MyProducts#refresh") {
             dispatch(getMyProducts())
-            navigate(window.location.pathname, {replace : true})
+            navigate("/MyProducts", {replace : true})
         } else if (!isLogin) {
             navigate("/SignIn", {replace: true})
         } else if (!isChecked) {

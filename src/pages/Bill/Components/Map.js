@@ -11,7 +11,7 @@ import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
 /* ======================================== */
-mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN
+mapboxgl.accessToken = window.MAPBOX_TOKEN
 
 async function getLocationName(longitude, latitude, accessToken) {
     const geocodeUrl = `https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${accessToken}`

@@ -1,5 +1,5 @@
-const API_URL = process.env.REACT_APP_API_URL
-const WS_URL = API_URL
+const API_URL = window.API_URL
+const WS_URL = window.API_URL
 
 /* ============================================================ */
 /* 帳號 */
