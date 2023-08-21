@@ -1,6 +1,7 @@
 {
   "name": "myapp",
   "version": "0.1.0",
+  "homepage": "./",
   "private": true,
   "dependencies": {
     "@mapbox/mapbox-gl-directions": "^4.1.1",
@@ -29,19 +30,19 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "json": "json-server --watch db.json --port 5000",
-    "server": "nodemon server.js",
+    "json": "json-server --watch ./BackendServer/db.json --port 5000",
+    "server": "nodemon ./BackendServer/server.js",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "BUILD_PATH='./ReactServer/build' react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "nodemonConfig": {
     "watch": [
-      "server.js"
+      "./BackendServer/server.js"
     ],
     "ignore": [
-      "db.json"
+      "./BackendServer/db.json"
     ],
     "ext": "js"
   },
@@ -53,9 +54,8 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
+      "defaults",
+      "not ie 11"
     ],
     "development": [
       "last 1 chrome version",

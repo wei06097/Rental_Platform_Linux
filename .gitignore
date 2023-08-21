@@ -2,6 +2,7 @@
 
 # dependencies
 /node_modules
+/ReactServer/node_modules
 /.pnp
 .pnp.js
 
@@ -10,6 +11,7 @@
 
 # production
 /build
+/ReactServer/build
 
 # misc
 .DS_Store
@@ -24,5 +26,6 @@ yarn-error.log*
 
 # custom
 .env
-/img
-db.json
+/BackendServer/img/*
+!/BackendServer/img/NotFound.jpeg
+/BackendServer/db.json
