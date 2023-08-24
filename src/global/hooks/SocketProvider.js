@@ -22,15 +22,16 @@ export default function SocketProvider({ children }) {
             console.log('This browser does not support notification')
         } else {
             // permission: 1. granted 2.denied 3.default
-            Notification.requestPermission()
-                .then(permission => {
-                    console.log(`notification permission ${permission}`)
-                })
+            // Notification.requestPermission()
+            //     .then(permission => {
+            //         console.log(`notification permission ${permission}`)
+            //     })
         }
     }, [])
 
     /* 登入後要socket連線 */
     useEffect(() => {
+        if (true) return
         if (!token) return
         const newSocket = webSocket(API.WS_URL, {
             extraHeaders : {

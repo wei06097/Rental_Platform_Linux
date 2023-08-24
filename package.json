@@ -33,7 +33,7 @@
     "json": "json-server --watch ./BackendServer/db.json --port 5000",
     "server": "nodemon ./BackendServer/server.js",
     "start": "react-scripts start",
-    "build": "BUILD_PATH='./ReactServer/build' react-scripts build",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
