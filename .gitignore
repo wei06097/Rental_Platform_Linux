@@ -2,7 +2,6 @@
 
 # dependencies
 /node_modules
-/ReactServer/node_modules
 /.pnp
 .pnp.js
 
@@ -11,7 +10,6 @@
 
 # production
 /build
-/ReactServer/build
 
 # misc
 .DS_Store

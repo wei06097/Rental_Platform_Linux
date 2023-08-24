@@ -1,7 +1,3 @@
 /BackendServer
-
 /build
 /node_modules
-
-/ReactServer/build
-/ReactServer/node_modules

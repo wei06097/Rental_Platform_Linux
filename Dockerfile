@@ -7,7 +7,7 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# step 2 (node express)
+# step 2 (node)
 # FROM node:14.21.3
 # WORKDIR /app
 # COPY --from=builder /app/ReactServer .
