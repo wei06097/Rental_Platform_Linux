@@ -25,6 +25,7 @@ import MyOrder from "./pages/MyOrder/MyOrder"
 import OrderDetail from "./pages/OrderDetail/OrderDetail"
 import Profile from "./pages/Profile/Profile"
 import MyCollect from "./pages/MyCollect/MyCollect"
+import Notify from "./pages/Notify/Notify"
 /* Hooks */
 import { Routes, Route } from "react-router-dom"
 import SocketProvider from "./global/hooks/SocketProvider"
@@ -57,6 +58,7 @@ function App() {
             <Route path="/OrderDetail/:id" element={<OrderDetail />} />
             <Route path="/Profile" element={<Profile />} />
             <Route path="/MyCollect" element={<MyCollect />} />
+            <Route path="/Notify" element={<Notify />} />
             <Route path="*" element={<NotFound />} />
         </Routes>
       </SocketProvider>

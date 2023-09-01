@@ -1,13 +1,33 @@
-import { Link } from "react-router-dom"
+/* import */
+/* ======================================== */
+import API from "../../API"
+/* Hooks */
+import { useEffect, useState } from "react"
+import { useSelector } from "react-redux"
+import { useNavigate } from "react-router-dom"
 
+/* ======================================== */
 export default function Message() {
+    const navigate = useNavigate()
+    const {token} = useSelector(state => state.account)
+    const [number, setNumber] = useState(0)
+
+    useEffect(() => {
+        init()
+        async function init() {
+            const {number} = await API.get(API.CHAT_NOTIFY, token)
+            setNumber(number || 0)
+        }
+    }, [token])
+    
+     /* ==================== 分隔線 ==================== */
     return <>
-        <Link to="/ChatList">
-            <button className="icon-button">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-chat-fill" viewBox="0 0 16 16">
-                    <path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"/>
-                </svg>
-            </button>
-        </Link>
+        <button
+            number={number>99? 99: number}
+            className={`icon-button ${number>0 && "number"}`} onClick={() => {navigate("/ChatList")}}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" className="icon bi bi-chat-fill" viewBox="0 0 16 16">
+                <path d="M8 15c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.76.743 3.37 1.97 4.6-.097 1.016-.417 2.13-.771 2.966-.079.186.074.394.273.362 2.256-.37 3.597-.938 4.18-1.234A9.06 9.06 0 0 0 8 15z"/>
+            </svg>
+        </button>
     </>
 }

@@ -59,7 +59,8 @@ io.on('connection', socket => {
             receiver,
             type,
             content : data,
-            datetime
+            datetime,
+            read : false,
         }
         // 丟到資料庫
         await fetch(`${DB_URL}/chat_history`, {
@@ -196,6 +197,13 @@ app.get('/api/chat/overview/', async (req, res) => {
     const newArray = Object.keys(lastMessage)
         .map(key => lastMessage[key])
         .sort((a, b) => b.id - a.id)
+    // 計算未讀聊天數量
+    for (let i=0; i<newArray.length; i++) {
+        const response = await fetch(`${DB_URL}/chat_history?provider=${newArray[i].account}`)
+        const result = await response.json()
+        const number = result.filter(element => !element.read).length
+        newArray[i] = {...newArray[i], number}
+    }
     res.json({success : true, list : newArray})
 })
 // 回傳聊天歷史紀錄 receiver為對方的帳號
@@ -215,27 +223,45 @@ app.get('/api/chat/history/', async (req, res) => {
     const params = `provider=${account}&receiver=${receiver}&provider=${receiver}&receiver=${account}`
     const response2 = await fetch(`${DB_URL}/chat_history?${params}`)
     const result2 = await response2.json()
+    // 標記已讀
+    const read_list = result2.filter(element => element.receiver===account && element.read===false)
+    for (let i=0; i<read_list.length; i++) {
+        await fetch(`${DB_URL}/chat_history/${read_list[i].id}`, {
+            method : "PATCH",
+            headers : { "Content-Type" : "application/json" },
+            body : JSON.stringify({...read_list[i], read : true})
+        })
+    }
     res.json( {success : true, history : result2, nickname : nickname} )
 })
-// 回傳所有帳號 (測試聊天用)
-app.get('/api/chat/list/', async (req, res) => {
+// 回傳全部未讀訊息數量
+app.get('/api/chat/notify/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
-    const response = await fetch(`${DB_URL}/accounts?account=${account}`)
+    const response = await fetch(`${DB_URL}/chat_history?receiver=${account}&read=false`)
     const result = await response.json()
-    if (!result[0]) {
-        res.json({success : false, list : null})
-        return
+    res.json( {success : true, number : result.length} )
+})
+// 標示對某人訊息已讀 receiver為對方的帳號
+app.put('/api/chat/notify/', async (req, res) => {
+    const {receiver} = req.query
+    const token = req.headers?.authorization || undefined
+    // 驗證身分
+    const {account} = decodeToken(token)
+    // 找對某人的未讀聊天
+    const response = await fetch(`${DB_URL}/chat_history?provider=${receiver}&consumer=${account}&read=false`)
+    const result = await response.json()
+    const ids = result.map(element => element.id)
+    // 標記已讀
+    for (let i=0; i<ids.length; i++) {
+        await fetch(`${DB_URL}/chat_history/${ids[i]}`, {
+            method : "PATCH",
+            headers : { "Content-Type" : "application/json" },
+            body : JSON.stringify({read : true})
+        })
     }
-    // 取得除了自己外的所有帳號
-    const response2 = await fetch(`${DB_URL}/accounts?account_ne=${account}`)
-    const result2 = await response2.json()
-    const list = result2.map(user => {
-        const {account, nickname} = user
-        return {account, nickname}
-    })
-    res.json( {success : true, list : list} )
+    res.json( {success : true} )
 })
 // 顯示圖片
 app.get('/img/:name', async (req, res) => {
@@ -676,6 +702,9 @@ app.post('/api/order/order_CRUD/', async (req, res) => {
         order_id : order_id, //自己定義的訂單編號
         consumer : account, //買家
         provider : provider, //賣家
+        read_consumer: false,
+        read_provider: false,
+        lasttime: Date.now(),
         order : products, //商品數量價格等資訊
         totalprice : totalPrice, //總金額
         comment, //買家留言
@@ -763,7 +792,11 @@ app.put('/api/order/order_CRUD/', async (req, res) => {
         return
     }
     // 檢查操作與對應身分是否符合(可參考文件)，並處理要更新的訂單資訊
-    let payload = {}
+    let payload = {
+        read_consumer: false,
+        read_provider: false,
+        lasttime: Date.now(),
+    }
     let isAccessable = false
     const {id, provider, consumer, order, actual, progress} = result[0]
     switch (mode) {
@@ -771,6 +804,7 @@ app.put('/api/order/order_CRUD/', async (req, res) => {
             isAccessable = (progress===0) || (account===provider)
             if (!isAccessable) break
             payload = {
+                ...payload,
                 usingMessage,
                 selectedOption,
                 progress : 1
@@ -780,13 +814,14 @@ app.put('/api/order/order_CRUD/', async (req, res) => {
         case 2: { //取消訂單
             isAccessable = (progress===0||progress===1) && (account===provider||account===consumer)
             if (!isAccessable) break
-            payload = {progress : -1}
+            payload = {...payload, progress : -1}
             break
         }
         case 3: { //已收貨
             isAccessable = (progress===1) && (account===consumer)
             if (!isAccessable) break
             payload = {
+                ...payload,
                 actual : {
                     ...actual,
                     start : getCurrentDateTime()
@@ -799,6 +834,7 @@ app.put('/api/order/order_CRUD/', async (req, res) => {
             isAccessable = (progress===2) && (account===provider)
             if (!isAccessable) break
             payload = {
+                ...payload,
                 actual : {
                     ...actual,
                     end : getCurrentDateTime()
@@ -848,9 +884,88 @@ app.put('/api/order/order_CRUD/', async (req, res) => {
     sendSocketMessage(provider, "order", {id: order_id, message: "訂單狀態已更新"})
 })
 
+/* ======================================== */
+// R 取得訂單更新通知
+app.get('/api/order/notify/', async (req, res) => {
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    const response = await fetch(`${DB_URL}/order?consumer=${account}&_sort=lasttime`)
+    const result = await response.json()
+    const consumer_orderlist = result
+        .map(element => {
+            return {
+                order_id: element.order_id,
+                cover: element.order[0].cover,
+                progress: element.progress,
+                read: element.read_consumer
+            }
+        })
+    const response2 = await fetch(`${DB_URL}/order?provider=${account}&_sort=lasttime`)
+    const result2 = await response2.json()
+    const provider_orderlist = result2
+        .map(element => {
+            return {
+                order_id: element.order_id,
+                cover: element.order[0].cover,
+                progress: element.progress,
+                read: element.read_provider
+            }
+        })
+    res.json({success : true, consumer_orderlist, provider_orderlist})
+})
+// U 透過訂單id(自定義的) 標示通知已讀，all=true 表示全部已讀
+app.put('/api/order/notify/', async (req, res) => {
+    const {id, all} = req.query
+    const token = req.headers?.authorization || undefined
+    const {account} = decodeToken(token)
+    if (!all) {
+        const response = await fetch(`${DB_URL}/order?order_id=${id}`)
+        const result = await response.json()
+        let payload = {}
+        if (!result[0]) {
+            res.json({success : false})
+            return
+        } else if (result[0].consumer === account) {
+            payload = {read_consumer : true}
+        } else if (result[0].provider === account) {
+            payload = {read_provider : true}
+        } else {
+            res.json({success : false})
+            return
+        }
+        await fetch(`${DB_URL}/order/${result[0].id}`, {
+            method : "PATCH",
+            headers : { "Content-Type" : "application/json" },
+            body : JSON.stringify(payload)
+        })
+    } else {
+        const response = await fetch(`${DB_URL}/order?consumer=${account}`)
+        const result = await response.json()
+        const response2 = await fetch(`${DB_URL}/order?provider=${account}`)
+        const result2 = await response2.json()
+        const ids = result.map(element => element.id)
+        const ids2 = result2.map(element => element.id)
+        for (let i=0; i<ids.length; i++) {
+            await fetch(`${DB_URL}/order/${ids[i]}`, {
+                method : "PATCH",
+                headers : { "Content-Type" : "application/json" },
+                body : JSON.stringify({read_consumer : true})
+            })
+        }
+        for (let i=0; i<ids2.length; i++) {
+            await fetch(`${DB_URL}/order/${ids2[i]}`, {
+                method : "PATCH",
+                headers : { "Content-Type" : "application/json" },
+                body : JSON.stringify({read_provider : true})
+            })
+        }
+    }
+    res.json({success : true})
+})
+
 /* ======================================== *//* ======================================== */
 // 拿個人資料
-app.get('/api/userfile/profile/',  async (req, res) => {
+app.get('/api/userfile/profile/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
     // 驗證帳號
@@ -874,7 +989,7 @@ app.get('/api/userfile/profile/',  async (req, res) => {
     res.json({success : true, data : profile})
 })
 // 修改個人資料
-app.put('/api/userfile/profile/',  async (req, res) => {
+app.put('/api/userfile/profile/', async (req, res) => {
     const payload = req.body
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -904,7 +1019,7 @@ app.put('/api/userfile/profile/',  async (req, res) => {
     res.json({success : true})
 })
 // 修改密碼
-app.post('/api/userfile/password_change/',  async (req, res) => {
+app.post('/api/userfile/password_change/', async (req, res) => {
     const {oldPassword, newPassword} = req.body
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)

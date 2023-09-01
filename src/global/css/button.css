@@ -97,4 +97,18 @@
     }
 }
 
+/* 通知數字 */
+/* ============================== */
+.number {
+    position: relative;
+}
+.number::after {
+    --size: 20px; content: attr(number);
+    width: var(--size); height: var(--size);
+    background-color: #ff0000cc; border-radius: 50%;
+    color: white; font-size: 13px;
+    position: absolute; top: 0; right: 0;
+    display: grid; place-items: center;
+}
+
 /* ============================== */

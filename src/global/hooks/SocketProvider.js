@@ -31,7 +31,6 @@ export default function SocketProvider({ children }) {
 
     /* 登入後要socket連線 */
     useEffect(() => {
-        if (true) return
         if (!token) return
         const newSocket = webSocket(API.WS_URL, {
             extraHeaders : {

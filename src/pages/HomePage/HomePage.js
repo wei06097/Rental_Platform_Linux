@@ -7,6 +7,7 @@ import API from "../../API"
 /* Components */
 import ShoppingCart from "../../global/icon/ShoppingCart"
 import Message from "../../global/icon/Message"
+import Bell from "../../global/icon/Bell"
 import User from "../../global/icon/User"
 import Reload from "../../global/icon/Reload"
 import GotoTop from "../../global/icon/GotoTop"
@@ -52,6 +53,7 @@ export default function HomePage() {
                 </Link>
                 <ShoppingCart />
                 <Message />
+                <Bell />
                 <User/>
             </div>
         </header>

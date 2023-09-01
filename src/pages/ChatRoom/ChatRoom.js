@@ -56,18 +56,21 @@ export default function ChatRoom() {
     useEffect(() => {
         if (!socket) return
         socket.on("message", messageHandler)
-        function messageHandler(message) {
+        async function messageHandler(message) {
             const Isend = (message.provider === account && message.receiver === receiver)
             const Usend = (message.provider === receiver && message.receiver === account)
             if (Isend || Usend) {
                 const newMessage = {...message, key : uuidv4()}
                 setMessages(prev => [...prev, newMessage])
             }
+            if (Usend) {
+                await API.put(`${API.CHAT_NOTIFY}?receiver=${receiver}`, token)
+            }
         }
         return () => {
             socket.off("message", messageHandler)
         }
-    }, [socket, account, receiver])
+    }, [socket, token, account, receiver])
     
     /* ==================== 分隔線 ==================== */
     function sendMessage() {
@@ -122,6 +125,7 @@ export default function ChatRoom() {
                                     key={message.key}
                                     message={message}
                                     fromMe={message.provider === account}
+                                    startHere={message.read===false && (i===0? true: messages[i-1].read)}
                                 />
                             )
                     }

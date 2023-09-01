@@ -10,7 +10,8 @@ import ViewPage from "./ViewPage"
 import { useState, useEffect, useRef } from "react"
 
 /* ======================================== */
-export default function Message({ message, fromMe }) {
+export default function Message({ message, fromMe, startHere, setMyScroll }) {
+    const readRef = useRef()
     const imgRef = useRef()
     const [loaded, setLoaded] = useState(false)
     const [opening, setOpening] = useState(false)
@@ -43,9 +44,21 @@ export default function Message({ message, fromMe }) {
             imgElement.removeEventListener("load", loaded)
         }
     }, [message, fromMe])
+    useEffect(() => {
+        if (!fromMe && startHere && readRef) {
+            setTimeout(() => {
+                const scrollY = readRef.current?.offsetTop - 80
+                window.scrollTo({ top: scrollY })
+            }, 100)
+        }
+    }, [startHere, fromMe])
 
     /* ==================== 分隔線 ==================== */
     return <>
+        {
+            !fromMe && startHere &&
+            <div className={style.date} ref={readRef}>未讀訊息</div>
+        }
         {
             message.showString &&
             <div className={style.date}>{string}</div>
