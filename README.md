@@ -4,16 +4,19 @@ REACT_APP_API_URL = "Backend URL"
 REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
 ```
 
-# 更新
-### BorrowedAmount
-<details>
-
-- `/api/commodity/commodity_CRUD/` 在新增/編輯商品時，傳到伺服器的 payload 不變，但要記得在資料庫多增加 BorrowedAmount 的欄位，用來記錄借出去的商品數量。
-- `/api/commodity/my_commodity/` 取得我的賣場所有商品時，回傳資料要多一項 BorrowedAmount。
-</details>
-
-
 # API 文件
+### 更新 (2023-09-02)
+- 新增 `/api/chat/notify/`
+- 新增 `/api/order/notify/`
+- 修改 `/api/chat/overview/`
+    - 回傳要加上未讀訊息數量
+- 修改 `/api/chat/history/`
+    - 要標記訊息已讀
+- 修改 `/api/order/order_CRUD/`
+    - 資料庫要多開雙方的已讀欄位
+    - 訂單 process 更新時要重置已讀
+- 修改 `socket.on("message", payload)`
+    - 資料庫要多開已讀欄位
 
 ## 購物車
 ### `/api/cart/cart_CRUD/`
@@ -248,6 +251,9 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
             order_id : order_id, //自己定義的訂單編號
             consumer : account, //買家
             provider : provider, //賣家
+            read_consumer: false, // 買家是否已讀訂單通知
+            read_provider: false, // 賣家是否已讀訂單通知
+            lasttime: Date.now(), // 紀錄更改日期用
             order : products, //商品數量價格等資訊
             totalprice : totalPrice, //總金額/天
             comment, //買家留言
@@ -393,6 +399,7 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
         ```
         - 提醒
             - 取消訂單(2)和歸還商品(4)時，記得更新資料庫的商品剩餘數量與借出數量
+            - progress 改變時要將買賣家雙方已讀狀態設為 false
 </details>
 
 ### `/api/order/overview/`
@@ -436,6 +443,59 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
                     items: [ 'Elden Ring' ]
                 }
             ]
+        }
+        ```
+</details>
+
+### `/api/order/notify/`
+<details>
+
+- 用途
+    - `get` 取得訂單更新通知
+    - `put` 標示訂單通知已讀
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+    - `?id=`
+        - `put` 時表示已讀的訂單標號(1個)
+    - `?all=true`
+        - `put` 時將所有通知標記已讀(全部)
+- method
+    - `get`
+        - response
+        ```JavaScript
+        success: true, //是否取得成功
+        consumer_orderlist: [], //個人通知
+        provider_orderlist: [ //賣場通知
+            {
+                order_id: 'c65441a5-0664-477c-9f93-7fe182d36041', //自定義商品 id
+                cover: 'img/8da5912c-48a5-4aec-a61b-377789dfd8a9.png', //拿第一張圖
+                progress: 0, //訂單進度
+                read: true //是否已讀
+            },
+            {
+                order_id: '8031771a-d44b-4e6d-ad9b-2cc12b460c83',
+                cover: 'img/88afbee0-8d69-4e1e-a3df-b346f01f0e2f.jpeg',
+                progress: 1,
+                read: false
+            }
+        ]
+        ```
+    - `put`
+        - body
+        ```JavaScript
+        {
+
+        }
+        ```
+        - response
+        ```JavaScript
+        {
+            success: true, //是否成功
         }
         ```
 </details>
@@ -535,7 +595,7 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
 <details>
 
 - 用途
-    - 取得對話過的對象及其最後一筆訊息
+    - 取得對話過的對象及其最後一筆訊息與未讀數量
     - 要按照時間在陣列排序
     - 最新的紀錄要放在陣列的前面
     - 時間規則與之前一樣 YYYY-MM-DDThh:mm (ex. 2023-07-10T00:28)
@@ -557,15 +617,15 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
                     account: 'kokoro123', //對方的帳號
                     content:'你好阿\n請多指教', //最後一則訊息
                     datetime: '2023-07-10T00:28', //時間
-                    id: 24, //在資料庫的id
-                    nickname: '弦巻こころ' //對方的暱稱
+                    nickname: '弦巻こころ', //對方的暱稱
+                    number: 3 //未讀訊息數量
                 },
                 {
                     account: '1',
                     content: '傳送了一張圖片', //如果是圖片要改成這樣
                     datetime: '2023-07-10T00:21',
-                    id: 23,
-                    nickname: '1'
+                    nickname: '1',
+                    number: 0 //未讀訊息數量
                 }
             ]
         }
@@ -576,7 +636,7 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
 <details>
 
 - 用途
-    - 取得與某人的對話紀錄
+    - 取得與某人的對話紀錄(記得標記已讀)
 - params
     - headers
         ```JavaScript
@@ -615,6 +675,45 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
         ```
 </details>
 
+### `/api/chat/notify/`
+<details>
+
+- 用途
+    - `get` 回傳未讀訊息總數量
+    - `put` 對某人訊息已讀
+- params
+    - headers
+        ```JavaScript
+        {
+            authorization : token //JWT token
+        }
+        ```
+    - `?receiver=`
+        - `put` 時要加上對方的帳號
+- method
+    - `get`
+        - response
+        ```JavaScript
+        {
+            success: true, //取得是否成功
+            number: 2 //未讀訊息總數量
+        }
+        ```
+    - `put`
+        - body
+        ```JavaScript
+        {
+
+        }
+        ```
+        - response
+        ```JavaScript
+        {
+            success: true, //是否成功
+        }
+        ```
+</details>
+
 ## Socket 事件
 - 登入會有 connect 事件觸發
 - 登出或離線會有 disconnect 事件觸發
@@ -635,7 +734,7 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
     ```
 - 存入資料庫(參考用)
     ```JavaScript
-    {provider, receiver, type, content, datetime}
+    {provider, receiver, type, content, datetime, read=false}
     ```
 </details>
 
@@ -674,7 +773,4 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
     ```
 </details>
 
-## 其他
-### `<== to be continued`
-<!-- <details>
-</details> -->
+## つづく
