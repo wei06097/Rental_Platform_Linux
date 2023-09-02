@@ -1,7 +1,9 @@
 # step 1
 FROM node:14.21.3 AS builder
-ENV REACT_APP_API_URL="Backend URL"
-ENV REACT_APP_MAPBOX_TOKEN="Mapbox Token"
+ARG API_URL="Backend URL"
+ARG MAPBOX_TOKEN="Mapbox Token"
+ENV REACT_APP_API_URL=${API_URL}
+ENV REACT_APP_MAPBOX_TOKEN=${MAPBOX_TOKEN}
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY public public
