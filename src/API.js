@@ -1,37 +1,36 @@
-const API_URL = window.API_URL
-const WS_URL = window.API_URL
+const WS_URL = process.env.REACT_APP_API_URL
 
 /* ============================================================ */
 /* 帳號 */
-const SIGNUP = `${API_URL}/api/userfile/signup/`
-const LOGIN = `${API_URL}/api/userfile/login/`
-const JWT = `${API_URL}/api/userfile/verify_token/`
+const SIGNUP = `${WS_URL}/api/userfile/signup/`
+const LOGIN = `${WS_URL}/api/userfile/login/`
+const JWT = `${WS_URL}/api/userfile/verify_token/`
 /* 個人檔案 */
-const PROFILE = `${API_URL}/api/userfile/profile/`
-const PASSWORD_CHANGE = `${API_URL}/api/userfile/password_change/`
+const PROFILE = `${WS_URL}/api/userfile/profile/`
+const PASSWORD_CHANGE = `${WS_URL}/api/userfile/password_change/`
 /* 賣場 */
-const STORE = `${API_URL}/api/userfile/browse_store/`
-const MY_PRODUCTS = `${API_URL}/api/commodity/my_commodity/`
-const CRUD_PRODUCT = `${API_URL}/api/commodity/commodity_CRUD/`
-const LAUNCH_PRODUCT = `${API_URL}/api/commodity/launch/`
+const STORE = `${WS_URL}/api/userfile/browse_store/`
+const MY_PRODUCTS = `${WS_URL}/api/commodity/my_commodity/`
+const CRUD_PRODUCT = `${WS_URL}/api/commodity/commodity_CRUD/`
+const LAUNCH_PRODUCT = `${WS_URL}/api/commodity/launch/`
 /* 商品 */
-const HOMEPAGE = `${API_URL}/api/commodity/get_launched_commodity/`
-const RESULT = `${API_URL}/api/commodity/get_searched_commodity/`
-const PRODUCT = `${API_URL}/api/commodity/get_commodity/`
+const HOMEPAGE = `${WS_URL}/api/commodity/get_launched_commodity/`
+const RESULT = `${WS_URL}/api/commodity/get_searched_commodity/`
+const PRODUCT = `${WS_URL}/api/commodity/get_commodity/`
 /* 聊天 */
-const CHAT_LIST = `${API_URL}/api/chat/list/`
-const CHAT_HISTORY = `${API_URL}/api/chat/history/`
-const CHAT_OVERVIEW = `${API_URL}/api/chat/overview/`
+const CHAT_LIST = `${WS_URL}/api/chat/list/`
+const CHAT_HISTORY = `${WS_URL}/api/chat/history/`
+const CHAT_OVERVIEW = `${WS_URL}/api/chat/overview/`
 /* 購物車 */
-const CRUD_CART = `${API_URL}/api/cart/cart_CRUD/`
-const MY_CART = `${API_URL}/api/cart/my_cart/`
-const MY_STORECART = `${API_URL}/api/cart/my_storecart/`
+const CRUD_CART = `${WS_URL}/api/cart/cart_CRUD/`
+const MY_CART = `${WS_URL}/api/cart/my_cart/`
+const MY_STORECART = `${WS_URL}/api/cart/my_storecart/`
 /* 訂單 */
-const ORDER = `${API_URL}/api/order/order_CRUD/`
-const OVERVIEW_ORDERS = `${API_URL}/api/order/overview/`
+const ORDER = `${WS_URL}/api/order/order_CRUD/`
+const OVERVIEW_ORDERS = `${WS_URL}/api/order/overview/`
 /* 訂單更新通知 */
-const ORDER_NOTIFY = `${API_URL}/api/order/notify/`
-const CHAT_NOTIFY = `${API_URL}/api/chat/notify/`
+const ORDER_NOTIFY = `${WS_URL}/api/order/notify/`
+const CHAT_NOTIFY = `${WS_URL}/api/chat/notify/`
 
 /* ============================================================ */
 async function get(url, token) {

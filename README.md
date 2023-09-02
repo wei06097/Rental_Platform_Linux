@@ -1,3 +1,9 @@
+# .env
+```js
+REACT_APP_API_URL = "Backend URL"
+REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
+```
+
 # 更新
 ### BorrowedAmount
 <details>

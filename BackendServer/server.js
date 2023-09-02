@@ -8,9 +8,9 @@ const fs = require('fs')
 const { v4: uuidv4 } = require('uuid')
 
 /* ======================================== */
-const JWT_SECRET = process.env.ACCESS_TOKEN_SECRET
-const HOST = process.env.BackEnd_HOST
-const PORT = process.env.BackEnd_PORT
+const JWT_SECRET = "80b340492b2ad963fa08bb80c9a8969882f05fa4e1d0fbd07fec2c3cc808da1d8deb991dd873905d278fc2902cb218a7b4210a0f743171fbe2abb1157e6da5be"
+const HOST = "192.168.244.130"
+const PORT = "4000"
 const DB_URL = "http://127.0.0.1:5000"
 
 const app = express()

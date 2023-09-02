@@ -13,7 +13,7 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 import '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions.css'
 
 /* ======================================== */
-mapboxgl.accessToken = window.MAPBOX_TOKEN
+mapboxgl.accessToken = process.env.REACT_APP_MAPBOX_TOKEN
 
 export default function Map({ closePage, destination }) {
     const [hidden, setHidden] = useState(false)
