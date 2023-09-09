@@ -1,11 +1,13 @@
 # .env
 ```js
 REACT_APP_API_URL = "Backend URL"
+REACT_APP_WS_URL = "Backend Websocket URL"
 REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
 ```
 
 # API 文件
-### 更新 (2023-09-02)
+### 更新
+#### (2023-09-02)
 - 新增 `/api/chat/notify/`
 - 新增 `/api/order/notify/`
 - 修改 `/api/chat/overview/`
@@ -17,6 +19,9 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
     - 訂單 process 更新時要重置已讀
 - 修改 `socket.on("message", payload)`
     - 資料庫要多開已讀欄位
+
+#### (2023-09-10)
+- 將 Socket.IO 改為 WebSocket
 
 ## 購物車
 ### `/api/cart/cart_CRUD/`
@@ -656,7 +661,7 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
                 {
                     provider: 'kokoro123', //發送訊息的人
                     receiver: '2', //接收訊息的人
-                    type: 'text', //訊息類型
+                    message_type: 'text', //訊息類型
                     content: '你好阿', //內容
                     datetime: '2023-07-09T23:30', //時間
                     id: 18  //在資料庫的id
@@ -664,7 +669,7 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
                 {
                     provider: 'kokoro123',
                     receiver: '2',
-                    type: 'img',
+                    message_type: 'img',
                     content: 'img/a9686976-cd2f-4cd4-ad91-075a10617521.png',
                     datetime: '2023-07-09T23:58',
                     id: 20
@@ -714,42 +719,48 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
         ```
 </details>
 
-## Socket 事件
+## WebSocket
 - 登入會有 connect 事件觸發
-- 登出或離線會有 disconnect 事件觸發
-- token 會在 headers 的 authorization
+- 登出或離線會有 close 事件觸發
+- token 放在 headers["sec-websocket-protocol"]
+- `message 事件` 分類
+    - `監聽 event: chat` 接收聊天訊息並處理
+    - `發送 event: chat` 發送及時聊天訊息
+    - `發送 event: order` 發送訂單更新時的及時通知
+- 注意 `message 事件` 傳遞的是字串
 
-### `socket.on("message", payload)`
+### `監聽 socket.on('message', '{event: "chat", payload: ...}')`
+
 <details>
 
 - 用途
-    - 接收訊息
+    - 接收聊天訊息並處理
 - payload
     ```JavaScript
     {
         receiver : "kokoro123", //接收者
-        type : "text" or "img", //類型
+        message_type : "text" or "img", //類型
         content : "你好" or 圖片 //內容
     }
     ```
 - 存入資料庫(參考用)
     ```JavaScript
-    {provider, receiver, type, content, datetime, read=false}
+    {provider, receiver, message_type, content, datetime, read=false}
     ```
 </details>
 
-### `socket.emit("message", body)`
+### `發送 socket.send('{event: "chat", payload: ...}')`
 <details>
 
 - 用途
-    - `socket.on("message", payload)`
+    - `socket.on("message", {event: "chat", payload: ...})`
     - 收到上面事件後傳送訊息給雙方
-- body
+- payload
     ```JavaScript
     {   // 跟存入資料庫的很像，但要多加暱稱
         provider,
         receiver,
-        type,
+        message_type,
         content,
         datetime,
         nickname
@@ -757,14 +768,14 @@ REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
     ```
 </details>
 
-### `socket.emit("order", body)`
+### `發送 socket.send('{event: "order", payload: ...}')`
 <details>
 
 - 用途
     - `post` `/order/order_CRUD/`
     - `put` `/order/order_CRUD/`
     - 上面兩個 api 處理完成後，傳送給買家和賣家及時通知
-- body
+- payload
     ```JavaScript
     {   // 跟存入資料庫的很像，但要多加暱稱
         id : "訂單自定義 id",

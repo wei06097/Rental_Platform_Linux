@@ -1,6 +1,7 @@
 /* ======================================== */
 require('dotenv').config()
 const express = require('express')
+const expressWs = require('express-ws')
 const cors = require('cors')
 const jwt = require('jsonwebtoken')
 const fetch = require('node-fetch')
@@ -14,79 +15,82 @@ const PORT = "4000"
 const DB_URL = "http://127.0.0.1:5000"
 
 const app = express()
+expressWs(app)
 app.use(cors())
 app.use(express.json({limit: '100mb'}))
-const server = require('http').Server(app)
-const io = require('socket.io')(server, {
-    cors: { origin: "*" },
-    maxHttpBufferSize: 10e7 //10MB
-})
 
 /* ======================================== *//* ======================================== */
-let online = {}
+let online = {} //線上列表
+const socketIdMap = new Map() //映射ws和uuid
 
-/* 前端登入後會連接 socket */
-io.on('connection', socket => {
-    /* 此時可以從 headers 拿 token */
-    const token = socket?.handshake?.headers?.authorization || null
+app.ws('/', (socket, req) => {
+    /* 解析 token */
+    const token = req.headers["sec-websocket-protocol"]?.split(", ")[1]
     const {account, nickname} = decodeToken(token)
-    /* 如果 token 解析錯誤，就離開函式 */
-    if (!token || !account) return
+    if (!account) return
     /* 加入線上列表 */
+    const socketId = uuidv4()
+    socketIdMap.set(socketId, socket)
     if (!online[account]) online[account] = []
-    online[account].push(socket.id)
-    
-    /* 前端登出後或是關閉分頁，會產生 socket 斷線的事件 */
-    socket.on("disconnect", () => {
-        /* 從線上列表移除 */
-        const index = online[account].indexOf(socket.id)
+    online[account].push(socketId)
+    /* 訊息事件 */
+    socket.addEventListener("message", event => {
+        const message = JSON.parse(event.data)
+        if (message.event === "chat") {
+            chatEventHandler(account, nickname, message.payload)
+        }
+    })
+    /* 斷線事件 */
+    socket.addEventListener("close", () => {
+        /* 移除映射並從線上列表移除 */
+        socketIdMap.delete(socketId)
+        const index = online[account].indexOf(socketId)
         if (index !== -1) online[account].splice(index, 1)
         if (!online[account][0]) delete online[account]
     })
-
-    /* 傳送訊息 */
-    socket.on("message", async ({receiver, type, content}) => {
-        // 驗證對方是否存在
-        const response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
-        const result = await response.json()
-        // 不能傳訊息給自己
-        if (!result[0] || account === receiver) return
-        // 處理訊息
-        const datetime = getCurrentDateTime()
-        const data = (type === "img")? await saveImg(content, true): content
-        const message = {
-            provider : account,
-            receiver,
-            type,
-            content : data,
-            datetime,
-            read : false,
-        }
-        // 丟到資料庫
-        await fetch(`${DB_URL}/chat_history`, {
-            method : "POST",
-            headers : { "Content-Type" : "application/json" },
-            body : JSON.stringify(message)
-        })
-        // 傳給自己
-        sendSocketMessage(account, "message", {...message, nickname})
-        // 傳給對方
-        sendSocketMessage(receiver, "message", {...message, nickname})
-    })
 })
 
-// 根據帳號送出訊息
+/* Functions */
+/* ======================================== */
+// 根據帳號送出 ws message
 function sendSocketMessage(account, event, payload) {
     if (!online[account]) return
     online[account]
         .forEach(socketId => {
-            const socket = io.sockets.sockets.get(socketId)
-            socket.emit(event, payload)
+            const socket = socketIdMap.get(socketId)
+            socket.send(JSON.stringify({ event, payload }))
         })
 }
-
-/* Functions */
-/* ======================================== */
+// 儲存聊天紀錄及後續處理
+async function chatEventHandler(account, nickname, payload) {
+    const {receiver, message_type, content } = payload
+    // 驗證對方是否存在
+    const response = await fetch(`${DB_URL}/accounts?account=${receiver}`)
+    const result = await response.json()
+    // 不能傳訊息給自己
+    if (!result[0] || account === receiver) return
+    // 處理訊息
+    const datetime = getCurrentDateTime()
+    const data = (message_type === "img")? await saveImg(content, true): content
+    const message = {
+        provider : account,
+        receiver,
+        message_type,
+        content : data,
+        datetime,
+        read : false,
+    }
+    // 丟到資料庫
+    await fetch(`${DB_URL}/chat_history`, {
+        method : "POST",
+        headers : { "Content-Type" : "application/json" },
+        body : JSON.stringify(message)
+    })
+    // 傳給自己
+    sendSocketMessage(account, "chat", {...message, nickname})
+    // 傳給對方
+    sendSocketMessage(receiver, "chat", {...message, nickname})
+}
 // 儲存圖片並回傳子網址
 async function saveImg(img, doSave) {
     /* 產生 id */
@@ -1044,7 +1048,7 @@ app.post('/api/userfile/password_change/', async (req, res) => {
 })
 
 /* ======================================== *//* ======================================== */
-server.listen(PORT, HOST, () => {
+app.listen(PORT, HOST, () => {
     console.log("\n===== Start =====")
     console.log(`at ${HOST}:${PORT}\n`)
 })

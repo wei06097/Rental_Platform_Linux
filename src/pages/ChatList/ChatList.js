@@ -40,18 +40,21 @@ export default function ChatList() {
 
     useEffect(() => {
         if (!socket) return
-        socket.on("message", messageHandler)
-        function messageHandler(message) { 
+        socket.addEventListener("message", messageEventHandler)
+        function messageEventHandler(event) {
+            const message = JSON.parse(event.data)
+            if (message.event !== "chat") return
+            const chat = message.payload
             setUsers(prev => {
                 const lastList = prev
-                    .filter(element => element.account === message.provider)
+                    .filter(element => element.account === chat.provider)
                 let newList = prev
-                    .filter(element => element.account !== message.provider)
+                    .filter(element => element.account !== chat.provider)
                 newList = [{
-                    account : message.provider,
-                    content : message.type === "text"? message.content: "傳送了一張圖片",
-                    datetime : message.datetime,
-                    nickname : message.nickname,
+                    account : chat.provider,
+                    content : chat.message_type === "text"? chat.content: "傳送了一張圖片",
+                    datetime : chat.datetime,
+                    nickname : chat.nickname,
                     number : lastList[0]?.number + 1 || 1,
                     key : uuidv4()
                 }, ...newList]
@@ -59,7 +62,7 @@ export default function ChatList() {
             })
         }
         return () => {
-            socket.off("message", messageHandler)
+            socket.removeEventListener("message", messageEventHandler)
         }
     }, [socket])
 

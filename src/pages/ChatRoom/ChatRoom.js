@@ -55,12 +55,15 @@ export default function ChatRoom() {
      // 及時訊息接收
     useEffect(() => {
         if (!socket) return
-        socket.on("message", messageHandler)
-        async function messageHandler(message) {
-            const Isend = (message.provider === account && message.receiver === receiver)
-            const Usend = (message.provider === receiver && message.receiver === account)
+        socket.addEventListener("message", messageEventHandler)
+        async function messageEventHandler(event) {
+            const message = JSON.parse(event.data)
+            if (message.event !== "chat") return
+            const chat = message.payload
+            const Isend = (chat.provider === account && chat.receiver === receiver)
+            const Usend = (chat.provider === receiver && chat.receiver === account)
             if (Isend || Usend) {
-                const newMessage = {...message, key : uuidv4()}
+                const newMessage = {...chat, key : uuidv4()}
                 setMessages(prev => [...prev, newMessage])
             }
             if (Usend) {
@@ -68,18 +71,18 @@ export default function ChatRoom() {
             }
         }
         return () => {
-            socket.off("message", messageHandler)
+            socket.removeEventListener("message", messageEventHandler)
         }
     }, [socket, token, account, receiver])
     
     /* ==================== 分隔線 ==================== */
     function sendMessage() {
-        const type = "text"
+        const message_type = "text"
         const content = textareaRef.current.innerText
         textareaRef.current.innerText = ""
         if (content.replaceAll('\n', '') === "") return
-        const paylaod = {receiver, type, content}
-        if (socket) socket.emit("message", paylaod)
+        const payload = { event: "chat", payload: {receiver, message_type, content} }
+        if (socket) socket.send(JSON.stringify(payload))
     }
     function onKeyDown(e) {
         const keyCode = e.which || e.keyCode
@@ -89,7 +92,7 @@ export default function ChatRoom() {
         sendMessage()
     }
     function onInputImgChange(e) {
-        const type = "img"
+        const message_type = "img"
         const length = e.target.files.length
         for (let i=0; i<length; i++) {
             const fileData = e.target.files[i]
@@ -98,8 +101,8 @@ export default function ChatRoom() {
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
                 const content = reader.result //base64Pic
-                const payload = {receiver, type, content}
-                if (socket) socket.emit("message", payload)
+                const payload = { event: "chat", payload: {receiver, message_type, content} }
+                if (socket) socket.send(JSON.stringify(payload))
             }, false)
         }
         e.target.value = ""

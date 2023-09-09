@@ -23,7 +23,7 @@ export default function Message({ message, fromMe, startHere, setMyScroll }) {
     
     useEffect(() => {
         autoScroll()
-        if (message.type === "text") return
+        if (message.message_type === "text") return
         const imgElement = imgRef.current
         const loaded = () => {
             setLoaded(true)
@@ -64,7 +64,7 @@ export default function Message({ message, fromMe, startHere, setMyScroll }) {
             <div className={style.date}>{string}</div>
         }
         {
-            (message.type === "text")?
+            (message.message_type === "text")?
             <div className={`${style.card} ${fromMe? style.right: style.left}`}
                 time={time}>
                 {message.content}
