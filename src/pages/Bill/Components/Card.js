@@ -23,7 +23,7 @@ export default function Card({ element, noBorder, payload, setPayload, deletePro
                     ...prev,
                     [element.id] : {
                         amount : Number(1),
-                        price : element.price
+                        price : Number(element.price)
                     }
                 }
             })
@@ -53,7 +53,7 @@ export default function Card({ element, noBorder, payload, setPayload, deletePro
                 ...prev,
                 [element.id] : {
                     amount : Number(data),
-                    price : element.price
+                    price : Number(element.price)
                 }
             }
         })

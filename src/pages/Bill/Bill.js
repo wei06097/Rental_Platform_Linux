@@ -58,7 +58,7 @@ export default function Bill() {
     async function deleteProduct(id) {
         if (isHandling) return
         setIsHandling(true)
-        const {success} = await API.del(`${API.CRUD_CART}/?id=${id}`, token)
+        const {success} = await API.del(`${API.CRUD_CART}?id=${id}`, token)
         if (success) {
             const newData = data.filter(element => element.id !== id)
             const newPayload = {...payload}
