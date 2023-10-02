@@ -1,0 +1,25 @@
+.map_container {
+    width: 100%; height: calc(100vh - var(--height));
+    overflow-x: auto; user-select: none;
+    position: relative; z-index: 1;
+    display: grid; place-items: center;
+}
+.map_container::-webkit-scrollbar {
+    width: 0; height: 10px;
+}
+.ntust_map {
+    max-width: 100%; max-height: 90%;
+    position: absolute;
+    border: 1px solid #ddd; border-radius: 10px;
+}
+
+@media (max-width: 1250px) and (min-height: 600px) {
+    .ntust_map {
+        left: 0;
+    }
+}
+@media (max-width: 1250px) {
+    .ntust_map {
+        max-width: none;
+    }
+}
