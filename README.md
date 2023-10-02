@@ -3,6 +3,7 @@
 REACT_APP_API_URL = "Backend URL"
 REACT_APP_WS_URL = "Backend Websocket URL"
 REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
+REACT_APP_NAVIGATION_API_URL = "Navigation API URL (Backend)"
 ```
 
 # API 文件
