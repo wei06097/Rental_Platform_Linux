@@ -11,10 +11,13 @@ export default function SchoolMap({ destination }) {
     const destinationCanvasRef = useRef()
     const [nodes, setNodes] = useState({})
     const [inited, setInited] = useState(false)
-    const [source, setSource] = useState([121.54110276123953, 25.01349988551148])
+    const [source, setSource] = useState(destination)
     const [route, setRoute] = useState([])
-    
+    const [distance, setDistance] = useState("0(m)")
+
+    /* ======================================== */
     useEffect(() => {
+        // 跟導航後端要地圖的 nodes 資訊
         remote.get_nodes().then(nodes => setNodes(nodes))
         const mapCtx = mapCanvasRef.current.getContext('2d')
         const image = new Image()
@@ -30,17 +33,35 @@ export default function SchoolMap({ destination }) {
             setInited(true)
         }
     }, [])
+    useEffect(() => {
+        // 監聽使用者目前位置
+        const id = navigator.geolocation.watchPosition(
+            (position) => {
+                const {longitude, latitude} = position.coords
+                setSource([longitude, latitude])
+            },
+            () => {},
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+            }
+        )
+        return () => {
+            navigator.geolocation.clearWatch(id)
+        }
+    }, [])
 
     useEffect(() => {
-        // 定位功能加這裡
-    }, [])
-    useEffect(() => {
+        // 當起點終點改變
         if (!inited) return
         remote.directions({source, destination})
             .then(data => {
                 const {source_xy, destination_xy, best_path, total_distance} = data
-                console.log(total_distance, source_xy)
                 setRoute(best_path)
+                setDistance(_ => {
+                    const distance = Math.round(total_distance)
+                    return (distance >= 1000)? `${distance / 1000}(km)`: `${distance}(m)`
+                })
                 const sourceCanvas = sourceCanvasRef.current
                 const destinationCanvas = destinationCanvasRef.current 
                 canvas.clearCanvas(sourceCanvas)
@@ -50,6 +71,7 @@ export default function SchoolMap({ destination }) {
             })
     }, [inited, source, destination])
     useEffect(() => {
+        // 將最佳路徑畫出
         if (!inited || !route[0]) return
         const routeCanvas = routeCanvasRef.current
         canvas.clearCanvas(routeCanvas)
@@ -65,6 +87,21 @@ export default function SchoolMap({ destination }) {
     
     /* ======================================== */
     return <>
+        {
+            inited && <>
+            <div className={style.display}>
+                <div className={style.dot}>
+                    <div className={style.black} />
+                    <span>起點</span>
+                </div>
+                <div className={style.dot}>
+                    <div className={style.red} />
+                    <span>終點</span>
+                </div>
+                <span>總距離: {distance}</span>
+            </div>
+            </>
+        }
         <div className={style.map_container}>
             <canvas ref={mapCanvasRef} className={style.ntust_map} />
             <canvas ref={routeCanvasRef} className={style.ntust_map} />

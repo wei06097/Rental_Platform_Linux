@@ -13,9 +13,34 @@
     border: 1px solid #ddd; border-radius: 10px;
 }
 
+/* ======================================== */
+.display {
+    position: fixed; z-index: 2;
+    top: calc(var(--height) + 10px);
+    left: calc(calc(100vw - var(--width)) / 2 + 10px);
+}
+.dot {
+    display: flex; gap: 10px;
+    margin: 3px 0;
+}
+.dot > div {
+    width: 20px; height: 20px;
+    border-radius: 50%;
+}
+.dot > .red {
+    background-color: red;
+}
+.dot > .black {
+    background-color: black;
+}
+
+/* ======================================== */
 @media (max-width: 1250px) and (min-height: 600px) {
     .ntust_map {
         left: 0;
+    }
+    .display {
+        left: 10px;
     }
 }
 @media (max-width: 1250px) {

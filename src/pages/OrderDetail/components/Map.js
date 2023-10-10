@@ -3,7 +3,7 @@
 /* Components */
 import Back from "../../../global/icon/Back"
 /* Hooks */
-import { useState } from "react"
+import { useEffect, useState } from "react"
 /* Components */
 import MapBox from "./MapBox"
 import SchoolMap from "./SchoolMap"
@@ -11,6 +11,15 @@ import SchoolMap from "./SchoolMap"
 /* ======================================== */
 export default function Map({ closePage, destination }) {
     const [inNtust, setInNtust] = useState(true)
+    useEffect(() => {
+        navigator.geolocation.getCurrentPosition(
+            () => {},
+            () => {
+                alert("請開啟定位功能")
+            }
+        )
+    }, [])
+
     /* ==================== 分隔線 ==================== */
     return <>
         <div className="page">
@@ -20,7 +29,13 @@ export default function Map({ closePage, destination }) {
                         goLastPage={false}
                         closeSubPage={closePage}
                     />
-                    <span>導航</span>
+                    <span>
+                    {
+                        inNtust?
+                        "校內導航":
+                        "導航"
+                    }
+                    </span>
                 </div>
                 <div>
                     <button className="icon-button" style={{width:"max-content"}}

@@ -52,8 +52,12 @@ export default function MapBox({ destination }) {
             .addControl(geolocate)
             .on('load', async () => {
                 geolocate.trigger()
+                new mapboxgl.Marker().setLngLat(destination.center).addTo(map)
+                map.flyTo({
+                    center: destination.center,
+                    zoom: (map.getZoom() <= 10)? 14: map.getZoom()
+                })
             })
-        
         document.querySelector(".mapboxgl-ctrl-logo").style.display = "none"
         document.querySelector(".mapbox-directions-component-keyline").style.visibility = "hidden"
         return () => {
