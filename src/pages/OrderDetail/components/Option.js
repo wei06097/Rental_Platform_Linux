@@ -51,8 +51,8 @@ export default function Option({ mode, value, setDecision, hideRadio, isHandling
             <label onClick={labelClickHandler}>
                 {
                     (mode === "position")
-                    ?<input type="text" className={style.position} disabled={true} value={value.name} />
-                    :<input type="text" disabled={true} value={datatime} />
+                    ?<input type="text" className={style.position} readOnly={true} value={value.name} />
+                    :<input type="text" readOnly={true} value={datatime} />
                 }
             </label>
             {

@@ -12,6 +12,7 @@
     margin: 5px; padding: 10px;
     border: 1px solid #ddd; border-radius: 5px;
     outline: none; cursor: pointer; font-size: 15px;
+    color: #777; background-color: #eee5;
 }
 
 /* ======================================== */
