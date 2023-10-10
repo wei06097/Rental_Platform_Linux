@@ -14,7 +14,16 @@ const navigation_api = {
         })
         const result = await response.json()
         return Promise.resolve(result)
-    }
+    },
+    transform : async (payload) => {
+        const response = await fetch(`${BASE_URL}/navigation/transform`, {
+            method : "POST",
+            headers: { "Content-Type": "application/json" },
+            body : JSON.stringify(payload)
+        })
+        const result = await response.json()
+        return Promise.resolve(result)
+    },
 }
 
 export default navigation_api

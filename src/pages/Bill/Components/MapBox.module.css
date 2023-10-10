@@ -1,0 +1,43 @@
+.map {
+    width: var(--width); height: calc(100vh - var(--height));
+    position: absolute; margin: 0 auto;
+}
+.container {
+    width: max-content;
+    position: fixed; z-index: 5;
+    top: calc(var(--height) + 10px);
+    left: calc((100vw - var(--width)) / 2  + 10px);
+}
+
+/* ======================================== */
+.container > form {
+    display: flex; gap: 5px;
+}
+.container > form > input {
+    height: 30px; border-radius: 5px;
+    outline: none; border: 0;
+    box-shadow: 0 0 2px 2px #0002;
+    background-color: #fff;
+}
+.container > form > input[type="text"] {
+    width: 250px; padding: 5px; font-size: 15px;
+}
+.container > form > input[type="submit"],
+.container > form > input[type="button"] {
+   cursor: pointer;
+}
+.container > form > input[type="submit"]:hover,
+.container > form > input[type="button"]:hover {
+    background-color: #eee;
+}
+
+/* ======================================== */
+.container > div {
+    width: 250px; font-size: 15px;
+    border-radius: 5px; cursor: pointer;
+    box-shadow: 0 0 2px 2px #0002;
+    background-color: #fff; color: #777;
+}
+.container > div > div {
+    padding: 5px; border-top: 1px solid #ddd;
+}
