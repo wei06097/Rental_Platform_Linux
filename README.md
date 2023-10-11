@@ -1,10 +1,24 @@
-# .env
+### `.env`
+範例 : 如果網域名稱是 `dev.local`
 ```js
-REACT_APP_API_URL = "Backend URL"
-REACT_APP_WS_URL = "Backend Websocket URL"
-REACT_APP_MAPBOX_TOKEN = "Mapbox Token"
-REACT_APP_NAVIGATION_API_URL = "Navigation API URL (Backend)"
+REACT_APP_API_URL = "https://dev.local"
+REACT_APP_WS_URL = "wss://dev.local/api/"
+REACT_APP_MAPBOX_TOKEN = "token"
+REACT_APP_NAVIGATION_API_URL = "https://dev.local"
 ```
+```js
+REACT_APP_API_URL => 後端網址
+REACT_APP_WS_URL => 後端 ws 網址
+REACT_APP_MAPBOX_TOKEN => Mapbox Token
+REACT_APP_NAVIGATION_API_URL => 導航後端網址
+```
+
+### `docker`
+1. 建立 image\
+`docker build -t <image name> .`\
+(建立時需要 .env)
+2. 啟動 container\
+`docker run -p <your port>:80 <image name>`
 
 # API 文件
 ### 更新
