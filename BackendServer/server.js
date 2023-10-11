@@ -10,9 +10,9 @@ const { v4: uuidv4 } = require('uuid')
 
 /* ======================================== */
 const JWT_SECRET = "80b340492b2ad963fa08bb80c9a8969882f05fa4e1d0fbd07fec2c3cc808da1d8deb991dd873905d278fc2902cb218a7b4210a0f743171fbe2abb1157e6da5be"
-const HOST = "192.168.244.130"
-const PORT = "4000"
-const DB_URL = "http://127.0.0.1:5000"
+const HOST = process.env.Test_HOST
+const PORT = process.env.Test_PORT
+const DB_URL = process.env.Test_DB
 
 const app = express()
 expressWs(app)
@@ -23,7 +23,7 @@ app.use(express.json({limit: '100mb'}))
 let online = {} //線上列表
 const socketIdMap = new Map() //映射ws和uuid
 
-app.ws('/', (socket, req) => {
+app.ws('/api/', (socket, req) => {
     /* 解析 token */
     const token = req.headers["sec-websocket-protocol"]?.split(", ")[1]
     const {account, nickname} = decodeToken(token)
@@ -102,7 +102,7 @@ async function saveImg(img, doSave) {
     const buf = Buffer.from(data, 'base64')
     if (doSave) fs.writeFile(path, buf, () => {})
     // 回傳子網址
-    return Promise.resolve(`img/${uniqueId}.${type}`)
+    return Promise.resolve(`api/img/${uniqueId}.${type}`)
 }
 // 將token解密
 function decodeToken(token) {
@@ -268,7 +268,7 @@ app.put('/api/chat/notify/', async (req, res) => {
     res.json( {success : true} )
 })
 // 顯示圖片
-app.get('/img/:name', async (req, res) => {
+app.get('/api/img/:name', async (req, res) => {
     const Picture = `${__dirname}/img/${req.params.name}`
     const NotFound = `${__dirname}/img/NotFound.jpeg`
     fs.readFile(Picture, (err) => {
