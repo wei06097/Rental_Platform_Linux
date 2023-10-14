@@ -35,10 +35,8 @@ app.ws('/api/', (socket, req) => {
     online[account].push(socketId)
     /* 訊息事件 */
     socket.addEventListener("message", event => {
-        const message = JSON.parse(event.data)
-        if (message.event === "chat") {
-            chatEventHandler(account, nickname, message.payload)
-        }
+        const payload = JSON.parse(event.data)
+        chatEventHandler(account, nickname, payload)
     })
     /* 斷線事件 */
     socket.addEventListener("close", () => {
@@ -186,9 +184,9 @@ app.get('/api/chat/overview/', async (req, res) => {
     const lastMessage = {}
     history
         .forEach(element => {
-            const {provider, receiver, type, content, datetime, id} = element
+            const {provider, receiver, message_type, content, datetime, id} = element
             const user = (provider === account)? receiver: provider
-            const string = (type === "img")? "傳送了一張圖片": content
+            const string = (message_type === "img")? "傳送了一張圖片": content
             lastMessage[user] =  {account: user, content: string, datetime, id}
         })
     for (let i=0; i<Object.keys(lastMessage).length; i++) {

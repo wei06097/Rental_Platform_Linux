@@ -81,7 +81,7 @@ export default function ChatRoom() {
         const content = textareaRef.current.innerText
         textareaRef.current.innerText = ""
         if (content.replaceAll('\n', '') === "") return
-        const payload = { event: "chat", payload: {receiver, message_type, content} }
+        const payload = {receiver, message_type, content}
         if (socket) socket.send(JSON.stringify(payload))
     }
     function onKeyDown(e) {
@@ -101,7 +101,7 @@ export default function ChatRoom() {
             reader.readAsDataURL(fileData)
             reader.addEventListener("load", () => {
                 const content = reader.result //base64Pic
-                const payload = { event: "chat", payload: {receiver, message_type, content} }
+                const payload = {receiver, message_type, content}
                 if (socket) socket.send(JSON.stringify(payload))
             }, false)
         }
