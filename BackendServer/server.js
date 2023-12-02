@@ -166,7 +166,7 @@ app.get('/api/userfile/verify_token/', async (req, res) => {
 
 /* ======================================== */
 // 回傳有聊天過的對象以及最後的對話內容 (照時間排，最新的在前面)
-app.get('/api/chat/overview/', async (req, res) => {
+app.get('/api/userfile/overview/', async (req, res) => {
     // 驗證身分
     const token = req.headers?.authorization || undefined
     const {account} = decodeToken(token)
@@ -209,7 +209,7 @@ app.get('/api/chat/overview/', async (req, res) => {
     res.json({success : true, list : newArray})
 })
 // 回傳聊天歷史紀錄 receiver為對方的帳號
-app.get('/api/chat/history/', async (req, res) => {
+app.get('/api/userfile/history/', async (req, res) => {
     const receiver = req.query?.receiver || undefined
     // 驗證身分
     const token = req.headers?.authorization || undefined
@@ -237,7 +237,7 @@ app.get('/api/chat/history/', async (req, res) => {
     res.json( {success : true, history : result2, nickname : nickname} )
 })
 // 回傳全部未讀訊息數量
-app.get('/api/chat/notify/', async (req, res) => {
+app.get('/api/userfile/notify/', async (req, res) => {
     const token = req.headers?.authorization || undefined
     // 驗證身分
     const {account} = decodeToken(token)
@@ -246,7 +246,7 @@ app.get('/api/chat/notify/', async (req, res) => {
     res.json( {success : true, number : result.length} )
 })
 // 標示對某人訊息已讀 receiver為對方的帳號
-app.put('/api/chat/notify/', async (req, res) => {
+app.put('/api/userfile/notify/', async (req, res) => {
     const {receiver} = req.query
     const token = req.headers?.authorization || undefined
     // 驗證身分

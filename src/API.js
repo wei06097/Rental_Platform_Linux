@@ -18,9 +18,8 @@ const HOMEPAGE = `${WS_URL}/api/commodity/get_launched_commodity/`
 const RESULT = `${WS_URL}/api/commodity/get_searched_commodity/`
 const PRODUCT = `${WS_URL}/api/commodity/get_commodity/`
 /* 聊天 */
-const CHAT_LIST = `${WS_URL}/api/chat/list/`
-const CHAT_HISTORY = `${WS_URL}/api/chat/history/`
-const CHAT_OVERVIEW = `${WS_URL}/api/chat/overview/`
+const CHAT_HISTORY = `${WS_URL}/api/userfile/history/`
+const CHAT_OVERVIEW = `${WS_URL}/api/userfile/overview/`
 /* 購物車 */
 const CRUD_CART = `${WS_URL}/api/cart/cart_CRUD/`
 const MY_CART = `${WS_URL}/api/cart/my_cart/`
@@ -30,7 +29,7 @@ const ORDER = `${WS_URL}/api/order/order_CRUD/`
 const OVERVIEW_ORDERS = `${WS_URL}/api/order/overview/`
 /* 訂單更新通知 */
 const ORDER_NOTIFY = `${WS_URL}/api/order/notify/`
-const CHAT_NOTIFY = `${WS_URL}/api/chat/notify/`
+const CHAT_NOTIFY = `${WS_URL}/api/userfile/notify/`
 
 /* ============================================================ */
 async function get(url, token) {
@@ -94,7 +93,7 @@ const API = {
     PROFILE, PASSWORD_CHANGE,
     STORE, MY_PRODUCTS, CRUD_PRODUCT, LAUNCH_PRODUCT,
     HOMEPAGE, RESULT, PRODUCT,
-    CHAT_LIST, CHAT_HISTORY, CHAT_OVERVIEW,
+    CHAT_HISTORY, CHAT_OVERVIEW,
     CRUD_CART, MY_CART, MY_STORECART,
     ORDER, OVERVIEW_ORDERS,
     ORDER_NOTIFY, CHAT_NOTIFY

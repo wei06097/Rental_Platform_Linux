@@ -16,7 +16,7 @@ export default function Bell() {
         init()
         async function init() {
             const {consumer_orderlist, provider_orderlist} = await API.get(API.ORDER_NOTIFY, token)
-            const number = consumer_orderlist.concat(provider_orderlist)
+            const number = (consumer_orderlist || []).concat(provider_orderlist || [])
                 .filter(element => !element.read).length
             setNumber(number)
         }

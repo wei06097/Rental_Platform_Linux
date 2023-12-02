@@ -41,10 +41,10 @@ export default function SocketProvider({ children }) {
     /* 訂單或是訊息事件監聽 */
     useEffect(() => {
         if (!socket) return
-        function messageNotify({ provider, receiver, type, content, nickname }) {
-            if (provider === account || receiver !== account) return
+        function messageNotify({ provider, receiver, message_type, content, nickname }) {
+            if (account !== receiver) return
             const notify = new Notification(nickname, {
-                body: (type === "img")? "傳送了一張圖片": content,
+                body: (message_type === "img")? "傳送了一張圖片": content,
                 tag: `message-${provider}`
             })
             notify.onclick = () => {
